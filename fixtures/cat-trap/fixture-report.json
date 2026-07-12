@@ -1,0 +1,48 @@
+{
+  "fixture_id": "cat-trap-aeris-v1",
+  "copied_files": [
+    "fixtures\\cat-trap\\references\\animation-sheet.png",
+    "fixtures\\cat-trap\\references\\turnaround.png",
+    "fixtures\\cat-trap\\references\\rigging-reference.png",
+    "fixtures\\cat-trap\\videos\\dash.mp4"
+  ],
+  "images": [
+    {
+      "path": "fixtures\\cat-trap\\references\\animation-sheet.png",
+      "width": 1448,
+      "height": 1086,
+      "channels": 3,
+      "alpha_min": null,
+      "alpha_max": null,
+      "embedded_checkerboard": false
+    },
+    {
+      "path": "fixtures\\cat-trap\\references\\rigging-reference.png",
+      "width": 1448,
+      "height": 1086,
+      "channels": 4,
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "embedded_checkerboard": true
+    },
+    {
+      "path": "fixtures\\cat-trap\\references\\turnaround.png",
+      "width": 1449,
+      "height": 1086,
+      "channels": 4,
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "embedded_checkerboard": true
+    }
+  ],
+  "videos": [
+    {
+      "path": "fixtures\\cat-trap\\videos\\dash.mp4",
+      "width": 1280,
+      "height": 720,
+      "fps": 24.0,
+      "frame_count": 240,
+      "duration_seconds": 10.0
+    }
+  ]
+}

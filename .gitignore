@@ -1,0 +1,45 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Rust / Cargo
+src-tauri/target/
+src-tauri/gen/schemas
+
+# Python worker build artifacts
+worker/.venv/
+worker/build/
+worker/__pycache__/
+worker/**/__pycache__/
+worker/.pytest_cache/
+*.pyc
+src-tauri/binaries/*.exe
+# Development secret files
+.env*
+!.env.example
+
+# Generated fixture artifacts
+fixtures/cat-trap/dash/frames/
+fixtures/cat-trap/ui-extract/
+fixtures/cat-trap/incoming/

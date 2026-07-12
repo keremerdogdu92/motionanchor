@@ -1,12 +1,12 @@
 # MotionAnchor
 ## Development Roadmap
 
-**Roadmap version:** 1.1  
-**Status:** Approved roadmap updated for open-source evaluation and OpenCode implementation  
-**Date:** 2026-07-11  
-**Product:** MotionAnchor — Consistent Characters. Production-Ready Motion.  
-**Planning model:** Solo developer with AI-assisted implementation  
-**Sprint assumption:** 2-week sprints  
+**Roadmap version:** 1.1
+**Status:** Approved roadmap updated for open-source evaluation and OpenCode implementation
+**Date:** 2026-07-11
+**Product:** MotionAnchor ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Consistent Characters. Production-Ready Motion.
+**Planning model:** Solo developer with AI-assisted implementation
+**Sprint assumption:** 2-week sprints
 **Estimate status:** Planning range, not a delivery guarantee
 
 ---
@@ -19,17 +19,17 @@ The critical path is:
 
 ```text
 Secure Desktop Foundation
-    ↓
-Deterministic Video → Frame → Sheet Pipeline
-    ↓
+    ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬Å“
+Deterministic Video ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Frame ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Sheet Pipeline
+    ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬Å“
 Motion Segmentation and Review
-    ↓
+    ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬Å“
 AI Provider/Consistency Layer
-    ↓
+    ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬Å“
 Unity Production Export
-    ↓
+    ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬Å“
 Private Beta Hardening
-    ↓
+    ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬Å“
 Commercial v1.0
 ```
 
@@ -61,20 +61,30 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ---
 
-## 3. Phase 0 — Discovery and Technical Spikes
+## 3. Phase 0 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Discovery and Technical Spikes
 
-**Duration:** 1 sprint  
+**Duration:** 1 sprint
 **Outcome:** Remove high-risk unknowns before core implementation.
 
 ### Work Items
 
-- Confirm Tauri 2 + React starter structure.
-- Build minimal Rust ↔ Python sidecar message exchange.
-- Verify packaged Python sidecar startup on Windows.
-- Test Windows Credential Manager create/read/delete using a Rust abstraction.
-- Test `.env` development-only fallback behavior.
-- Probe video with FFmpeg/PyAV and extract exact timestamps.
-- Test one local background-removal approach on hair, cape, sword, staff, and glow.
+- Confirm Tauri 2 + React starter structure. ~~Spike 0.1 verified: minimal Tauri 2 + React + TypeScript shell with one Rust command, `core:default` capability, `npm run typecheck`, `npm run build`, `cargo check`, `cargo test`, and `npm run tauri:dev` all passing.~~
+- ~~Build minimal Rust ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬Â Python sidecar message exchange. Spike 0.2a verified with protocol 1.0 NDJSON, startup handshake, ping/pong ID preservation, 1 MiB bound, structured errors, timeout/process-exit handling, stderr diagnostics, graceful shutdown, 34 Python tests, and 2 Rust tests.~~
+- ~~Verify packaged Python sidecar startup on Windows. Spike 0.2b verified with a PyInstaller-built Windows executable, Tauri `externalBin`, packaged protocol test, and successful MSI/NSIS release bundles.~~
+- ~~Test Windows Credential Manager create/read/delete using a Rust abstraction. Verified with the `CredentialStore` contract, native Windows generic credentials, bounded/redacted handling, cleanup verification, ADR-012, and passing Rust integration tests.~~
+- ~~Test `.env` development-only fallback behavior. Verified with explicit debug-only opt-in, namespaced keys, release-build rejection, `.gitignore` coverage, and ADR-013.~~
+- ~~Probe video with FFmpeg and extract exact timestamps. Verified with the external LGPL FFmpeg 8.1 adapter, typed probe metadata, ffprobe frame timestamps, lossless PNG extraction, non-overwrite protection, ADR-014, and integration fixtures. PyAV remains unselected.~~
+- ~~Expose FFmpeg probe and frame extraction through the worker protocol. Verified with `media.probe` / `media.extract_frames`, ID preservation, structured errors, adapter injection tests, and ADR-017. Job progress/cancellation remains separate.~~
+- ~~Connect Rust host to worker frame extraction. Verified with typed `FrameExtractionReport`, source/output path checks, real 240-frame Cat Trap dash extraction, non-empty output rejection, Tauri `extract_frames`, and ADR-019.~~
+- ~~Connect the Rust host to `media.probe`. Verified with canonical path validation, typed `MediaProbeReport`, supervised lifecycle, Tauri command registration, the real Cat Trap dash fixture, missing-path rejection, and ADR-018.~~
+- ~~Build the first interactive media workflow UI. Verified with typed probe rendering, background extraction submission, 350 ms status polling, progress and terminal-state display, cancellation, result/error presentation, production build, Tauri dev launch, and ADR-023. Native pickers and UI automation remain separate.~~
+- ~~Add bounded representative-frame previews after extraction. Verified with manifest parsing, even sampling, canonical child-path checks, a 12 MiB response cap, real 240-frame Cat Trap coverage, React gallery rendering, and ADR-025.~~
+- ~~Add native media and output path selection to the Phase 0 workflow UI. Verified with the official Tauri dialog plugin, `dialog:default` capability only, single-video filtering, directory selection, retained Rust path validation, and ADR-024.~~
+- ~~Establish the worker-owned background job foundation. Verified with thread-safe queued/running/completed/failed/cancelled states, bounded progress, cooperative cancellation, structured failures, terminal-state protection, and ADR-020. NDJSON wiring and active FFmpeg process termination remain separate.~~
+- ~~Connect Rust/Tauri to persistent worker jobs. Verified with lazy managed sidecar state, typed submit/status/cancel reports, real Cat Trap completion and cancellation tests, partial-artifact cleanup, and ADR-022.~~
+- ~~Wire cancellable frame extraction into the worker job protocol. Verified with submit/status/cancel NDJSON messages, Popen supervision, bounded progress polling, terminate/kill escalation, partial artifact cleanup, structured job lookup errors, and ADR-021.~~
+- Establish deterministic OpenCV fixture and mask-adapter baseline. ~~Verified with pinned OpenCV/NumPy, `MaskEngine`, existing-alpha and chroma-key implementations, reproducible hashes, edge-contact metadata, synthetic thin-feature fixtures, and ADR-015. Real Cat Trap quality evaluation remains open.~~
+- Test one local background-removal approach on real Cat Trap hair, cape, sword, staff, and glow. Shared benchmark harness is ready with IoU, precision, recall, boundary F1, fixture provenance, and ADR-016; real assets and approved masks remain required.
 - Create a Unity 2022.3 editor script that reads a small manifest and creates a sliced texture/Animation Clip.
 - Complete code, model-weight, checkpoint, binary, and transitive-dependency license inventory.
 - Build the Open Source & Model Evaluation Matrix.
@@ -109,12 +119,12 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ---
 
-## 4. Phase 1 — Desktop Foundation
+## 4. Phase 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Desktop Foundation
 
-**Duration:** 2 sprints  
+**Duration:** 2 sprints
 **Target:** Internal version `0.1.0`
 
-### Sprint 1 — Application Shell and Project Model
+### Sprint 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Application Shell and Project Model
 
 - Tauri 2 + React + TypeScript setup.
 - Strict folder/module conventions.
@@ -126,7 +136,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - Host/sidecar protocol versioning.
 - Background job skeleton with progress/cancel.
 
-### Sprint 2 — Provider Settings and Secrets
+### Sprint 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Provider Settings and Secrets
 
 - `CredentialStore` interface.
 - Windows Credential Manager backend.
@@ -155,12 +165,12 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ---
 
-## 5. Phase 2 — Deterministic Media Pipeline
+## 5. Phase 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Deterministic Media Pipeline
 
-**Duration:** 2 sprints  
+**Duration:** 2 sprints
 **Target:** Internal version `0.2.0`
 
-### Sprint 3 — Import and Frame Extraction
+### Sprint 3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Import and Frame Extraction
 
 - Media import wizard.
 - Codec/FPS/resolution/variable-FPS inspection through the FFmpeg adapter.
@@ -170,7 +180,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - Thumbnail generation and virtualized frame browser.
 - Duplicate/corrupt frame checks.
 
-### Sprint 4 — Background, Crop, Alignment, Sheet
+### Sprint 4 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Background, Crop, Alignment, Sheet
 
 - Existing-alpha validation.
 - OpenCV chroma-key mode.
@@ -195,12 +205,12 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ---
 
-## 6. Phase 3 — Motion Segmentation and Keyframe Review
+## 6. Phase 3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Motion Segmentation and Keyframe Review
 
-**Duration:** 2 sprints  
+**Duration:** 2 sprints
 **Target:** Internal version `0.3.0`
 
-### Sprint 5 — Motion Signals and Segmentation
+### Sprint 5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Motion Signals and Segmentation
 
 - Foreground centroid and silhouette metrics.
 - Optical-flow motion-energy timeline.
@@ -215,7 +225,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - Segment split/merge/rename/lock.
 - Signal visualizations.
 
-### Sprint 6 — Candidate Generation and Manual Review
+### Sprint 6 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Candidate Generation and Manual Review
 
 - Candidate generation per segment.
 - Entry/exit/extrema/inflection/low-blur candidate rules.
@@ -235,12 +245,12 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ---
 
-## 7. Phase 4 — Multi-Provider AI and Consistency Engine
+## 7. Phase 4 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Multi-Provider AI and Consistency Engine
 
-**Duration:** 3 sprints  
+**Duration:** 3 sprints
 **Target:** MVP/Alpha `0.5.0`
 
-### Sprint 7 — Provider Adapter and Routing Core
+### Sprint 7 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Provider Adapter and Routing Core
 
 - MotionAnchor-owned common provider interface.
 - Benchmark direct SDK adapters, aisuite, and LiteLLM without allowing any upstream library to define domain schemas.
@@ -252,7 +262,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - Provider/model routing policy.
 - Selected-frame upload packaging.
 
-### Sprint 8 — Provider Research and Benchmark Harness
+### Sprint 8 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Provider Research and Benchmark Harness
 
 - Research matrix using official provider documentation.
 - Use `freellm.net` as discovery input, not source of truth.
@@ -262,7 +272,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - Build quota screen with provenance labels.
 - Add dashboard links where quota APIs do not exist.
 
-### Sprint 9 — Consistency and Drift MVP
+### Sprint 9 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Consistency and Drift MVP
 
 - Character-reference comparison workflow.
 - DINOv2 standard-model embedding spike; exclude specialized non-commercial/research-only variants.
@@ -286,12 +296,12 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ---
 
-## 8. Phase 5 — Unity Production Export
+## 8. Phase 5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Unity Production Export
 
-**Duration:** 2 sprints  
+**Duration:** 2 sprints
 **Target:** Private Alpha `0.7.0`
 
-### Sprint 10 — Engine-Neutral Export Contract
+### Sprint 10 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Engine-Neutral Export Contract
 
 - Finalize animation manifest schema.
 - Export adapter interface.
@@ -300,7 +310,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - PPU/pivot/FPS/loop profiles.
 - Export validation and dry-run report.
 
-### Sprint 11 — Unity 2022.3 Companion Package
+### Sprint 11 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Unity 2022.3 Companion Package
 
 - Unity package structure and installation guide.
 - Manifest importer window.
@@ -320,12 +330,12 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ---
 
-## 9. Phase 6 — Cat Trap Production Validation
+## 9. Phase 6 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Cat Trap Production Validation
 
-**Duration:** 2 sprints  
+**Duration:** 2 sprints
 **Target:** Private Beta `0.9.0`
 
-### Sprint 12 — Real Animation Set
+### Sprint 12 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Real Animation Set
 
 Process and validate at least:
 
@@ -344,7 +354,7 @@ For each animation:
 - tune provider routing,
 - confirm Unity import.
 
-### Sprint 13 — Workflow and Quality Hardening
+### Sprint 13 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Workflow and Quality Hardening
 
 - Batch job queue.
 - Cached analysis reuse.
@@ -364,9 +374,9 @@ For each animation:
 
 ---
 
-## 10. Phase 7 — Commercial v1.0
+## 10. Phase 7 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Commercial v1.0
 
-**Duration:** 3–4 sprints  
+**Duration:** 3ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“4 sprints
 **Target:** Stable `1.0.0`
 
 ### Scope
@@ -414,7 +424,7 @@ For each animation:
 
 ## 11. v1.x Roadmap
 
-### v1.1 — Productivity
+### v1.1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Productivity
 
 - reusable animation presets,
 - project templates,
@@ -424,14 +434,14 @@ For each animation:
 - local model option,
 - provider benchmark auto-refresh.
 
-### v1.2 — Additional 2D Integrations
+### v1.2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Additional 2D Integrations
 
 - Godot exporter,
 - Unreal Paper2D exporter,
 - Spine/Live2D preparation manifests,
 - engine adapter SDK documentation.
 
-### v1.3 — Collaboration Foundations
+### v1.3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Collaboration Foundations
 
 - review comments,
 - export approval records,
@@ -440,7 +450,7 @@ For each animation:
 
 ---
 
-## 12. v2.0 Roadmap — 3D and Advanced Motion
+## 12. v2.0 Roadmap ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 3D and Advanced Motion
 
 ### Candidate Scope
 
@@ -605,10 +615,10 @@ Do not trade away the first seven items to add breadth.
 
 1. Create the MotionAnchor repository and copy this documentation pack into `docs/`.
 2. Add the supplied root `AGENTS.md` and OpenCode project commands.
-3. Use OpenCode’s plan agent to produce a Phase 0 execution plan; do not implement later phases.
+3. Use OpenCodeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€Â¢s plan agent to produce a Phase 0 execution plan; do not implement later phases.
 4. Record ADR-001 through ADR-011 as repository ADR files.
 5. Create the component registry/evaluation matrix before adding CV/ML dependencies.
-6. Execute credential-store, Tauri↔Python sidecar, FFmpeg extraction, mask-engine, and Unity-manifest spikes.
+6. Execute credential-store, TauriÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬ÂPython sidecar, FFmpeg extraction, mask-engine, and Unity-manifest spikes.
 7. Select exact Rust/Python/npm dependencies only after source, license, model-weight, and Windows packaging review.
 8. Define protocol, component-lock, job, and export-manifest JSON schemas.
 9. Build the first end-to-end fixture using the current Cat Trap idle video and character references.
@@ -628,6 +638,6 @@ Do not trade away the first seven items to add breadth.
 | MVP/Alpha with AI consistency | 20 weeks |
 | Unity private alpha | 24 weeks |
 | Cat Trap private beta | 28 weeks |
-| Commercial v1.0 | 34–36 weeks |
+| Commercial v1.0 | 34ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“36 weeks |
 
 These ranges assume solo implementation and production-grade testing. They can shorten with reduced scope or parallel development, but the acceptance gates should remain unchanged.

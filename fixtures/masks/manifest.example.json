@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "fixtures": [
+    {
+      "id": "cat-trap-idle-0001",
+      "source": "cat-trap-idle-0001.png",
+      "ground_truth_mask": "cat-trap-idle-0001.mask.png",
+      "features": ["hair", "cape", "sword", "staff", "glow"],
+      "provenance": "MotionAnchor project-owned fixture",
+      "approved_by": "manual-review-required"
+    }
+  ]
+}

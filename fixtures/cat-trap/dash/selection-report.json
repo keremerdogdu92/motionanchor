@@ -1,0 +1,81 @@
+{
+  "fixture_id": "cat-trap-aeris-dash-v1",
+  "video": "fixtures\\cat-trap\\videos\\dash.mp4",
+  "frame_count": 240,
+  "selected_count": 8,
+  "selection_policy": "8 temporal buckets; maximize motion energy plus normalized sharpness",
+  "selected_frames": [
+    {
+      "order": 0,
+      "frame_index": 20,
+      "timestamp_seconds": 0.833333,
+      "source_filename": "frame_000020.png",
+      "selected_filename": "dash_00_frame_000020.png",
+      "sharpness": 310.30011367551896,
+      "motion_from_previous": 2.0162065972222223
+    },
+    {
+      "order": 1,
+      "frame_index": 59,
+      "timestamp_seconds": 2.458333,
+      "source_filename": "frame_000059.png",
+      "selected_filename": "dash_01_frame_000059.png",
+      "sharpness": 264.09096231154336,
+      "motion_from_previous": 2.4939659288194442
+    },
+    {
+      "order": 2,
+      "frame_index": 74,
+      "timestamp_seconds": 3.083333,
+      "source_filename": "frame_000074.png",
+      "selected_filename": "dash_02_frame_000074.png",
+      "sharpness": 243.7045300719638,
+      "motion_from_previous": 6.454333767361111
+    },
+    {
+      "order": 3,
+      "frame_index": 110,
+      "timestamp_seconds": 4.583333,
+      "source_filename": "frame_000110.png",
+      "selected_filename": "dash_03_frame_000110.png",
+      "sharpness": 182.3577028913133,
+      "motion_from_previous": 16.415897352430555
+    },
+    {
+      "order": 4,
+      "frame_index": 143,
+      "timestamp_seconds": 5.958333,
+      "source_filename": "frame_000143.png",
+      "selected_filename": "dash_04_frame_000143.png",
+      "sharpness": 153.7735708962888,
+      "motion_from_previous": 22.135057508680557
+    },
+    {
+      "order": 5,
+      "frame_index": 150,
+      "timestamp_seconds": 6.25,
+      "source_filename": "frame_000150.png",
+      "selected_filename": "dash_05_frame_000150.png",
+      "sharpness": 128.98542317063604,
+      "motion_from_previous": 21.260706380208333
+    },
+    {
+      "order": 6,
+      "frame_index": 180,
+      "timestamp_seconds": 7.5,
+      "source_filename": "frame_000180.png",
+      "selected_filename": "dash_06_frame_000180.png",
+      "sharpness": 256.61098522880934,
+      "motion_from_previous": 5.934200303819445
+    },
+    {
+      "order": 7,
+      "frame_index": 211,
+      "timestamp_seconds": 8.791667,
+      "source_filename": "frame_000211.png",
+      "selected_filename": "dash_07_frame_000211.png",
+      "sharpness": 305.1317350250515,
+      "motion_from_previous": 1.6031217447916666
+    }
+  ]
+}
