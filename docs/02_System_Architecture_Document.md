@@ -893,6 +893,8 @@ ExportAdapter
 
 ### 12.3 Unity Companion Package
 
+The Unity importer is installed once at `Assets/MotionAnchor/Editor/MotionAnchorTexturePostprocessor.cs`. Individual animation exports must not contain duplicate Editor class definitions. An existing shared importer may be reused only when its contents match the expected MotionAnchor importer exactly; automatic replacement of a differing importer is prohibited.
+
 A versioned Unity Editor package imports the manifest and uses Unity editor APIs to:
 
 - configure `TextureImporter` as Sprite/Multiple,

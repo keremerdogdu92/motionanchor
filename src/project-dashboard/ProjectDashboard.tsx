@@ -207,6 +207,33 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
     }
   }
 
+  useEffect(() => {
+    if (!unityExportResult || !activeProject || !exportAssetName.trim() || unityImportStatus) return;
+    let cancelled = false;
+    let attempts = 0;
+    const poll = async () => {
+      attempts += 1;
+      try {
+        const status = await invoke<UnityImportStatus | null>("read_unity_import_status", {
+          workspacePath: activeProject.workspacePath,
+          assetName: exportAssetName,
+        });
+        if (!cancelled) {
+          setUnityImportStatus(status);
+          setUnityImportChecked(true);
+        }
+      } catch {
+        if (!cancelled) setUnityImportChecked(true);
+      }
+    };
+    void poll();
+    const timer = window.setInterval(() => {
+      if (attempts >= 30) { window.clearInterval(timer); return; }
+      void poll();
+    }, 2000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [unityExportResult?.destinationPath, activeProject?.id, exportAssetName, unityImportStatus?.state]);
+
   async function checkUnityImportStatus() {
     if (!activeProject || !exportAssetName.trim()) return;
     setSubmitting(true);

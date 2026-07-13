@@ -315,7 +315,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ### Sprint 11 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Unity 2022.3 Companion Package
 
-- Unity package structure and installation guide.
+- Unity package structure and installation guide, with one shared importer under `Assets/MotionAnchor/Editor` and no duplicate Editor class per animation export.
 - Manifest importer window.
 - Texture import setup.
 - Sprite rectangle/pivot creation.

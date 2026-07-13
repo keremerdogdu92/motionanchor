@@ -280,9 +280,7 @@ pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profi
     let staging = parent.join(format!(".motionanchor-staging-{}", Uuid::new_v4()));
     let result = (|| {
         let frames_dir = staging.join("Frames");
-        let editor_dir = staging.join("Editor");
         fs::create_dir_all(&frames_dir).map_err(|error| format!("could not create staging frames directory: {error}"))?;
-        fs::create_dir_all(&editor_dir).map_err(|error| format!("could not create staging editor directory: {error}"))?;
         let mut exported_frames = Vec::with_capacity(plan.frames.len());
         let digits = usize::max(4, plan.frame_count.to_string().len());
         for (index, source) in plan.frames.iter().enumerate() {
@@ -307,13 +305,22 @@ pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profi
         let manifest_path = staging.join("motionanchor-export.json");
         fs::write(&manifest_path, serde_json::to_vec_pretty(&manifest).map_err(|error| format!("could not encode Unity export manifest: {error}"))?)
             .map_err(|error| format!("could not write Unity export manifest: {error}"))?;
-        let editor_script_path = editor_dir.join("MotionAnchorTexturePostprocessor.cs");
-        fs::write(&editor_script_path, EDITOR_SCRIPT).map_err(|error| format!("could not write Unity editor script: {error}"))?;
+        let shared_editor_dir = parent.join("Editor");
+        let editor_script_path = shared_editor_dir.join("MotionAnchorTexturePostprocessor.cs");
+        if editor_script_path.exists() {
+            let existing = fs::read(&editor_script_path).map_err(|error| format!("could not read shared Unity importer: {error}"))?;
+            if existing != EDITOR_SCRIPT.as_bytes() {
+                return Err("A different MotionAnchor Unity importer already exists; automatic replacement is disabled".into());
+            }
+        } else {
+            fs::create_dir_all(&shared_editor_dir).map_err(|error| format!("could not create shared Unity editor directory: {error}"))?;
+            fs::write(&editor_script_path, EDITOR_SCRIPT).map_err(|error| format!("could not install shared Unity importer: {error}"))?;
+        }
         fs::rename(&staging, &destination).map_err(|error| format!("could not publish Unity export atomically: {error}"))?;
         Ok(UnityExportResult {
             destination_path: destination.to_string_lossy().into_owned(),
             manifest_path: destination.join("motionanchor-export.json").to_string_lossy().into_owned(),
-            editor_script_path: destination.join("Editor/MotionAnchorTexturePostprocessor.cs").to_string_lossy().into_owned(),
+            editor_script_path: editor_script_path.to_string_lossy().into_owned(),
             copied_frames: plan.frame_count,
         })
     })();
@@ -419,9 +426,28 @@ mod tests {
         assert_eq!(result.copied_frames, 2);
         assert!(Path::new(&result.manifest_path).is_file());
         assert!(Path::new(&result.editor_script_path).is_file());
+        let editor_path = Path::new(&result.editor_script_path);
+        assert_eq!(editor_path.file_name().and_then(|value| value.to_str()), Some("MotionAnchorTexturePostprocessor.cs"));
+        assert_eq!(editor_path.parent().and_then(Path::file_name).and_then(|value| value.to_str()), Some("Editor"));
+        assert!(!Path::new(&result.destination_path).join("Editor").exists());
         assert!(Path::new(&result.destination_path).join("Frames/Dash_frame_0001.png").is_file());
         let manifest: UnityExportManifest = serde_json::from_slice(&fs::read(&result.manifest_path).unwrap()).unwrap();
         assert_eq!(manifest.asset_name, "Dash");
         assert_eq!(manifest.frames[1], "Frames/Dash_frame_0002.png");
     }
+    #[test]
+    fn exports_share_one_unity_importer_without_overwriting_it() {
+        let directory = tempfile::tempdir().unwrap();
+        fs::create_dir_all(directory.path().join("artifacts/rgba")).unwrap();
+        fs::create_dir(directory.path().join("Assets")).unwrap();
+        fs::write(directory.path().join("artifacts/rgba/frame.png"), png(16, 16)).unwrap();
+        let first = execute_unity_export(directory.path().to_str().unwrap(), "Idle", "unity-2022.3", 12.0, true).unwrap();
+        fs::remove_dir_all(directory.path().join("artifacts/rgba")).unwrap();
+        fs::create_dir_all(directory.path().join("artifacts/rgba")).unwrap();
+        fs::write(directory.path().join("artifacts/rgba/frame.png"), png(16, 16)).unwrap();
+        let second = execute_unity_export(directory.path().to_str().unwrap(), "Dash", "unity-2022.3", 24.0, false).unwrap();
+        assert_eq!(first.editor_script_path, second.editor_script_path);
+        assert!(Path::new(&second.destination_path).join("Frames/Dash_frame_0001.png").is_file());
+    }
+
 }
