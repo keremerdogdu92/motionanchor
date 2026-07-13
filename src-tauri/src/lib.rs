@@ -195,6 +195,8 @@ pub fn run() {
             database::archive_project,
             unity_export::build_unity_export_plan,
             unity_export::execute_unity_export,
+            unity_export::read_unity_import_status,
+            unity_export::reveal_unity_export,
             project_workspace::workspace_readiness,
             project_workspace::engine_compatibility,
             project_workspace::prepare_project_workspace,

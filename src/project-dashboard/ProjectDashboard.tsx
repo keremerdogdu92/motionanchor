@@ -49,6 +49,14 @@ export type UnityExportResult = {
   copiedFrames: number;
 };
 
+export type UnityImportStatus = {
+  state: "completed" | "failed";
+  assetName: string;
+  clipPath: string;
+  importedFrames: number;
+  message: string;
+};
+
 export type UnityExportPlan = {
   supported: boolean;
   assetName: string;
@@ -91,6 +99,8 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   const [engineStatus, setEngineStatus] = useState<EngineCompatibility | null>(null);
   const [unityExportPlan, setUnityExportPlan] = useState<UnityExportPlan | null>(null);
   const [unityExportResult, setUnityExportResult] = useState<UnityExportResult | null>(null);
+  const [unityImportStatus, setUnityImportStatus] = useState<UnityImportStatus | null>(null);
+  const [unityImportChecked, setUnityImportChecked] = useState(false);
   const [unityFrameRate, setUnityFrameRate] = useState(30);
   const [unityLoopAnimation, setUnityLoopAnimation] = useState(true);
 
@@ -117,7 +127,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   useEffect(() => { void loadProjects(); }, []);
 
   async function refreshWorkspaceStatus(project: ProjectRecord | null) {
-    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); setUnityExportPlan(null); setUnityExportResult(null); onWorkspaceStatusChange(null); return; }
+    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); setUnityExportPlan(null); setUnityExportResult(null); setUnityImportStatus(null); setUnityImportChecked(false); onWorkspaceStatusChange(null); return; }
     try {
       const [status, compatibility] = await Promise.all([
         invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath }),
@@ -127,6 +137,8 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       setEngineStatus(compatibility);
       setUnityExportPlan(null);
       setUnityExportResult(null);
+      setUnityImportStatus(null);
+      setUnityImportChecked(false);
       onWorkspaceStatusChange(status);
     } catch (cause) {
       setWorkspaceStatus(null);
@@ -195,6 +207,35 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
     }
   }
 
+  async function checkUnityImportStatus() {
+    if (!activeProject || !exportAssetName.trim()) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      setUnityImportStatus(await invoke<UnityImportStatus | null>("read_unity_import_status", {
+        workspacePath: activeProject.workspacePath,
+        assetName: exportAssetName,
+      }));
+      setUnityImportChecked(true);
+    } catch (cause) {
+      setUnityImportStatus(null);
+      setUnityImportChecked(true);
+      setError(String(cause));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function revealUnityExport() {
+    if (!activeProject || !exportAssetName.trim()) return;
+    setError("");
+    try {
+      await invoke("reveal_unity_export", { workspacePath: activeProject.workspacePath, assetName: exportAssetName });
+    } catch (cause) {
+      setError(String(cause));
+    }
+  }
+
   async function chooseWorkspace() {
     const selected = await open({ multiple: false, directory: true });
     if (typeof selected === "string") {
@@ -255,10 +296,12 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       )}
       {activeProject && engineStatus?.applicable && (
         <div className="unity-export-plan">
-          <div><strong>Unity export</strong><span>Preview RGBA first, name the animation, then plan and publish atomically.</span></div><label>Asset / animation name<input value={exportAssetName} maxLength={80} onChange={(event) => { onExportAssetNameChange(event.target.value); setUnityExportPlan(null); setUnityExportResult(null); }} placeholder="dash" /></label><div className="unity-export-settings"><label>Frame rate<input type="number" min="1" max="240" step="1" value={unityFrameRate} onChange={(event) => { setUnityFrameRate(Number(event.target.value)); setUnityExportPlan(null); setUnityExportResult(null); }} /></label><label className="checkbox-label"><input type="checkbox" checked={unityLoopAnimation} onChange={(event) => { setUnityLoopAnimation(event.target.checked); setUnityExportPlan(null); setUnityExportResult(null); }} />Loop animation</label></div>
+          <div><strong>Unity export</strong><span>Preview RGBA first, name the animation, then plan and publish atomically.</span></div><label>Asset / animation name<input value={exportAssetName} maxLength={80} onChange={(event) => { onExportAssetNameChange(event.target.value); setUnityExportPlan(null); setUnityExportResult(null); setUnityImportStatus(null); setUnityImportChecked(false); }} placeholder="dash" /></label><div className="unity-export-settings"><label>Frame rate<input type="number" min="1" max="240" step="1" value={unityFrameRate} onChange={(event) => { setUnityFrameRate(Number(event.target.value)); setUnityExportPlan(null); setUnityExportResult(null); setUnityImportStatus(null); setUnityImportChecked(false); }} /></label><label className="checkbox-label"><input type="checkbox" checked={unityLoopAnimation} onChange={(event) => { setUnityLoopAnimation(event.target.checked); setUnityExportPlan(null); setUnityExportResult(null); setUnityImportStatus(null); setUnityImportChecked(false); }} />Loop animation</label></div>
           <div className="unity-export-plan__actions"><button type="button" className="secondary" onClick={() => void buildUnityExportPlan()} disabled={submitting || projectActionsDisabled || !engineStatus.compatible || !workspaceStatus?.rgbaHasFiles || !exportAssetName.trim()}>Build export plan</button><button type="button" onClick={() => void executeUnityExport()} disabled={submitting || projectActionsDisabled || !unityExportPlan?.ready}>Export to Unity</button></div>
           {unityExportPlan && <><small>Name: {unityExportPlan.assetName} Â· {unityExportPlan.ready ? "Ready" : "Blocked"}: {unityExportPlan.frameCount} frames{unityExportPlan.width && unityExportPlan.height ? ` Â· ${unityExportPlan.width}Ã—${unityExportPlan.height}` : ""} Â· {unityExportPlan.frameRate} fps Â· {unityExportPlan.loopAnimation ? "loop" : "once"}</small><small title={unityExportPlan.destinationPath}>Target: {unityExportPlan.destinationPath}</small>{unityExportPlan.errors.length > 0 && <small>Issues: {unityExportPlan.errors.join(" Â· ")}</small>}{unityExportPlan.conflicts.length > 0 && <small>Conflicts: {unityExportPlan.conflicts.length}</small>}</>}
-          {unityExportResult && <><small>Exported {unityExportResult.copiedFrames} frames.</small><small title={unityExportResult.manifestPath}>Manifest: {unityExportResult.manifestPath}</small><small title={unityExportResult.editorScriptPath}>Editor script: {unityExportResult.editorScriptPath}</small></>}
+          {unityExportResult && <><small>Exported {unityExportResult.copiedFrames} frames.</small><small title={unityExportResult.manifestPath}>Manifest: {unityExportResult.manifestPath}</small><small title={unityExportResult.editorScriptPath}>Editor script: {unityExportResult.editorScriptPath}</small><div className="unity-import-actions"><button type="button" className="secondary" onClick={() => void checkUnityImportStatus()} disabled={submitting || projectActionsDisabled}>Check Unity import result</button><button type="button" className="secondary" onClick={() => void revealUnityExport()}>Open export folder</button></div></>}
+          {unityImportChecked && !unityImportStatus && <small>Unity import status: waiting for the Unity Editor to process this export.</small>}
+          {unityImportStatus && <div className={`unity-import-status unity-import-status--${unityImportStatus.state}`}><strong>{unityImportStatus.state === "completed" ? "Unity import completed" : "Unity import failed"}</strong><span>{unityImportStatus.message}</span>{unityImportStatus.state === "completed" && <small>{unityImportStatus.importedFrames} frames · {unityImportStatus.clipPath}</small>}</div>}
         </div>
       )}
       {activeProject && workspaceStatus && (

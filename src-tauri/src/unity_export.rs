@@ -18,6 +18,17 @@ pub struct UnityExportResult {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct UnityImportStatus {
+    #[serde(rename = "status")]
+    pub state: String,
+    pub asset_name: String,
+    pub clip_path: String,
+    pub imported_frames: usize,
+    pub message: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UnityExportManifest {
     pub schema_version: u32,
     pub asset_name: String,
@@ -310,6 +321,33 @@ pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profi
     result
 }
 
+
+#[tauri::command]
+pub fn read_unity_import_status(workspace_path: &str, asset_name: &str) -> Result<Option<UnityImportStatus>, String> {
+    let workspace = Path::new(workspace_path).canonicalize().map_err(|error| format!("invalid project workspace path: {error}"))?;
+    let asset_name = sanitize_segment(asset_name)?;
+    let status_path = workspace.join("Assets/MotionAnchor").join(&asset_name).join("motionanchor-import-status.json");
+    if !status_path.exists() { return Ok(None); }
+    if !status_path.is_file() { return Err("Unity import status path is not a file".into()); }
+    let status: UnityImportStatus = serde_json::from_slice(&fs::read(&status_path).map_err(|error| format!("could not read Unity import status: {error}"))?)
+        .map_err(|error| format!("invalid Unity import status JSON: {error}"))?;
+    if !matches!(status.state.as_str(), "completed" | "failed") { return Err("Unity import status has an unsupported state".into()); }
+    if status.asset_name != asset_name && status.state == "completed" { return Err("Unity import status asset name does not match the requested asset".into()); }
+    Ok(Some(status))
+}
+
+#[tauri::command]
+pub fn reveal_unity_export(workspace_path: &str, asset_name: &str) -> Result<(), String> {
+    let workspace = Path::new(workspace_path).canonicalize().map_err(|error| format!("invalid project workspace path: {error}"))?;
+    let asset_name = sanitize_segment(asset_name)?;
+    let destination = workspace.join("Assets/MotionAnchor").join(asset_name);
+    let canonical = destination.canonicalize().map_err(|error| format!("Unity export directory is unavailable: {error}"))?;
+    if !canonical.is_dir() { return Err("Unity export destination must be a directory".into()); }
+    std::process::Command::new("explorer.exe").arg(&canonical).spawn()
+        .map_err(|error| format!("could not open Unity export directory: {error}"))?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -356,6 +394,18 @@ mod tests {
         assert!(EDITOR_SCRIPT.contains("replacement is not automatic"));
         assert!(EDITOR_SCRIPT.contains("motionanchor-import-status.json"));
         assert!(EDITOR_SCRIPT.contains("loopTime = manifest.loopAnimation"));
+    }
+
+
+    #[test]
+    fn reads_completed_unity_import_status_for_requested_asset() {
+        let directory = tempfile::tempdir().unwrap();
+        let target = directory.path().join("Assets/MotionAnchor/Dash");
+        fs::create_dir_all(&target).unwrap();
+        fs::write(target.join("motionanchor-import-status.json"), br#"{"status":"completed","assetName":"Dash","clipPath":"Assets/MotionAnchor/Dash/Dash.anim","importedFrames":12,"message":"ok"}"#).unwrap();
+        let status = read_unity_import_status(directory.path().to_str().unwrap(), "Dash").unwrap().unwrap();
+        assert_eq!(status.state, "completed");
+        assert_eq!(status.imported_frames, 12);
     }
 
     #[test]
