@@ -1,0 +1,10 @@
+﻿/* src/sam2-settings/Sam2Presets.css
+ * Mobile-first SAM 2 preset cards for repeatable production settings.
+ */
+.sam2-presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sam2-presets button { display: grid; gap: 4px; min-width: 0; padding: 10px; text-align: left; }
+.sam2-presets strong { font-size: 0.82rem; }
+.sam2-presets span { color: #aab0c7; font-size: 0.68rem; line-height: 1.35; }
+.sam2-preset-active { background: #6674ff; }
+.sam2-preset-active span { color: #eef0ff; }
+@media (max-width: 620px) { .sam2-presets { grid-template-columns: 1fr; } }

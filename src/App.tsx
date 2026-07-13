@@ -7,6 +7,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { PromptEditor } from "./prompt-editor/PromptEditor";
 import { RgbaPreviewGallery } from "./rgba-preview/RgbaPreviewGallery";
 import { JobHistory, type JobHistoryEntry, type JobRequest } from "./job-history/JobHistory";
+import { Sam2Presets, type Sam2Settings } from "./sam2-settings/Sam2Presets";
 import "./App.css";
 
 type MediaProbe = {
@@ -59,6 +60,20 @@ const DEFAULT_SEGMENTATION_OUTPUT = `${ROOT}\\ui-sam2-output`;
 const DEFAULT_PROMPTS = `${ROOT}\\dash\\sam2-prompts.json`;
 const JOB_HISTORY_KEY = "motionanchor.job-history.v1";
 const JOB_HISTORY_LIMIT = 20;
+const SAM2_SETTINGS_KEY = "motionanchor.sam2-settings.v1";
+
+function loadSam2Settings(): Sam2Settings {
+  try {
+    const raw = window.localStorage.getItem(SAM2_SETTINGS_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed && typeof parsed.featherRadius === "number" && typeof parsed.defringe === "boolean") {
+      return { featherRadius: Math.min(8, Math.max(0, parsed.featherRadius)), defringe: parsed.defringe };
+    }
+  } catch {
+    // Invalid local preferences fall back to production defaults.
+  }
+  return { featherRadius: 1.5, defringe: true };
+}
 
 function retryOutputPath(path: string) {
   return `${path}-retry-${new Date().toISOString().replace(/[:.]/g, "-")}`;
@@ -93,8 +108,9 @@ function App() {
   const [framesPath, setFramesPath] = useState(DEFAULT_FRAMES);
   const [segmentationOutput, setSegmentationOutput] = useState(DEFAULT_SEGMENTATION_OUTPUT);
   const [promptPath, setPromptPath] = useState(DEFAULT_PROMPTS);
-  const [featherRadius, setFeatherRadius] = useState(1.5);
-  const [defringe, setDefringe] = useState(true);
+  const [initialSam2Settings] = useState(loadSam2Settings);
+  const [featherRadius, setFeatherRadius] = useState(initialSam2Settings.featherRadius);
+  const [defringe, setDefringe] = useState(initialSam2Settings.defringe);
   const [probe, setProbe] = useState<MediaProbe | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
   const [activeRequest, setActiveRequest] = useState<JobRequest | null>(null);
@@ -113,6 +129,11 @@ function App() {
   useEffect(() => {
     window.localStorage.setItem(JOB_HISTORY_KEY, JSON.stringify(jobHistory.slice(0, JOB_HISTORY_LIMIT)));
   }, [jobHistory]);
+
+  useEffect(() => {
+    window.localStorage.setItem(SAM2_SETTINGS_KEY, JSON.stringify({ featherRadius, defringe }));
+  }, [featherRadius, defringe]);
+
 
   useEffect(() => {
     if (!job || !activeRequest || job.operation !== activeRequest.operation) return;
@@ -402,6 +423,10 @@ function App() {
                 <button type="button" className="browse" onClick={() => chooseDirectory(setSegmentationOutput)}>Browse</button>
               </span>
             </label>
+            <Sam2Presets
+              settings={{ featherRadius, defringe }}
+              onChange={(settings) => { setFeatherRadius(settings.featherRadius); setDefringe(settings.defringe); }}
+            />
             <div className="setting-row">
               <label>
                 Feather radius
