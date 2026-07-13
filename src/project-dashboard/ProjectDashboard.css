@@ -39,3 +39,5 @@
 .unity-export-plan span, .unity-export-plan small { color:#c4b5fd; }
 .unity-export-plan small { grid-column:1 / -1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 @media (max-width:600px) { .unity-export-plan { grid-template-columns:1fr; } .unity-export-plan button { width:100%; } }
+
+.unity-export-plan__actions { display:flex; gap:.6rem; flex-wrap:wrap; }

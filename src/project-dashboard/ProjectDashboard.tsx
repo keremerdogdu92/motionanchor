@@ -42,6 +42,13 @@ export type EngineCompatibility = {
 };
 
 
+export type UnityExportResult = {
+  destinationPath: string;
+  manifestPath: string;
+  editorScriptPath: string;
+  copiedFrames: number;
+};
+
 export type UnityExportPlan = {
   supported: boolean;
   ready: boolean;
@@ -80,6 +87,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceReadiness | null>(null);
   const [engineStatus, setEngineStatus] = useState<EngineCompatibility | null>(null);
   const [unityExportPlan, setUnityExportPlan] = useState<UnityExportPlan | null>(null);
+  const [unityExportResult, setUnityExportResult] = useState<UnityExportResult | null>(null);
 
   async function loadProjects() {
     setLoading(true);
@@ -104,7 +112,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   useEffect(() => { void loadProjects(); }, []);
 
   async function refreshWorkspaceStatus(project: ProjectRecord | null) {
-    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); setUnityExportPlan(null); onWorkspaceStatusChange(null); return; }
+    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); setUnityExportPlan(null); setUnityExportResult(null); onWorkspaceStatusChange(null); return; }
     try {
       const [status, compatibility] = await Promise.all([
         invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath }),
@@ -113,6 +121,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       setWorkspaceStatus(status);
       setEngineStatus(compatibility);
       setUnityExportPlan(null);
+      setUnityExportResult(null);
       onWorkspaceStatusChange(status);
     } catch (cause) {
       setWorkspaceStatus(null);
@@ -144,6 +153,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
     setSubmitting(true);
     setError("");
     try {
+      setUnityExportResult(null);
       setUnityExportPlan(await invoke<UnityExportPlan>("build_unity_export_plan", {
         workspacePath: activeProject.workspacePath,
         projectName: activeProject.name,
@@ -158,6 +168,28 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       setSubmitting(false);
     }
   }
+  async function executeUnityExport() {
+    if (!activeProject || !unityExportPlan?.ready) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      const result = await invoke<UnityExportResult>("execute_unity_export", {
+        workspacePath: activeProject.workspacePath,
+        projectName: activeProject.name,
+        engineProfile: activeProject.engineProfile,
+        frameRate: unityExportPlan.frameRate,
+        loopAnimation: unityExportPlan.loopAnimation,
+      });
+      setUnityExportResult(result);
+      setUnityExportPlan(null);
+    } catch (cause) {
+      setUnityExportResult(null);
+      setError(String(cause));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function chooseWorkspace() {
     const selected = await open({ multiple: false, directory: true });
     if (typeof selected === "string") {
@@ -218,11 +250,13 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       )}
       {activeProject && engineStatus?.applicable && (
         <div className="unity-export-plan">
-          <div><strong>Unity export plan</strong><span>Dry run only. Initial export support targets Unity 2022.3 LTS.</span></div>
-          <button type="button" onClick={() => void buildUnityExportPlan()} disabled={submitting || projectActionsDisabled || !engineStatus.compatible || !workspaceStatus?.rgbaHasFiles}>Build export plan</button>
+          <div><strong>Unity export</strong><span>Plan first, then publish atomically. Initial support targets Unity 2022.3 LTS.</span></div>
+          <div className="unity-export-plan__actions"><button type="button" className="secondary" onClick={() => void buildUnityExportPlan()} disabled={submitting || projectActionsDisabled || !engineStatus.compatible || !workspaceStatus?.rgbaHasFiles}>Build export plan</button><button type="button" onClick={() => void executeUnityExport()} disabled={submitting || projectActionsDisabled || !unityExportPlan?.ready}>Export to Unity</button></div>
           {unityExportPlan && <><small>{unityExportPlan.ready ? "Ready" : "Blocked"}: {unityExportPlan.frameCount} frames{unityExportPlan.width && unityExportPlan.height ? ` · ${unityExportPlan.width}×${unityExportPlan.height}` : ""} · {unityExportPlan.frameRate} fps · {unityExportPlan.loopAnimation ? "loop" : "once"}</small><small title={unityExportPlan.destinationPath}>Target: {unityExportPlan.destinationPath}</small>{unityExportPlan.errors.length > 0 && <small>Issues: {unityExportPlan.errors.join(" · ")}</small>}{unityExportPlan.conflicts.length > 0 && <small>Conflicts: {unityExportPlan.conflicts.length}</small>}</>}
+          {unityExportResult && <><small>Exported {unityExportResult.copiedFrames} frames.</small><small title={unityExportResult.manifestPath}>Manifest: {unityExportResult.manifestPath}</small><small title={unityExportResult.editorScriptPath}>Editor script: {unityExportResult.editorScriptPath}</small></>}
         </div>
-      )}      {activeProject && workspaceStatus && (
+      )}
+      {activeProject && workspaceStatus && (
         <div className={`workspace-readiness ${workspaceStatus.ready ? "workspace-readiness--ready" : "workspace-readiness--blocked"}`}>
           <div><strong>{workspaceStatus.ready ? "Workspace structure ready" : "Workspace needs attention"}</strong><span>Extraction: {workspaceStatus.extractionReady ? "ready" : "blocked"} ? Segmentation: {workspaceStatus.segmentationReady ? "ready" : "blocked"}</span></div>
           <div className="workspace-readiness__actions"><button type="button" className="secondary" onClick={() => void refreshWorkspaceStatus(activeProject)} disabled={submitting || projectActionsDisabled}>Check</button><button type="button" onClick={() => void prepareWorkspace()} disabled={submitting || projectActionsDisabled || workspaceStatus.missingDirectories.length === 0}>Prepare folders</button></div>

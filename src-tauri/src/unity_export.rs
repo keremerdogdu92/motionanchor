@@ -1,10 +1,34 @@
-﻿/// src-tauri/src/unity_export.rs
+/// src-tauri/src/unity_export.rs
 /// Builds a non-destructive Unity 2022.3 export plan for completed RGBA sequences.
 
 use serde::Serialize;
+use uuid::Uuid;
 use std::cmp::Ordering;
 use std::fs;
 use std::path::{Path, PathBuf};
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UnityExportResult {
+    pub destination_path: String,
+    pub manifest_path: String,
+    pub editor_script_path: String,
+    pub copied_frames: usize,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UnityExportManifest {
+    pub schema_version: u32,
+    pub frame_rate: f64,
+    pub loop_animation: bool,
+    pub width: u32,
+    pub height: u32,
+    pub frames: Vec<String>,
+    pub pixels_per_unit: f64,
+    pub filter_mode: String,
+    pub compression: String,
+}
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -96,7 +120,7 @@ fn build_plan(workspace: &Path, project_name: &str, engine_profile: &str, frame_
         fs::read_dir(&destination).map_err(|error| format!("could not inspect Unity destination: {error}"))?
             .filter_map(Result::ok).map(|entry| entry.path().to_string_lossy().into_owned()).collect()
     } else { Vec::new() };
-    if !conflicts.is_empty() { errors.push("Unity destination already contains assets".into()); }
+    if destination.exists() { errors.push("Unity destination already exists".into()); }
     Ok(UnityExportPlan {
         supported,
         ready: supported && errors.is_empty(),
@@ -116,6 +140,75 @@ fn build_plan(workspace: &Path, project_name: &str, engine_profile: &str, frame_
 pub fn build_unity_export_plan(workspace_path: &str, project_name: &str, engine_profile: &str, frame_rate: f64, loop_animation: bool) -> Result<UnityExportPlan, String> {
     let workspace = Path::new(workspace_path).canonicalize().map_err(|error| format!("invalid project workspace path: {error}"))?;
     build_plan(&workspace, project_name, engine_profile, frame_rate, loop_animation)
+}
+
+const EDITOR_SCRIPT: &str = r#"using UnityEditor;
+
+public sealed class MotionAnchorTexturePostprocessor : AssetPostprocessor
+{
+    private void OnPreprocessTexture()
+    {
+        if (!assetPath.Contains("/MotionAnchor/")) return;
+        var importer = (TextureImporter)assetImporter;
+        importer.textureType = TextureImporterType.Sprite;
+        importer.spriteImportMode = SpriteImportMode.Single;
+        importer.alphaIsTransparency = true;
+        importer.mipmapEnabled = false;
+        importer.filterMode = UnityEngine.FilterMode.Bilinear;
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        importer.spritePixelsPerUnit = 100f;
+    }
+}
+"#;
+
+#[tauri::command]
+pub fn execute_unity_export(workspace_path: &str, project_name: &str, engine_profile: &str, frame_rate: f64, loop_animation: bool) -> Result<UnityExportResult, String> {
+    let workspace = Path::new(workspace_path).canonicalize().map_err(|error| format!("invalid project workspace path: {error}"))?;
+    let plan = build_plan(&workspace, project_name, engine_profile, frame_rate, loop_animation)?;
+    if !plan.ready { return Err(format!("Unity export plan is blocked: {}", plan.errors.join("; "))); }
+    let destination = PathBuf::from(&plan.destination_path);
+    let parent = destination.parent().ok_or_else(|| "Unity destination has no parent directory".to_string())?;
+    fs::create_dir_all(parent).map_err(|error| format!("could not create Unity export parent: {error}"))?;
+    let staging = parent.join(format!(".motionanchor-staging-{}", Uuid::new_v4()));
+    let result = (|| {
+        let frames_dir = staging.join("Frames");
+        let editor_dir = staging.join("Editor");
+        fs::create_dir_all(&frames_dir).map_err(|error| format!("could not create staging frames directory: {error}"))?;
+        fs::create_dir_all(&editor_dir).map_err(|error| format!("could not create staging editor directory: {error}"))?;
+        let mut exported_frames = Vec::with_capacity(plan.frames.len());
+        for source in &plan.frames {
+            let source_path = Path::new(source);
+            let filename = source_path.file_name().ok_or_else(|| format!("invalid frame path: {}", source_path.display()))?;
+            let target = frames_dir.join(filename);
+            fs::copy(source_path, &target).map_err(|error| format!("could not copy {}: {error}", source_path.display()))?;
+            exported_frames.push(format!("Frames/{}", filename.to_string_lossy()));
+        }
+        let manifest = UnityExportManifest {
+            schema_version: 1,
+            frame_rate: plan.frame_rate,
+            loop_animation: plan.loop_animation,
+            width: plan.width.ok_or_else(|| "export width is unavailable".to_string())?,
+            height: plan.height.ok_or_else(|| "export height is unavailable".to_string())?,
+            frames: exported_frames,
+            pixels_per_unit: 100.0,
+            filter_mode: "Bilinear".into(),
+            compression: "Uncompressed".into(),
+        };
+        let manifest_path = staging.join("motionanchor-export.json");
+        fs::write(&manifest_path, serde_json::to_vec_pretty(&manifest).map_err(|error| format!("could not encode Unity export manifest: {error}"))?)
+            .map_err(|error| format!("could not write Unity export manifest: {error}"))?;
+        let editor_script_path = editor_dir.join("MotionAnchorTexturePostprocessor.cs");
+        fs::write(&editor_script_path, EDITOR_SCRIPT).map_err(|error| format!("could not write Unity editor script: {error}"))?;
+        fs::rename(&staging, &destination).map_err(|error| format!("could not publish Unity export atomically: {error}"))?;
+        Ok(UnityExportResult {
+            destination_path: destination.to_string_lossy().into_owned(),
+            manifest_path: destination.join("motionanchor-export.json").to_string_lossy().into_owned(),
+            editor_script_path: destination.join("Editor/MotionAnchorTexturePostprocessor.cs").to_string_lossy().into_owned(),
+            copied_frames: plan.frame_count,
+        })
+    })();
+    if result.is_err() && staging.exists() { let _ = fs::remove_dir_all(&staging); }
+    result
 }
 
 #[cfg(test)]
@@ -156,5 +249,19 @@ mod tests {
         fs::write(directory.path().join("artifacts/rgba/2.png"), png(64, 32)).unwrap();
         let plan = build_plan(directory.path(), "Test", "unity-2022.3", 24.0, true).unwrap();
         assert!(!plan.ready); assert!(!plan.conflicts.is_empty()); assert!(plan.errors.iter().any(|error| error.contains("dimensions")));
+    }
+
+    #[test]
+    fn export_copies_frames_and_writes_manifest_atomically() {
+        let directory = tempfile::tempdir().unwrap();
+        fs::create_dir_all(directory.path().join("artifacts/rgba")).unwrap();
+        fs::create_dir(directory.path().join("Assets")).unwrap();
+        fs::write(directory.path().join("artifacts/rgba/frame_1.png"), png(32, 16)).unwrap();
+        fs::write(directory.path().join("artifacts/rgba/frame_2.png"), png(32, 16)).unwrap();
+        let result = execute_unity_export(directory.path().to_str().unwrap(), "Test", "unity-2022.3", 30.0, true).unwrap();
+        assert_eq!(result.copied_frames, 2);
+        assert!(Path::new(&result.manifest_path).is_file());
+        assert!(Path::new(&result.editor_script_path).is_file());
+        assert!(Path::new(&result.destination_path).join("Frames/frame_1.png").is_file());
     }
 }

@@ -1,5 +1,5 @@
 /// src-tauri/src/lib.rs
-/// MotionAnchor Rust host â€” Tauri application entry and command handlers.
+/// MotionAnchor Rust host Ã¢â‚¬â€ Tauri application entry and command handlers.
 mod artifact_cleanup;
 mod credential_store;
 mod database;
@@ -194,6 +194,7 @@ pub fn run() {
             database::list_projects,
             database::archive_project,
             unity_export::build_unity_export_plan,
+            unity_export::execute_unity_export,
             project_workspace::workspace_readiness,
             project_workspace::engine_compatibility,
             project_workspace::prepare_project_workspace,
