@@ -16,6 +16,7 @@ export type JobHistoryEntry = {
   progress: number;
   message: string | null;
   error: string | null;
+  errorCode?: string | null;
   request: JobRequest;
   createdAt: string;
   updatedAt: string;

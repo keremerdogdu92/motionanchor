@@ -1,0 +1,15 @@
+/* src/job-recovery/RecoveryNotice.css
+ * Responsive recovery alert for interrupted production jobs.
+ */
+.recovery-notice { display: grid; gap: 14px; margin-top: 18px; padding: 16px; border: 1px solid #73552d; border-radius: 14px; background: #2a2115; }
+.recovery-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.recovery-heading > div { display: grid; gap: 5px; }
+.recovery-heading p { margin: 0; color: #d0b991; font-size: 0.82rem; }
+.recovery-jobs { display: grid; gap: 8px; }
+.recovery-jobs article { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid #604a2b; border-radius: 10px; background: #1d1811; }
+.recovery-jobs article > div { display: grid; gap: 3px; min-width: 0; }
+.recovery-jobs small { color: #bba47d; font-size: 0.72rem; }
+@media (max-width: 620px) {
+  .recovery-heading, .recovery-jobs article { align-items: stretch; flex-direction: column; }
+  .recovery-heading button, .recovery-jobs button { width: 100%; }
+}

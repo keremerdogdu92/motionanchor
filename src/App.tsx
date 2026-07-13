@@ -7,6 +7,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { PromptEditor } from "./prompt-editor/PromptEditor";
 import { RgbaPreviewGallery } from "./rgba-preview/RgbaPreviewGallery";
 import { JobHistory, type JobHistoryEntry, type JobRequest } from "./job-history/JobHistory";
+import { RecoveryNotice } from "./job-recovery/RecoveryNotice";
 import { Sam2Presets, type Sam2Settings } from "./sam2-settings/Sam2Presets";
 import "./App.css";
 
@@ -115,11 +116,17 @@ function App() {
   const [job, setJob] = useState<JobStatus | null>(null);
   const [activeRequest, setActiveRequest] = useState<JobRequest | null>(null);
   const [jobHistory, setJobHistory] = useState<JobHistoryEntry[]>(loadJobHistory);
+  const [dismissedRecoveryIds, setDismissedRecoveryIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [previews, setPreviews] = useState<FramePreview[]>([]);
   const [rgbaPreviews, setRgbaPreviews] = useState<FramePreview[]>([]);
   const [sam2Runtime, setSam2Runtime] = useState<Sam2Preflight | null>(null);
   const [error, setError] = useState("");
+
+  const interruptedJobs = useMemo(
+    () => jobHistory.filter((entry) => entry.errorCode === "job_interrupted" && !dismissedRecoveryIds.includes(entry.jobId)),
+    [dismissedRecoveryIds, jobHistory],
+  );
 
   const terminal = useMemo(
     () => Boolean(job && ["completed", "failed", "cancelled"].includes(job.status)),
@@ -149,7 +156,7 @@ function App() {
       setJobHistory((current) => current.map((entry) => {
         const status = byId.get(entry.jobId);
         return status ? { ...entry, status: status.status, progress: status.progress, message: status.message,
-          error: status.error?.message ?? null, updatedAt: new Date().toISOString() } : entry;
+          error: status.error?.message ?? null, errorCode: status.error?.code ?? null, updatedAt: new Date().toISOString() } : entry;
       }));
     });
     return () => { cancelled = true; };
@@ -172,6 +179,7 @@ function App() {
         progress: job.progress,
         message: job.message,
         error: job.error?.message ?? null,
+        errorCode: job.error?.code ?? null,
         request: activeRequest,
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,
@@ -331,7 +339,7 @@ function App() {
       progress: entry.progress,
       message: entry.message,
       result: null,
-      error: entry.error ? { code: "HISTORY", message: entry.error } : null,
+      error: entry.error ? { code: entry.errorCode ?? "HISTORY", message: entry.error } : null,
       cancellation_requested: false,
     });
     if (entry.request.operation === "media.extract_frames") {
@@ -541,6 +549,16 @@ function App() {
           ) : <p className="muted">No production job has been submitted.</p>}
         </article>
       </section>
+
+      <RecoveryNotice
+        entries={interruptedJobs}
+        busy={busy}
+        onRetry={(entry) => {
+          setDismissedRecoveryIds((current) => [...current, entry.jobId]);
+          void retryHistoryEntry(entry);
+        }}
+        onDismiss={() => setDismissedRecoveryIds((current) => [...new Set([...current, ...interruptedJobs.map((entry) => entry.jobId)])])}
+      />
 
       <JobHistory
         entries={jobHistory}
