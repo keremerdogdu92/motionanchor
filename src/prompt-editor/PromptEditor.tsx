@@ -67,15 +67,42 @@ export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onErr
   const contentRef = useRef<SVGGElement | null>(null);
   const panPointerRef = useRef<{ pointer: Point; origin: Point } | null>(null);
 
-  const selectedAnchor = useMemo(
-    () => document.anchors.find((anchor) => anchor.frame_index === selectedFrame) ?? null,
-    [document, selectedFrame],
+  const sortedAnchors = useMemo(
+    () => [...document.anchors].sort((a, b) => a.frame_index - b.frame_index),
+    [document.anchors],
   );
+  const selectedAnchor = useMemo(
+    () => sortedAnchors.find((anchor) => anchor.frame_index === selectedFrame) ?? null,
+    [sortedAnchors, selectedFrame],
+  );
+  const selectedAnchorIndex = sortedAnchors.findIndex((anchor) => anchor.frame_index === selectedFrame);
 
   useEffect(() => {
     if (!selectedAnchor) return;
     void loadFrame(selectedAnchor.frame_index);
   }, [framesPath, selectedAnchor?.frame_index]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (event.key === "ArrowLeft" && selectedAnchorIndex > 0) {
+        event.preventDefault();
+        setSelectedFrame(sortedAnchors[selectedAnchorIndex - 1].frame_index);
+      } else if (event.key === "ArrowRight" && selectedAnchorIndex >= 0 && selectedAnchorIndex < sortedAnchors.length - 1) {
+        event.preventDefault();
+        setSelectedFrame(sortedAnchors[selectedAnchorIndex + 1].frame_index);
+      } else if ((event.key === "Delete" || event.key === "Backspace") && document.anchors.length > 1) {
+        event.preventDefault();
+        removeSelectedAnchor();
+      } else if (event.key === " ") {
+        event.preventDefault();
+        setTool((current) => current === "pan" ? "edit" : "pan");
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [document.anchors.length, selectedAnchorIndex, sortedAnchors]);
 
   async function loadFrame(frameIndex: number) {
     if (!framesPath) return;
@@ -267,7 +294,7 @@ export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onErr
           <label>Anchor frame<span className="anchor-frame-row"><input type="number" min="0" value={selectedFrame} onChange={(event) => setSelectedFrame(Math.max(0, Number(event.target.value)))} /><button type="button" className="secondary" onClick={() => loadFrame(selectedFrame)} disabled={busy}>Load</button></span></label>
           <div className="anchor-actions"><button type="button" className="secondary" onClick={addAnchor}>Add anchor</button><button type="button" className="danger" onClick={removeSelectedAnchor} disabled={document.anchors.length <= 1}>Remove</button></div>
           <div className="anchor-list" aria-label="Prompt anchors">
-            {document.anchors.map((anchor) => <button key={anchor.frame_index} type="button" className={anchor.frame_index === selectedFrame ? "anchor-active" : "secondary"} onClick={() => setSelectedFrame(anchor.frame_index)}>Frame {anchor.frame_index}<small>{anchor.positive.length}+ / {anchor.negative.length}-</small></button>)}
+            {sortedAnchors.map((anchor) => <button key={anchor.frame_index} type="button" className={anchor.frame_index === selectedFrame ? "anchor-active" : "secondary"} onClick={() => setSelectedFrame(anchor.frame_index)}>Frame {anchor.frame_index}<small>{anchor.positive.length}+ / {anchor.negative.length}-</small></button>)}
           </div>
         </aside>
 
@@ -276,6 +303,23 @@ export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onErr
             {(["box", "positive", "negative", "edit", "pan"] as EditorTool[]).map((item) => <button key={item} type="button" className={tool === item ? "tool-active" : "secondary"} onClick={() => setTool(item)}>{item}</button>)}
             <button type="button" className="secondary" onClick={() => updateAnchor((anchor) => ({ ...anchor, positive: [], negative: [] }))} disabled={!selectedAnchor}>Clear clicks</button>
             <button type="button" className="secondary" onClick={() => updateAnchor((anchor) => ({ ...anchor, box: null }))} disabled={!selectedAnchor?.box}>Clear box</button>
+          </div>
+
+          <div className="anchor-timeline" role="list" aria-label="Anchor frame timeline">
+            {sortedAnchors.map((anchor, index) => (
+              <button
+                key={anchor.frame_index}
+                type="button"
+                role="listitem"
+                className={anchor.frame_index === selectedFrame ? "timeline-anchor timeline-active" : "timeline-anchor"}
+                onClick={() => setSelectedFrame(anchor.frame_index)}
+                aria-label={`Select anchor frame ${anchor.frame_index}`}
+              >
+                <span className="timeline-index">{index + 1}</span>
+                <strong>#{anchor.frame_index}</strong>
+                <small>{anchor.positive.length}+ / {anchor.negative.length}-</small>
+              </button>
+            ))}
           </div>
 
           <div className="canvas-shell">
@@ -297,6 +341,7 @@ export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onErr
             <label>Zoom <input type="range" min="0.5" max="4" step="0.1" value={zoom} onChange={(event) => setZoom(Number(event.target.value))} /></label>
             <button type="button" className="secondary" onClick={() => { setZoom(1); setPan([0, 0]); }}>Reset view</button>
           </div>
+          <p className="editor-hint">?/? anchors ? Space toggles Pan/Edit ? Delete removes the selected anchor.</p>
           {tool === "edit" && <p className="editor-hint">Drag the box or its corner handles. Click a positive or negative point to delete it.</p>}
         </div>
       </div>

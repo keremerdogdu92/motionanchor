@@ -14,6 +14,12 @@
 .anchor-active, .tool-active { background: #6674ff; }
 .editor-workspace { min-width: 0; }
 .editor-toolbar { margin-bottom: 10px; }
+.anchor-timeline { display: flex; gap: 8px; margin-bottom: 10px; padding: 8px; overflow-x: auto; border: 1px solid #34394d; border-radius: 12px; background: #0a0c13; scrollbar-width: thin; }
+.timeline-anchor { display: grid; grid-template-columns: auto auto; gap: 2px 8px; min-width: 104px; padding: 8px 10px; text-align: left; background: #151927; border: 1px solid #34394d; }
+.timeline-anchor strong { font-size: 0.86rem; }
+.timeline-anchor small { grid-column: 2; color: #aab0c7; }
+.timeline-index { display: grid; grid-row: 1 / span 2; width: 24px; height: 24px; place-items: center; align-self: center; border-radius: 999px; background: #272d45; font-size: 0.72rem; }
+.timeline-active { border-color: #8f9aff; background: #252c55; }
 .editor-toolbar button { text-transform: capitalize; }
 .canvas-shell { position: relative; overflow: hidden; min-height: 260px; border: 1px solid #34394d; border-radius: 14px; background: #07080d; }
 .prompt-canvas { display: block; width: 100%; aspect-ratio: 16 / 9; touch-action: none; user-select: none; }
