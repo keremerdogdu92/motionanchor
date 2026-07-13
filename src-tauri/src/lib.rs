@@ -6,6 +6,7 @@ mod database;
 mod dev_env_store;
 mod previews;
 mod prompt_editor;
+mod project_workspace;
 mod sidecar;
 
 use std::sync::Mutex;
@@ -191,6 +192,8 @@ pub fn run() {
             database::create_project,
             database::list_projects,
             database::archive_project,
+            project_workspace::workspace_readiness,
+            project_workspace::prepare_project_workspace,
             get_frame_previews,
             get_rgba_previews,
             load_prompt_document,

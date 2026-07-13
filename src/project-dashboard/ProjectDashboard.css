@@ -1,4 +1,4 @@
-﻿/* src/project-dashboard/ProjectDashboard.css */
+/* src/project-dashboard/ProjectDashboard.css */
 /* Responsive project management UI for SQLite-backed desktop workspaces. */
 .project-dashboard { margin: 0 0 1.5rem; padding: 1.25rem; border: 1px solid rgba(148,163,184,.22); border-radius: 18px; background: rgba(15,23,42,.72); }
 .project-dashboard__heading { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
@@ -18,3 +18,12 @@
 .project-card__actions button { flex:1; }
 @media (max-width: 900px) { .project-create-form { grid-template-columns:1fr 1fr; } .project-create-form__workspace { grid-column:1 / -1; } }
 @media (max-width: 600px) { .project-dashboard { padding:1rem; border-radius:14px; } .project-dashboard__heading { flex-direction:column; } .project-dashboard__heading button { width:100%; } .project-create-form { grid-template-columns:1fr; } .project-create-form__workspace { grid-column:auto; } .project-create-form > button { width:100%; } .project-card-grid { grid-template-columns:1fr; } }
+
+.workspace-readiness { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.55rem 1rem; align-items:center; margin-top:1rem; padding:.85rem 1rem; border:1px solid rgba(148,163,184,.28); border-radius:12px; background:rgba(15,23,42,.55); }
+.workspace-readiness div:first-child { display:flex; flex-direction:column; gap:.2rem; }
+.workspace-readiness span, .workspace-readiness small { color:#94a3b8; }
+.workspace-readiness small { grid-column:1 / -1; overflow-wrap:anywhere; }
+.workspace-readiness--ready { border-color:rgba(52,211,153,.5); }
+.workspace-readiness--blocked { border-color:rgba(251,191,36,.5); }
+.workspace-readiness__actions { display:flex; gap:.55rem; }
+@media (max-width:600px) { .workspace-readiness { grid-template-columns:1fr; } .workspace-readiness__actions button { flex:1; } }

@@ -17,6 +17,15 @@ export type ProjectRecord = {
   archivedAt: string | null;
 };
 
+export type WorkspaceReadiness = {
+  workspacePath: string;
+  ready: boolean;
+  missingDirectories: string[];
+  nonEmptyOutputDirectories: string[];
+  sourceExists: boolean;
+  promptExists: boolean;
+};
+
 type Props = {
   activeProject: ProjectRecord | null;
   initialActiveProjectId: string | null;
@@ -38,6 +47,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceReadiness | null>(null);
 
   async function loadProjects() {
     setLoading(true);
@@ -60,6 +70,31 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   }
 
   useEffect(() => { void loadProjects(); }, []);
+
+  async function refreshWorkspaceStatus(project: ProjectRecord | null) {
+    if (!project) { setWorkspaceStatus(null); return; }
+    try {
+      setWorkspaceStatus(await invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath }));
+    } catch (cause) {
+      setWorkspaceStatus(null);
+      setError(String(cause));
+    }
+  }
+
+  useEffect(() => { void refreshWorkspaceStatus(activeProject); }, [activeProject?.id]);
+
+  async function prepareWorkspace() {
+    if (!activeProject) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      setWorkspaceStatus(await invoke<WorkspaceReadiness>("prepare_project_workspace", { workspacePath: activeProject.workspacePath }));
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   async function chooseWorkspace() {
     const selected = await open({ multiple: false, directory: true });
@@ -113,6 +148,14 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
         <button type="submit" disabled={submitting || projectActionsDisabled || !name.trim() || !workspacePath.trim()}>{submitting ? "Creating…" : "Create project"}</button>
       </form>
       {error && <div className="project-dashboard__error" role="alert">{error}</div>}
+      {activeProject && workspaceStatus && (
+        <div className={`workspace-readiness ${workspaceStatus.ready ? "workspace-readiness--ready" : "workspace-readiness--blocked"}`}>
+          <div><strong>{workspaceStatus.ready ? "Workspace ready" : "Workspace needs attention"}</strong><span>{workspaceStatus.sourceExists ? "Source video found" : "Source video missing"} ? {workspaceStatus.promptExists ? "Prompt JSON found" : "Prompt JSON missing"}</span></div>
+          <div className="workspace-readiness__actions"><button type="button" className="secondary" onClick={() => void refreshWorkspaceStatus(activeProject)} disabled={submitting || projectActionsDisabled}>Check</button><button type="button" onClick={() => void prepareWorkspace()} disabled={submitting || projectActionsDisabled || workspaceStatus.ready}>Prepare folders</button></div>
+          {workspaceStatus.missingDirectories.length > 0 && <small>Missing: {workspaceStatus.missingDirectories.join(", ")}</small>}
+          {workspaceStatus.nonEmptyOutputDirectories.length > 0 && <small>Output folders must be empty: {workspaceStatus.nonEmptyOutputDirectories.join(", ")}</small>}
+        </div>
+      )}
       {loading ? <div className="project-dashboard__state">Loading projects…</div> : projects.length === 0 ? <div className="project-dashboard__state"><strong>No active projects</strong><span>Create a project to bind a workspace and engine profile.</span></div> : (
         <div className="project-card-grid">{projects.map((project) => { const selected = activeProject?.id === project.id; return <article key={project.id} className={`project-card${selected ? " project-card--selected" : ""}`}><div><span className="project-card__profile">{project.engineProfile}</span><h3>{project.name}</h3><p title={project.workspacePath}>{project.workspacePath}</p></div><div className="project-card__actions"><button type="button" onClick={() => onSelectProject(project)} disabled={selected || submitting || projectActionsDisabled}>{selected ? "Active" : "Open"}</button><button type="button" className="danger" onClick={() => void archiveProject(project)} disabled={submitting || projectActionsDisabled}>Archive</button></div></article>; })}</div>
       )}
