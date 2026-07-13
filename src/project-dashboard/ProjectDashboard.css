@@ -27,3 +27,10 @@
 .workspace-readiness--blocked { border-color:rgba(251,191,36,.5); }
 .workspace-readiness__actions { display:flex; gap:.55rem; }
 @media (max-width:600px) { .workspace-readiness { grid-template-columns:1fr; } .workspace-readiness__actions button { flex:1; } }
+
+.engine-compatibility { display:flex; justify-content:space-between; gap:1rem; margin-top:1rem; padding:.8rem 1rem; border:1px solid rgba(148,163,184,.28); border-radius:12px; background:rgba(15,23,42,.58); }
+.engine-compatibility div { display:flex; flex-direction:column; gap:.25rem; }
+.engine-compatibility span, .engine-compatibility small { color:#94a3b8; }
+.engine-compatibility--ready { border-color:rgba(52,211,153,.45); }
+.engine-compatibility--blocked { border-color:rgba(248,113,113,.45); }
+@media (max-width:600px) { .engine-compatibility { flex-direction:column; } }

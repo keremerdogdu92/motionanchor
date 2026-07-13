@@ -30,6 +30,17 @@ export type WorkspaceReadiness = {
   segmentationReady: boolean;
 };
 
+
+export type EngineCompatibility = {
+  engineProfile: string;
+  applicable: boolean;
+  compatible: boolean;
+  assetsExists: boolean;
+  projectVersionExists: boolean;
+  detectedVersion: string | null;
+  message: string;
+};
+
 type Props = {
   activeProject: ProjectRecord | null;
   initialActiveProjectId: string | null;
@@ -53,6 +64,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceReadiness | null>(null);
+  const [engineStatus, setEngineStatus] = useState<EngineCompatibility | null>(null);
 
   async function loadProjects() {
     setLoading(true);
@@ -77,13 +89,18 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   useEffect(() => { void loadProjects(); }, []);
 
   async function refreshWorkspaceStatus(project: ProjectRecord | null) {
-    if (!project) { setWorkspaceStatus(null); onWorkspaceStatusChange(null); return; }
+    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); onWorkspaceStatusChange(null); return; }
     try {
-      const status = await invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath });
+      const [status, compatibility] = await Promise.all([
+        invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath }),
+        invoke<EngineCompatibility>("engine_compatibility", { workspacePath: project.workspacePath, engineProfile: project.engineProfile }),
+      ]);
       setWorkspaceStatus(status);
+      setEngineStatus(compatibility);
       onWorkspaceStatusChange(status);
     } catch (cause) {
       setWorkspaceStatus(null);
+      setEngineStatus(null);
       onWorkspaceStatusChange(null);
       setError(String(cause));
     }
@@ -158,6 +175,12 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
         <button type="submit" disabled={submitting || projectActionsDisabled || !name.trim() || !workspacePath.trim()}>{submitting ? "Creating…" : "Create project"}</button>
       </form>
       {error && <div className="project-dashboard__error" role="alert">{error}</div>}
+      {activeProject && engineStatus && (
+        <div className={`engine-compatibility ${engineStatus.compatible ? "engine-compatibility--ready" : "engine-compatibility--blocked"}`}>
+          <div><strong>{engineStatus.applicable ? "Unity compatibility" : "Engine compatibility"}</strong><span>{engineStatus.message}</span></div>
+          <small>{engineStatus.detectedVersion ? `Detected: ${engineStatus.detectedVersion}` : `Profile: ${engineStatus.engineProfile}`}</small>
+        </div>
+      )}
       {activeProject && workspaceStatus && (
         <div className={`workspace-readiness ${workspaceStatus.ready ? "workspace-readiness--ready" : "workspace-readiness--blocked"}`}>
           <div><strong>{workspaceStatus.ready ? "Workspace structure ready" : "Workspace needs attention"}</strong><span>Extraction: {workspaceStatus.extractionReady ? "ready" : "blocked"} ? Segmentation: {workspaceStatus.segmentationReady ? "ready" : "blocked"}</span></div>

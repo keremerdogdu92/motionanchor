@@ -193,6 +193,7 @@ pub fn run() {
             database::list_projects,
             database::archive_project,
             project_workspace::workspace_readiness,
+            project_workspace::engine_compatibility,
             project_workspace::prepare_project_workspace,
             get_frame_previews,
             get_rgba_previews,

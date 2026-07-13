@@ -69,9 +69,54 @@ fn inspect_workspace(workspace: &Path) -> Result<WorkspaceReadiness, String> {
     })
 }
 
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EngineCompatibility {
+    pub engine_profile: String,
+    pub applicable: bool,
+    pub compatible: bool,
+    pub assets_exists: bool,
+    pub project_version_exists: bool,
+    pub detected_version: Option<String>,
+    pub message: String,
+}
+
+fn read_unity_version(workspace: &Path) -> Result<Option<String>, String> {
+    let path = workspace.join("ProjectSettings/ProjectVersion.txt");
+    if !path.is_file() { return Ok(None); }
+    let content = std::fs::read_to_string(&path)
+        .map_err(|error| format!("could not read {}: {error}", path.display()))?;
+    Ok(content.lines().find_map(|line| line.strip_prefix("m_EditorVersion:").map(str::trim).map(str::to_owned)))
+}
+
+fn inspect_engine_compatibility(workspace: &Path, engine_profile: &str) -> Result<EngineCompatibility, String> {
+    if engine_profile == "generic" {
+        return Ok(EngineCompatibility { engine_profile: engine_profile.into(), applicable: false, compatible: true, assets_exists: false, project_version_exists: false, detected_version: None, message: "Generic pipeline does not require a Unity project".into() });
+    }
+    let expected_prefix = match engine_profile {
+        "unity-2022.3" => "2022.3",
+        "unity-6" => "6000.",
+        _ => return Err(format!("unsupported engine profile: {engine_profile}")),
+    };
+    let assets_exists = workspace.join("Assets").is_dir();
+    let detected_version = read_unity_version(workspace)?;
+    let project_version_exists = detected_version.is_some();
+    let version_matches = detected_version.as_deref().is_some_and(|version| version.starts_with(expected_prefix));
+    let compatible = assets_exists && project_version_exists && version_matches;
+    let message = if compatible { "Unity project is compatible" } else if !assets_exists { "Unity Assets directory is missing" } else if !project_version_exists { "Unity ProjectVersion.txt is missing or invalid" } else { "Detected Unity version does not match the selected engine profile" };
+    Ok(EngineCompatibility { engine_profile: engine_profile.into(), applicable: true, compatible, assets_exists, project_version_exists, detected_version, message: message.into() })
+}
+
 #[tauri::command]
 pub fn workspace_readiness(workspace_path: &str) -> Result<WorkspaceReadiness, String> {
     inspect_workspace(&canonical_workspace(workspace_path)?)
+}
+
+
+#[tauri::command]
+pub fn engine_compatibility(workspace_path: &str, engine_profile: &str) -> Result<EngineCompatibility, String> {
+    inspect_engine_compatibility(&canonical_workspace(workspace_path)?, engine_profile)
 }
 
 #[tauri::command]
@@ -123,6 +168,36 @@ mod tests {
         let segmentation = workspace_readiness(directory.path().to_str().unwrap()).expect("segmentation status");
         assert!(!segmentation.extraction_ready);
         assert!(segmentation.segmentation_ready);
+    }
+
+
+    #[test]
+    fn generic_profile_skips_unity_validation() {
+        let directory = tempfile::tempdir().expect("temporary directory");
+        let status = engine_compatibility(directory.path().to_str().unwrap(), "generic").expect("compatibility");
+        assert!(!status.applicable);
+        assert!(status.compatible);
+    }
+
+    #[test]
+    fn unity_2022_profile_detects_matching_project() {
+        let directory = tempfile::tempdir().expect("temporary directory");
+        std::fs::create_dir(directory.path().join("Assets")).expect("assets");
+        std::fs::create_dir(directory.path().join("ProjectSettings")).expect("settings");
+        std::fs::write(directory.path().join("ProjectSettings/ProjectVersion.txt"), "m_EditorVersion: 2022.3.18f1\n").expect("version");
+        let status = engine_compatibility(directory.path().to_str().unwrap(), "unity-2022.3").expect("compatibility");
+        assert!(status.compatible);
+        assert_eq!(status.detected_version.as_deref(), Some("2022.3.18f1"));
+    }
+
+    #[test]
+    fn unity_profile_rejects_version_mismatch() {
+        let directory = tempfile::tempdir().expect("temporary directory");
+        std::fs::create_dir(directory.path().join("Assets")).expect("assets");
+        std::fs::create_dir(directory.path().join("ProjectSettings")).expect("settings");
+        std::fs::write(directory.path().join("ProjectSettings/ProjectVersion.txt"), "m_EditorVersion: 6000.0.45f1\n").expect("version");
+        let status = engine_compatibility(directory.path().to_str().unwrap(), "unity-2022.3").expect("compatibility");
+        assert!(!status.compatible);
     }
 
     #[test]
