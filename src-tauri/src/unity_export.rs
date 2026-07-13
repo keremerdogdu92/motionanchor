@@ -2,8 +2,7 @@
 /// Builds a non-destructive Unity 2022.3 export plan for completed RGBA sequences.
 
 use serde::{Deserialize, Serialize};
-use crate::animation_manifest::{AnimationFrameV2, AnimationManifestV2, CanvasSize, NormalizedPivot, ANIMATION_MANIFEST_FILENAME, ANIMATION_MANIFEST_SCHEMA_VERSION};
-use std::collections::BTreeMap;
+use crate::animation_manifest::{AnimationManifestV2, ANIMATION_MANIFEST_FILENAME};
 use uuid::Uuid;
 use std::cmp::Ordering;
 use std::fs;
@@ -15,6 +14,7 @@ pub struct UnityExportResult {
     pub destination_path: String,
     pub manifest_path: String,
     pub editor_script_path: String,
+    pub canonical_package_path: String,
     pub copied_frames: usize,
 }
 
@@ -270,6 +270,18 @@ pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profi
     let workspace = Path::new(workspace_path).canonicalize().map_err(|error| format!("invalid project workspace path: {error}"))?;
     let plan = build_plan(&workspace, asset_name, engine_profile, frame_rate, loop_animation)?;
     if !plan.ready { return Err(format!("Unity export plan is blocked: {}", plan.errors.join("; "))); }
+    let canonical = crate::canonical_export::execute_export(
+        &workspace,
+        &plan.asset_name,
+        plan.frame_rate,
+        plan.loop_animation,
+    )?;
+    let canonical_manifest: AnimationManifestV2 = serde_json::from_slice(
+        &fs::read(&canonical.manifest_path)
+            .map_err(|error| format!("could not read canonical manifest: {error}"))?,
+    )
+    .map_err(|error| format!("invalid canonical manifest JSON: {error}"))?;
+    canonical_manifest.validate()?;
     let destination = PathBuf::from(&plan.destination_path);
     let parent = destination.parent().ok_or_else(|| "Unity destination has no parent directory".to_string())?;
     fs::create_dir_all(parent).map_err(|error| format!("could not create Unity export parent: {error}"))?;
@@ -277,34 +289,17 @@ pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profi
     let result = (|| {
         let frames_dir = staging.join("Frames");
         fs::create_dir_all(&frames_dir).map_err(|error| format!("could not create staging frames directory: {error}"))?;
-        let mut exported_frames = Vec::with_capacity(plan.frames.len());
-        let digits = usize::max(4, plan.frame_count.to_string().len());
-        for (index, source) in plan.frames.iter().enumerate() {
-            let source_path = Path::new(source);
-            let filename = format!("{}_frame_{:0width$}.png", plan.asset_name, index + 1, width = digits);
-            let target = frames_dir.join(&filename);
-            fs::copy(source_path, &target).map_err(|error| format!("could not copy {}: {error}", source_path.display()))?;
-            exported_frames.push(format!("Frames/{filename}"));
+        for frame in &canonical_manifest.frames {
+            let source_path = Path::new(&canonical.package_path).join(&frame.path);
+            let target = staging.join(&frame.path);
+            if let Some(parent) = target.parent() {
+                fs::create_dir_all(parent).map_err(|error| format!("could not create Unity frame directory: {error}"))?;
+            }
+            fs::copy(&source_path, &target).map_err(|error| format!("could not copy {}: {error}", source_path.display()))?;
         }
-        let frame_duration_ms = 1000.0 / plan.frame_rate;
-        let manifest = AnimationManifestV2 {
-            schema_version: ANIMATION_MANIFEST_SCHEMA_VERSION,
-            asset_name: plan.asset_name.clone(),
-            frames: exported_frames.into_iter().enumerate().map(|(index, path)| AnimationFrameV2 { index: index + 1, path, duration_ms: frame_duration_ms }).collect(),
-            frame_rate: plan.frame_rate,
-            loop_animation: plan.loop_animation,
-            canvas: CanvasSize { width: plan.width.ok_or_else(|| "export width is unavailable".to_string())?, height: plan.height.ok_or_else(|| "export height is unavailable".to_string())? },
-            pivot: NormalizedPivot { space: "normalized".into(), x: 0.5, y: 0.0 },
-            pixels_per_unit: 100.0,
-            tags: Vec::new(),
-            events: Vec::new(),
-            provenance: BTreeMap::from([("adapter".into(), "unity".into())]),
-            content_hashes: BTreeMap::new(),
-        };
-        manifest.validate()?;
         let manifest_path = staging.join(ANIMATION_MANIFEST_FILENAME);
-        fs::write(&manifest_path, serde_json::to_vec_pretty(&manifest).map_err(|error| format!("could not encode Unity export manifest: {error}"))?)
-            .map_err(|error| format!("could not write Unity export manifest: {error}"))?;
+        fs::copy(&canonical.manifest_path, &manifest_path)
+            .map_err(|error| format!("could not copy canonical manifest into Unity export: {error}"))?;
         let shared_editor_dir = parent.join("Editor");
         let editor_script_path = shared_editor_dir.join("MotionAnchorTexturePostprocessor.cs");
         if editor_script_path.exists() {
@@ -321,7 +316,8 @@ pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profi
             destination_path: destination.to_string_lossy().into_owned(),
             manifest_path: destination.join(ANIMATION_MANIFEST_FILENAME).to_string_lossy().into_owned(),
             editor_script_path: editor_script_path.to_string_lossy().into_owned(),
-            copied_frames: plan.frame_count,
+            canonical_package_path: canonical.package_path.clone(),
+            copied_frames: canonical.copied_frames,
         })
     })();
     if result.is_err() && staging.exists() { let _ = fs::remove_dir_all(&staging); }

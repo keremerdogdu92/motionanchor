@@ -2,6 +2,7 @@
 /// MotionAnchor Rust host Ã¢â‚¬â€ Tauri application entry and command handlers.
 mod animation_manifest;
 mod artifact_cleanup;
+mod canonical_export;
 mod credential_store;
 mod database;
 mod dev_env_store;
@@ -194,6 +195,8 @@ pub fn run() {
             database::create_project,
             database::list_projects,
             database::archive_project,
+            canonical_export::build_canonical_export_plan,
+            canonical_export::execute_canonical_export,
             unity_export::build_unity_export_plan,
             unity_export::execute_unity_export,
             unity_export::read_unity_import_status,

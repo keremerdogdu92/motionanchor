@@ -62,3 +62,14 @@ It must not contain API keys or other credentials. Large media may remain extern
 ## 5. Compatibility Policy
 
 Core project and manifest schemas are versioned independently from engine adapters. An adapter declares which manifest versions and engine versions it supports. Unsupported combinations fail during dry-run validation before any target project is modified.
+
+
+## 6. Canonical Export Package
+
+The production canonical exporter publishes packages under `<workspace>/exports/<asset_name>/` using an atomic staging directory. Each package contains the v2 manifest and naturally ordered RGBA frames under `Frames/`.
+
+- Existing package directories are never replaced automatically.
+- Every frame receives a SHA-256 entry keyed by its manifest-relative path.
+- `contentHashes.packageSummary` is a deterministic SHA-256 digest of the validated manifest inputs and frame hashes before the summary field is inserted.
+- Canonical provenance remains engine-neutral; adapter identity belongs to adapter outputs, not the canonical package.
+- Unity adapters consume the published canonical package instead of reading `artifacts/rgba` directly during export execution.
