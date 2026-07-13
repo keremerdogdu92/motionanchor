@@ -41,6 +41,20 @@ export type EngineCompatibility = {
   message: string;
 };
 
+
+export type UnityExportPlan = {
+  supported: boolean;
+  ready: boolean;
+  destinationPath: string;
+  frameCount: number;
+  width: number | null;
+  height: number | null;
+  frameRate: number;
+  loopAnimation: boolean;
+  conflicts: string[];
+  errors: string[];
+  frames: string[];
+};
 type Props = {
   activeProject: ProjectRecord | null;
   initialActiveProjectId: string | null;
@@ -65,6 +79,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   const [error, setError] = useState("");
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceReadiness | null>(null);
   const [engineStatus, setEngineStatus] = useState<EngineCompatibility | null>(null);
+  const [unityExportPlan, setUnityExportPlan] = useState<UnityExportPlan | null>(null);
 
   async function loadProjects() {
     setLoading(true);
@@ -89,7 +104,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   useEffect(() => { void loadProjects(); }, []);
 
   async function refreshWorkspaceStatus(project: ProjectRecord | null) {
-    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); onWorkspaceStatusChange(null); return; }
+    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); setUnityExportPlan(null); onWorkspaceStatusChange(null); return; }
     try {
       const [status, compatibility] = await Promise.all([
         invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath }),
@@ -97,6 +112,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       ]);
       setWorkspaceStatus(status);
       setEngineStatus(compatibility);
+      setUnityExportPlan(null);
       onWorkspaceStatusChange(status);
     } catch (cause) {
       setWorkspaceStatus(null);
@@ -123,6 +139,25 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
     }
   }
 
+  async function buildUnityExportPlan() {
+    if (!activeProject) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      setUnityExportPlan(await invoke<UnityExportPlan>("build_unity_export_plan", {
+        workspacePath: activeProject.workspacePath,
+        projectName: activeProject.name,
+        engineProfile: activeProject.engineProfile,
+        frameRate: 30,
+        loopAnimation: true,
+      }));
+    } catch (cause) {
+      setUnityExportPlan(null);
+      setError(String(cause));
+    } finally {
+      setSubmitting(false);
+    }
+  }
   async function chooseWorkspace() {
     const selected = await open({ multiple: false, directory: true });
     if (typeof selected === "string") {
@@ -172,7 +207,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
         <label>Project name<input value={name} maxLength={120} onChange={(event) => setName(event.target.value)} placeholder="Cat Trap" required /></label>
         <label>Engine profile<select value={engineProfile} onChange={(event) => setEngineProfile(event.target.value)}>{ENGINE_PROFILES.map((profile) => <option key={profile.value} value={profile.value}>{profile.label}</option>)}</select></label>
         <label className="project-create-form__workspace">Workspace directory<span className="path-control"><input value={workspacePath} onChange={(event) => setWorkspacePath(event.target.value)} placeholder="Select an existing directory" required /><button type="button" className="browse" onClick={() => void chooseWorkspace()}>Browse</button></span></label>
-        <button type="submit" disabled={submitting || projectActionsDisabled || !name.trim() || !workspacePath.trim()}>{submitting ? "Creating…" : "Create project"}</button>
+        <button type="submit" disabled={submitting || projectActionsDisabled || !name.trim() || !workspacePath.trim()}>{submitting ? "Creatingâ€¦" : "Create project"}</button>
       </form>
       {error && <div className="project-dashboard__error" role="alert">{error}</div>}
       {activeProject && engineStatus && (
@@ -181,7 +216,13 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
           <small>{engineStatus.detectedVersion ? `Detected: ${engineStatus.detectedVersion}` : `Profile: ${engineStatus.engineProfile}`}</small>
         </div>
       )}
-      {activeProject && workspaceStatus && (
+      {activeProject && engineStatus?.applicable && (
+        <div className="unity-export-plan">
+          <div><strong>Unity export plan</strong><span>Dry run only. Initial export support targets Unity 2022.3 LTS.</span></div>
+          <button type="button" onClick={() => void buildUnityExportPlan()} disabled={submitting || projectActionsDisabled || !engineStatus.compatible || !workspaceStatus?.rgbaHasFiles}>Build export plan</button>
+          {unityExportPlan && <><small>{unityExportPlan.ready ? "Ready" : "Blocked"}: {unityExportPlan.frameCount} frames{unityExportPlan.width && unityExportPlan.height ? ` · ${unityExportPlan.width}×${unityExportPlan.height}` : ""} · {unityExportPlan.frameRate} fps · {unityExportPlan.loopAnimation ? "loop" : "once"}</small><small title={unityExportPlan.destinationPath}>Target: {unityExportPlan.destinationPath}</small>{unityExportPlan.errors.length > 0 && <small>Issues: {unityExportPlan.errors.join(" · ")}</small>}{unityExportPlan.conflicts.length > 0 && <small>Conflicts: {unityExportPlan.conflicts.length}</small>}</>}
+        </div>
+      )}      {activeProject && workspaceStatus && (
         <div className={`workspace-readiness ${workspaceStatus.ready ? "workspace-readiness--ready" : "workspace-readiness--blocked"}`}>
           <div><strong>{workspaceStatus.ready ? "Workspace structure ready" : "Workspace needs attention"}</strong><span>Extraction: {workspaceStatus.extractionReady ? "ready" : "blocked"} ? Segmentation: {workspaceStatus.segmentationReady ? "ready" : "blocked"}</span></div>
           <div className="workspace-readiness__actions"><button type="button" className="secondary" onClick={() => void refreshWorkspaceStatus(activeProject)} disabled={submitting || projectActionsDisabled}>Check</button><button type="button" onClick={() => void prepareWorkspace()} disabled={submitting || projectActionsDisabled || workspaceStatus.missingDirectories.length === 0}>Prepare folders</button></div>
@@ -189,7 +230,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
           {workspaceStatus.nonEmptyOutputDirectories.length > 0 && <small>Output folders must be empty: {workspaceStatus.nonEmptyOutputDirectories.join(", ")}</small>}
         </div>
       )}
-      {loading ? <div className="project-dashboard__state">Loading projects…</div> : projects.length === 0 ? <div className="project-dashboard__state"><strong>No active projects</strong><span>Create a project to bind a workspace and engine profile.</span></div> : (
+      {loading ? <div className="project-dashboard__state">Loading projectsâ€¦</div> : projects.length === 0 ? <div className="project-dashboard__state"><strong>No active projects</strong><span>Create a project to bind a workspace and engine profile.</span></div> : (
         <div className="project-card-grid">{projects.map((project) => { const selected = activeProject?.id === project.id; return <article key={project.id} className={`project-card${selected ? " project-card--selected" : ""}`}><div><span className="project-card__profile">{project.engineProfile}</span><h3>{project.name}</h3><p title={project.workspacePath}>{project.workspacePath}</p></div><div className="project-card__actions"><button type="button" onClick={() => onSelectProject(project)} disabled={selected || submitting || projectActionsDisabled}>{selected ? "Active" : "Open"}</button><button type="button" className="danger" onClick={() => void archiveProject(project)} disabled={submitting || projectActionsDisabled}>Archive</button></div></article>; })}</div>
       )}
     </section>

@@ -34,3 +34,8 @@
 .engine-compatibility--ready { border-color:rgba(52,211,153,.45); }
 .engine-compatibility--blocked { border-color:rgba(248,113,113,.45); }
 @media (max-width:600px) { .engine-compatibility { flex-direction:column; } }
+.unity-export-plan { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.45rem 1rem; margin-top:1rem; padding:.9rem 1rem; border:1px solid rgba(167,139,250,.38); border-radius:12px; background:rgba(91,33,182,.12); }
+.unity-export-plan div { display:flex; flex-direction:column; gap:.2rem; }
+.unity-export-plan span, .unity-export-plan small { color:#c4b5fd; }
+.unity-export-plan small { grid-column:1 / -1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:600px) { .unity-export-plan { grid-template-columns:1fr; } .unity-export-plan button { width:100%; } }
