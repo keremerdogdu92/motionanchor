@@ -2,12 +2,14 @@
 /// MotionAnchor Rust host — Tauri application entry and command handlers.
 mod artifact_cleanup;
 mod credential_store;
+mod database;
 mod dev_env_store;
 mod previews;
 mod prompt_editor;
 mod sidecar;
 
 use std::sync::Mutex;
+use tauri::Manager;
 
 struct JobSidecarState {
     client: Mutex<Option<sidecar::JobSidecarClient>>,
@@ -162,6 +164,12 @@ fn get_prompt_editor_frame(
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .setup(|app| {
+            let database = database::initialize(app.handle())
+                .map_err(std::io::Error::other)?;
+            app.manage(database);
+            Ok(())
+        })
         .manage(JobSidecarState {
             client: Mutex::new(None),
         })
@@ -179,6 +187,10 @@ pub fn run() {
             get_job_status,
             cancel_job,
             delete_job_artifacts,
+            database::database_status,
+            database::create_project,
+            database::list_projects,
+            database::archive_project,
             get_frame_previews,
             get_rgba_previews,
             load_prompt_document,
