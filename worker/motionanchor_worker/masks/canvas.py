@@ -13,6 +13,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+from .quality_gates import evaluate_export_quality, export_quality_report_dict
+
 
 @dataclass(frozen=True)
 class SharedCanvasFrame:
@@ -190,11 +192,13 @@ def normalize_rgba_sequence(
 
         sequence_sha256 = _sequence_digest(plan, normalized_frames)
         report_path = staging / "shared-canvas-report.json"
+        quality_report = evaluate_export_quality([staging / Path(frame.output_path).name for frame in normalized_frames])
         report_payload = {
             "schemaVersion": 1,
             "plan": asdict(plan),
             "sequenceSha256": sequence_sha256,
             "frames": [asdict(frame) for frame in normalized_frames],
+            "qualityGate": export_quality_report_dict(quality_report),
         }
         report_path.write_text(
             json.dumps(report_payload, indent=2, sort_keys=True),

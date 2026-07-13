@@ -197,6 +197,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - ~~Bottom-center baseline and normalized pivot metadata.~~
 - Onion-skin preview.
 - Deterministic sprite sheet builder.
+- ~~Add conservative export quality gates for empty foreground, edge contact, duplicates, blur outliers, and foreground-area jumps.~~
 - PNG frame and manifest export.
 
 ### Exit Criteria

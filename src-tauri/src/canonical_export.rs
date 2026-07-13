@@ -4,7 +4,7 @@ use crate::animation_manifest::{
     AnimationFrameV2, AnimationManifestV2, CanvasSize, NormalizedPivot,
     ANIMATION_MANIFEST_FILENAME, ANIMATION_MANIFEST_SCHEMA_VERSION,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
@@ -21,6 +21,29 @@ pub struct CanonicalExportResult {
     pub package_summary_sha256: String,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SharedCanvasQualityFinding {
+    code: String,
+    message: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SharedCanvasQualityGate {
+    status: String,
+    #[serde(default)]
+    blockers: Vec<SharedCanvasQualityFinding>,
+    #[serde(default)]
+    warnings: Vec<SharedCanvasQualityFinding>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SharedCanvasReport {
+    quality_gate: SharedCanvasQualityGate,
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CanonicalExportPlan {
@@ -34,6 +57,7 @@ pub struct CanonicalExportPlan {
     pub frame_rate: f64,
     pub loop_animation: bool,
     pub conflicts: Vec<String>,
+    pub warnings: Vec<String>,
     pub errors: Vec<String>,
     pub frames: Vec<String>,
 }
@@ -151,6 +175,25 @@ fn inspect_plan(
         }
     }
     let mut errors = Vec::new();
+    let mut warnings = Vec::new();
+    if source_directory.file_name().and_then(|value| value.to_str()) == Some("shared_canvas") {
+        let report_path = source_directory.join("shared-canvas-report.json");
+        if !report_path.is_file() {
+            errors.push("Shared-canvas quality report is missing".into());
+        } else {
+            let report: SharedCanvasReport = serde_json::from_slice(
+                &fs::read(&report_path).map_err(|error| format!("could not read shared-canvas quality report: {error}"))?,
+            ).map_err(|error| format!("invalid shared-canvas quality report: {error}"))?;
+            if report.quality_gate.status == "blocked" || !report.quality_gate.blockers.is_empty() {
+                errors.extend(report.quality_gate.blockers.into_iter().map(|finding| {
+                    format!("Quality gate {}: {}", finding.code, finding.message)
+                }));
+            }
+            warnings.extend(report.quality_gate.warnings.into_iter().map(|finding| {
+                format!("Quality warning {}: {}", finding.code, finding.message)
+            }));
+        }
+    }
     frames.sort_by(natural_cmp);
     if frames.is_empty() {
         errors.push("No RGBA PNG frames were found".into());
@@ -191,6 +234,7 @@ fn inspect_plan(
         frame_rate,
         loop_animation,
         conflicts,
+        warnings,
         errors,
         frames: frames
             .into_iter()
@@ -381,6 +425,11 @@ mod tests {
         )
         .unwrap();
         fs::write(
+            directory.path().join("artifacts/rgba/shared_canvas/shared-canvas-report.json"),
+            br#"{"qualityGate":{"status":"passed","blockers":[],"warnings":[]}}"#,
+        )
+        .unwrap();
+        fs::write(
             directory.path().join("artifacts/rgba/rgba/frame_1.png"),
             png(40, 32, 2),
         )
@@ -389,6 +438,22 @@ mod tests {
         assert!(plan.ready);
         assert!(plan.source_path.ends_with("shared_canvas"));
         assert_eq!((plan.width, plan.height), (Some(24), Some(20)));
+    }
+
+    #[test]
+    fn plan_blocks_shared_canvas_with_quality_blockers() {
+        let directory = prepared_workspace();
+        let shared = directory.path().join("artifacts/rgba/shared_canvas");
+        fs::create_dir_all(&shared).unwrap();
+        fs::write(shared.join("frame_1.png"), png(24, 20, 1)).unwrap();
+        fs::write(
+            shared.join("shared-canvas-report.json"),
+            br#"{"qualityGate":{"status":"blocked","blockers":[{"code":"foreground_touches_canvas_edge","message":"padding failed"}],"warnings":[]}}"#,
+        )
+        .unwrap();
+        let plan = inspect_plan(directory.path(), "Dash", 30.0, true).unwrap();
+        assert!(!plan.ready);
+        assert!(plan.errors.iter().any(|error| error.contains("foreground_touches_canvas_edge")));
     }
 
     #[test]
