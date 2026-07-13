@@ -9,6 +9,7 @@ import { RgbaPreviewGallery } from "./rgba-preview/RgbaPreviewGallery";
 import { JobHistory, type JobHistoryEntry, type JobRequest } from "./job-history/JobHistory";
 import { RecoveryNotice } from "./job-recovery/RecoveryNotice";
 import { ProjectDashboard, type ProjectRecord } from "./project-dashboard/ProjectDashboard";
+import { deriveProjectWorkspacePaths } from "./project-dashboard/projectPaths";
 import { Sam2Presets, type Sam2Settings } from "./sam2-settings/Sam2Presets";
 import "./App.css";
 
@@ -63,6 +64,7 @@ const DEFAULT_PROMPTS = `${ROOT}\\dash\\sam2-prompts.json`;
 const JOB_HISTORY_KEY = "motionanchor.job-history.v1";
 const JOB_HISTORY_LIMIT = 20;
 const SAM2_SETTINGS_KEY = "motionanchor.sam2-settings.v1";
+const ACTIVE_PROJECT_KEY = "motionanchor.active-project-id.v1";
 
 function loadSam2Settings(): Sam2Settings {
   try {
@@ -79,6 +81,14 @@ function loadSam2Settings(): Sam2Settings {
 
 function retryOutputPath(path: string) {
   return `${path}-retry-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+}
+
+function loadActiveProjectId() {
+  try {
+    return window.localStorage.getItem(ACTIVE_PROJECT_KEY);
+  } catch {
+    return null;
+  }
 }
 
 function loadJobHistory(): JobHistoryEntry[] {
@@ -106,6 +116,7 @@ function queuedJob(accepted: JobAccepted): JobStatus {
 
 function App() {
   const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
+  const [initialActiveProjectId] = useState(loadActiveProjectId);
   const [sourcePath, setSourcePath] = useState(DEFAULT_SOURCE);
   const [extractionOutput, setExtractionOutput] = useState(DEFAULT_EXTRACTION_OUTPUT);
   const [framesPath, setFramesPath] = useState(DEFAULT_FRAMES);
@@ -216,6 +227,35 @@ function App() {
       .then(setRgbaPreviews)
       .catch((cause) => setError(String(cause)));
   }, [job?.status, job?.operation, segmentationOutput]);
+
+  function selectProject(project: ProjectRecord | null) {
+    setActiveProject(project);
+    setProbe(null);
+    setPreviews([]);
+    setRgbaPreviews([]);
+    setSam2Runtime(null);
+    setActiveRequest(null);
+    setJob(null);
+    setError("");
+
+    if (!project) {
+      window.localStorage.removeItem(ACTIVE_PROJECT_KEY);
+      setSourcePath(DEFAULT_SOURCE);
+      setExtractionOutput(DEFAULT_EXTRACTION_OUTPUT);
+      setFramesPath(DEFAULT_FRAMES);
+      setSegmentationOutput(DEFAULT_SEGMENTATION_OUTPUT);
+      setPromptPath(DEFAULT_PROMPTS);
+      return;
+    }
+
+    window.localStorage.setItem(ACTIVE_PROJECT_KEY, project.id);
+    const paths = deriveProjectWorkspacePaths(project.workspacePath);
+    setSourcePath(paths.sourcePath);
+    setExtractionOutput(paths.extractionOutput);
+    setFramesPath(paths.framesPath);
+    setSegmentationOutput(paths.segmentationOutput);
+    setPromptPath(paths.promptPath);
+  }
 
   async function chooseFile(
     setter: (path: string) => void,
@@ -422,7 +462,12 @@ function App() {
         <span className="status-pill">Keremev worker</span>
       </header>
 
-      <ProjectDashboard activeProject={activeProject} onSelectProject={setActiveProject} />
+      <ProjectDashboard
+        activeProject={activeProject}
+        initialActiveProjectId={initialActiveProjectId}
+        projectActionsDisabled={busy || Boolean(job && !terminal)}
+        onSelectProject={selectProject}
+      />
 
       {activeProject && <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>}
 
