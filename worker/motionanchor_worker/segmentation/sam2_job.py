@@ -237,6 +237,12 @@ def run_sam2_rgba_job(
         result["output_path"] = str(resolved_output)
         result["masks_path"] = str(resolved_output / "masks")
         result["rgba_path"] = str(resolved_output / "rgba")
+        if "normalized_rgba_path" in result:
+            result["normalized_rgba_path"] = str(resolved_output / "shared_canvas")
+        if "shared_canvas_report_path" in result:
+            result["shared_canvas_report_path"] = str(
+                resolved_output / "shared_canvas" / "shared-canvas-report.json"
+            )
         result["report_path"] = str(resolved_output / "sam2-rgba-report.json")
         report(1.0, "SAM 2 RGBA sequence completed")
         return result

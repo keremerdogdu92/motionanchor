@@ -25,7 +25,11 @@ if str(WORKER) not in sys.path:
     sys.path.insert(0, str(WORKER))
 
 from motionanchor_worker.benchmarks import compare_temporal_masks
-from motionanchor_worker.masks import analyze_rgba_sequence, compose_rgba_cutout
+from motionanchor_worker.masks import (
+    analyze_rgba_sequence,
+    compose_rgba_cutout,
+    normalize_rgba_sequence,
+)
 
 MODEL = {
     "checkpoint": WORKER / "models" / "sam2" / "sam2.1_hiera_small.pt",
@@ -166,8 +170,11 @@ def main() -> None:
         if index % 12 == 0 or index == len(frames):
             emit("progress", progress=0.78 + 0.17 * index / len(frames), message=f"Composing frame {index}/{len(frames)}")
 
+    ordered_rgba = sorted(rgba_dir.glob("frame_*.png"))
     temporal = compare_temporal_masks(resolved_masks)
-    quality = analyze_rgba_sequence(sorted(rgba_dir.glob("frame_*.png")))
+    quality = analyze_rgba_sequence(ordered_rgba)
+    emit("progress", progress=0.96, message="Building shared animation canvas")
+    shared_canvas = normalize_rgba_sequence(ordered_rgba, output / "shared_canvas", padding=16)
     report = {
         "engine_id": "sam2.1.video.hiera-small.v1",
         "frame_count": len(frames),
@@ -177,8 +184,18 @@ def main() -> None:
         "elapsed_seconds": time.perf_counter() - started,
         "temporal": {key: value for key, value in asdict(temporal).items() if key != "pairs"},
         "quality": {key: value for key, value in asdict(quality).items() if key != "frames"},
+        "shared_canvas": {
+            "width": shared_canvas.canvas_width,
+            "height": shared_canvas.canvas_height,
+            "pivot_x": shared_canvas.pivot_x,
+            "pivot_y": shared_canvas.pivot_y,
+            "baseline_y": shared_canvas.baseline_y,
+            "sequence_sha256": shared_canvas.sequence_sha256,
+        },
         "masks_path": str(masks_dir.resolve()),
         "rgba_path": str(rgba_dir.resolve()),
+        "normalized_rgba_path": shared_canvas.output_path,
+        "shared_canvas_report_path": shared_canvas.report_path,
         "prompt_path": str(prompt_path.resolve()),
     }
     report_path = output / "sam2-rgba-report.json"

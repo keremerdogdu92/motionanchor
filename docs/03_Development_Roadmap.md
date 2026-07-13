@@ -192,9 +192,9 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - SAM 2 production-candidate spike with temporal-mask evaluation.
 - Cutie/XMem retained as experimental benchmark candidates until Windows packaging is proven.
 - Mask preview and confidence.
-- Union-bounds safe crop.
-- Configurable padding.
-- Baseline and pivot alignment.
+- ~~Union-bounds safe crop with deterministic shared-canvas publication.~~
+- ~~Configurable padding with non-overwrite and atomic staging.~~
+- ~~Bottom-center baseline and normalized pivot metadata.~~
 - Onion-skin preview.
 - Deterministic sprite sheet builder.
 - PNG frame and manifest export.

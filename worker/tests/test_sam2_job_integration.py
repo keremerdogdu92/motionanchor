@@ -20,8 +20,11 @@ request = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 output = Path(request["output_path"])
 (output / "masks").mkdir(parents=True)
 (output / "rgba").mkdir()
+(output / "shared_canvas").mkdir()
 (output / "masks" / "frame_000000.png").write_bytes(b"mask")
 (output / "rgba" / "frame_000000.png").write_bytes(b"rgba")
+(output / "shared_canvas" / "frame_000000.png").write_bytes(b"normalized")
+(output / "shared_canvas" / "shared-canvas-report.json").write_text("{}", encoding="utf-8")
 report = output / "sam2-rgba-report.json"
 report.write_text("{}", encoding="utf-8")
 print(json.dumps({"type": "progress", "progress": 0.5, "message": "fake processing"}), flush=True)
@@ -30,6 +33,8 @@ print(json.dumps({"type": "result", "payload": {
     "frame_count": 1,
     "masks_path": str(output / "masks"),
     "rgba_path": str(output / "rgba"),
+    "normalized_rgba_path": str(output / "shared_canvas"),
+    "shared_canvas_report_path": str(output / "shared_canvas" / "shared-canvas-report.json"),
     "report_path": str(report),
 }}), flush=True)
 '''
@@ -63,6 +68,8 @@ class Sam2JobIntegrationTests(unittest.TestCase):
             self.assertEqual(Path(result["output_path"]), output.resolve())
             self.assertEqual(Path(result["masks_path"]), output.resolve() / "masks")
             self.assertEqual(Path(result["rgba_path"]), output.resolve() / "rgba")
+            self.assertEqual(Path(result["normalized_rgba_path"]), output.resolve() / "shared_canvas")
+            self.assertTrue(Path(result["shared_canvas_report_path"]).is_file())
             self.assertTrue(Path(result["report_path"]).is_file())
             self.assertTrue((output / "rgba" / "frame_000000.png").is_file())
             self.assertEqual(progress[-1], 1.0)

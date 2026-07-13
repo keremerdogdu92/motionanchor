@@ -70,39 +70,3 @@ class RgbaQualityTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-    def test_sequence_requires_matching_dimensions(self) -> None:
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            first = root / "first.png"
-            second = root / "second.png"
-            self._write_rgba(first, np.full((8, 8), 255, dtype=np.uint8))
-            self._write_rgba(second, np.full((9, 8), 255, dtype=np.uint8))
-
-            with self.assertRaises(ValueError):
-                analyze_rgba_sequence([first, second])
-
-    def test_sequence_aggregates_empty_and_edge_touching_frames(self) -> None:
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            empty = root / "empty.png"
-            edge = root / "edge.png"
-            alpha_empty = np.zeros((10, 12), dtype=np.uint8)
-            alpha_edge = np.zeros((10, 12), dtype=np.uint8)
-            alpha_edge[:, 0:3] = 255
-            self._write_rgba(empty, alpha_empty)
-            self._write_rgba(edge, alpha_edge)
-
-            result = analyze_rgba_sequence([empty, edge])
-            self.assertEqual(result.frame_count, 2)
-            self.assertEqual(result.empty_frame_count, 1)
-            self.assertEqual(result.edge_touch_frame_count, 1)
-            self.assertEqual(result.maximum_component_count, 1)
-
-    def test_empty_sequence_is_rejected(self) -> None:
-        with self.assertRaises(ValueError):
-            analyze_rgba_sequence([])
-
-
-if __name__ == "__main__":
-    unittest.main()

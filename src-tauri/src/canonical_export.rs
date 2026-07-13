@@ -27,6 +27,7 @@ pub struct CanonicalExportPlan {
     pub asset_name: String,
     pub ready: bool,
     pub destination_path: String,
+    pub source_path: String,
     pub frame_count: usize,
     pub width: Option<u32>,
     pub height: Option<u32>,
@@ -124,10 +125,15 @@ fn inspect_plan(
     }
     let asset_name = sanitize_asset_name(asset_name)?;
     let destination = workspace.join("exports").join(&asset_name);
-    let rgba_directory = workspace.join("artifacts/rgba");
-    let mut errors = Vec::new();
-    let mut frames = if rgba_directory.is_dir() {
-        fs::read_dir(&rgba_directory)
+    let rgba_root = workspace.join("artifacts/rgba");
+    let candidates = [rgba_root.join("shared_canvas"), rgba_root.join("rgba"), rgba_root];
+    let mut source_directory = candidates.last().expect("RGBA candidates are defined").clone();
+    let mut frames = Vec::new();
+    for candidate in candidates {
+        if !candidate.is_dir() {
+            continue;
+        }
+        let mut candidate_frames = fs::read_dir(&candidate)
             .map_err(|error| format!("could not inspect RGBA output: {error}"))?
             .filter_map(Result::ok)
             .map(|entry| entry.path())
@@ -137,10 +143,14 @@ fn inspect_plan(
                         .extension()
                         .is_some_and(|extension| extension.eq_ignore_ascii_case("png"))
             })
-            .collect::<Vec<_>>()
-    } else {
-        Vec::new()
-    };
+            .collect::<Vec<_>>();
+        if !candidate_frames.is_empty() {
+            source_directory = candidate;
+            frames.append(&mut candidate_frames);
+            break;
+        }
+    }
+    let mut errors = Vec::new();
     frames.sort_by(natural_cmp);
     if frames.is_empty() {
         errors.push("No RGBA PNG frames were found".into());
@@ -174,6 +184,7 @@ fn inspect_plan(
         asset_name,
         ready: errors.is_empty(),
         destination_path: destination.to_string_lossy().into_owned(),
+        source_path: source_directory.to_string_lossy().into_owned(),
         frame_count: frames.len(),
         width: dimensions.map(|value| value.0),
         height: dimensions.map(|value| value.1),
@@ -357,6 +368,27 @@ mod tests {
             .errors
             .iter()
             .any(|error| error.contains("already exists")));
+    }
+
+    #[test]
+    fn plan_prefers_shared_canvas_over_raw_rgba_outputs() {
+        let directory = prepared_workspace();
+        fs::create_dir_all(directory.path().join("artifacts/rgba/shared_canvas")).unwrap();
+        fs::create_dir_all(directory.path().join("artifacts/rgba/rgba")).unwrap();
+        fs::write(
+            directory.path().join("artifacts/rgba/shared_canvas/frame_1.png"),
+            png(24, 20, 1),
+        )
+        .unwrap();
+        fs::write(
+            directory.path().join("artifacts/rgba/rgba/frame_1.png"),
+            png(40, 32, 2),
+        )
+        .unwrap();
+        let plan = inspect_plan(directory.path(), "Dash", 30.0, true).unwrap();
+        assert!(plan.ready);
+        assert!(plan.source_path.ends_with("shared_canvas"));
+        assert_eq!((plan.width, plan.height), (Some(24), Some(20)));
     }
 
     #[test]
