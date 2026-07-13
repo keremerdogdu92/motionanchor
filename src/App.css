@@ -249,3 +249,8 @@ button.browse:hover {
 @media (max-width: 620px) {
   .runtime-card { grid-template-columns: 1fr; }
 }
+
+/* Active project context supplied by the SQLite project dashboard. */
+.active-project-banner { display:flex; justify-content:space-between; gap:1rem; margin:0 0 1rem; padding:.8rem 1rem; border:1px solid rgba(56,189,248,.35); border-radius:12px; background:rgba(14,116,144,.14); }
+.active-project-banner span { overflow:hidden; color:#94a3b8; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:600px) { .active-project-banner { flex-direction:column; } }

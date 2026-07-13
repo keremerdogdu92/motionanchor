@@ -8,6 +8,7 @@ import { PromptEditor } from "./prompt-editor/PromptEditor";
 import { RgbaPreviewGallery } from "./rgba-preview/RgbaPreviewGallery";
 import { JobHistory, type JobHistoryEntry, type JobRequest } from "./job-history/JobHistory";
 import { RecoveryNotice } from "./job-recovery/RecoveryNotice";
+import { ProjectDashboard, type ProjectRecord } from "./project-dashboard/ProjectDashboard";
 import { Sam2Presets, type Sam2Settings } from "./sam2-settings/Sam2Presets";
 import "./App.css";
 
@@ -104,6 +105,7 @@ function queuedJob(accepted: JobAccepted): JobStatus {
 }
 
 function App() {
+  const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
   const [sourcePath, setSourcePath] = useState(DEFAULT_SOURCE);
   const [extractionOutput, setExtractionOutput] = useState(DEFAULT_EXTRACTION_OUTPUT);
   const [framesPath, setFramesPath] = useState(DEFAULT_FRAMES);
@@ -419,6 +421,10 @@ function App() {
         </div>
         <span className="status-pill">Keremev worker</span>
       </header>
+
+      <ProjectDashboard activeProject={activeProject} onSelectProject={setActiveProject} />
+
+      {activeProject && <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>}
 
       <section className="workflow-grid">
         <article className="panel">
