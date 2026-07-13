@@ -905,6 +905,19 @@ A versioned Unity Editor package imports the manifest and uses Unity editor APIs
 
 This approach is safer than writing external `.meta` files because Unity GUIDs and serialized assets belong to the target project/editor context.
 
+
+### 12.4 Deterministic Export Naming Contract
+
+The export adapter receives a user-approved animation asset name before dry-run generation. The React preview, Rust dry-run planner, atomic exporter, manifest, and Unity companion importer must use the same normalized value.
+
+```text
+asset directory: Assets/MotionAnchor/<asset_name>/
+frame filename:  <asset_name>_frame_0001.png
+clip filename:   <asset_name>.anim
+```
+
+Normalization is deterministic and owned by the Rust export boundary. A name change invalidates any prior plan so that previewed paths cannot differ from published paths. Frame indices are one-based and padded to four digits to preserve lexical and animation order.
+
 ---
 
 ## 13. Frontend Architecture

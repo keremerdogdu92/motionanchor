@@ -117,6 +117,7 @@ function queuedJob(accepted: JobAccepted): JobStatus {
 function App() {
   const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceReadiness | null>(null);
+  const [exportAssetName, setExportAssetName] = useState("");
   const [initialActiveProjectId] = useState(loadActiveProjectId);
   const [sourcePath, setSourcePath] = useState(DEFAULT_SOURCE);
   const [extractionOutput, setExtractionOutput] = useState(DEFAULT_EXTRACTION_OUTPUT);
@@ -232,6 +233,7 @@ function App() {
   function selectProject(project: ProjectRecord | null) {
     setActiveProject(project);
     setWorkspaceStatus(null);
+    setExportAssetName(project?.name ?? "");
     setProbe(null);
     setPreviews([]);
     setRgbaPreviews([]);
@@ -474,6 +476,8 @@ function App() {
         projectActionsDisabled={busy || Boolean(job && !terminal)}
         onSelectProject={selectProject}
         onWorkspaceStatusChange={setWorkspaceStatus}
+        exportAssetName={exportAssetName}
+        onExportAssetNameChange={setExportAssetName}
       />
 
       {activeProject && <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>}
@@ -629,7 +633,7 @@ function App() {
       />
 
       {rgbaPreviews.length > 0 && (
-        <RgbaPreviewGallery rgbaFrames={rgbaPreviews} sourceFrames={previews} />
+        <RgbaPreviewGallery rgbaFrames={rgbaPreviews} sourceFrames={previews} animationName={exportAssetName} />
       )}
 
       {previews.length > 0 && (

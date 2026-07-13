@@ -69,6 +69,8 @@ type Props = {
   projectActionsDisabled: boolean;
   onSelectProject: (project: ProjectRecord | null) => void;
   onWorkspaceStatusChange: (status: WorkspaceReadiness | null) => void;
+  exportAssetName: string;
+  onExportAssetNameChange: (name: string) => void;
 };
 
 const ENGINE_PROFILES = [
@@ -77,7 +79,7 @@ const ENGINE_PROFILES = [
   { value: "generic", label: "Generic RGBA Pipeline" },
 ];
 
-export function ProjectDashboard({ activeProject, initialActiveProjectId, projectActionsDisabled, onSelectProject, onWorkspaceStatusChange }: Props) {
+export function ProjectDashboard({ activeProject, initialActiveProjectId, projectActionsDisabled, onSelectProject, onWorkspaceStatusChange, exportAssetName, onExportAssetNameChange }: Props) {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [name, setName] = useState("");
   const [workspacePath, setWorkspacePath] = useState("");
@@ -89,7 +91,6 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   const [engineStatus, setEngineStatus] = useState<EngineCompatibility | null>(null);
   const [unityExportPlan, setUnityExportPlan] = useState<UnityExportPlan | null>(null);
   const [unityExportResult, setUnityExportResult] = useState<UnityExportResult | null>(null);
-  const [unityAssetName, setUnityAssetName] = useState("");
 
   async function loadProjects() {
     setLoading(true);
@@ -114,7 +115,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   useEffect(() => { void loadProjects(); }, []);
 
   async function refreshWorkspaceStatus(project: ProjectRecord | null) {
-    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); setUnityExportPlan(null); setUnityExportResult(null); setUnityAssetName(""); onWorkspaceStatusChange(null); return; }
+    if (!project) { setWorkspaceStatus(null); setEngineStatus(null); setUnityExportPlan(null); setUnityExportResult(null); onWorkspaceStatusChange(null); return; }
     try {
       const [status, compatibility] = await Promise.all([
         invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath }),
@@ -124,7 +125,6 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       setEngineStatus(compatibility);
       setUnityExportPlan(null);
       setUnityExportResult(null);
-      setUnityAssetName(project.name);
       onWorkspaceStatusChange(status);
     } catch (cause) {
       setWorkspaceStatus(null);
@@ -159,7 +159,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       setUnityExportResult(null);
       setUnityExportPlan(await invoke<UnityExportPlan>("build_unity_export_plan", {
         workspacePath: activeProject.workspacePath,
-        assetName: unityAssetName,
+        assetName: exportAssetName,
         engineProfile: activeProject.engineProfile,
         frameRate: 30,
         loopAnimation: true,
@@ -178,7 +178,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
     try {
       const result = await invoke<UnityExportResult>("execute_unity_export", {
         workspacePath: activeProject.workspacePath,
-        assetName: unityAssetName,
+        assetName: exportAssetName,
         engineProfile: activeProject.engineProfile,
         frameRate: unityExportPlan.frameRate,
         loopAnimation: unityExportPlan.loopAnimation,
@@ -242,7 +242,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
         <label>Project name<input value={name} maxLength={120} onChange={(event) => setName(event.target.value)} placeholder="Cat Trap" required /></label>
         <label>Engine profile<select value={engineProfile} onChange={(event) => setEngineProfile(event.target.value)}>{ENGINE_PROFILES.map((profile) => <option key={profile.value} value={profile.value}>{profile.label}</option>)}</select></label>
         <label className="project-create-form__workspace">Workspace directory<span className="path-control"><input value={workspacePath} onChange={(event) => setWorkspacePath(event.target.value)} placeholder="Select an existing directory" required /><button type="button" className="browse" onClick={() => void chooseWorkspace()}>Browse</button></span></label>
-        <button type="submit" disabled={submitting || projectActionsDisabled || !name.trim() || !workspacePath.trim()}>{submitting ? "Creatingâ€¦" : "Create project"}</button>
+        <button type="submit" disabled={submitting || projectActionsDisabled || !name.trim() || !workspacePath.trim()}>{submitting ? "CreatingÃ¢â‚¬Â¦" : "Create project"}</button>
       </form>
       {error && <div className="project-dashboard__error" role="alert">{error}</div>}
       {activeProject && engineStatus && (
@@ -253,9 +253,9 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       )}
       {activeProject && engineStatus?.applicable && (
         <div className="unity-export-plan">
-          <div><strong>Unity export</strong><span>Preview RGBA first, name the animation, then plan and publish atomically.</span></div><label>Asset / animation name<input value={unityAssetName} maxLength={80} onChange={(event) => { setUnityAssetName(event.target.value); setUnityExportPlan(null); setUnityExportResult(null); }} placeholder="dash" /></label>
-          <div className="unity-export-plan__actions"><button type="button" className="secondary" onClick={() => void buildUnityExportPlan()} disabled={submitting || projectActionsDisabled || !engineStatus.compatible || !workspaceStatus?.rgbaHasFiles || !unityAssetName.trim()}>Build export plan</button><button type="button" onClick={() => void executeUnityExport()} disabled={submitting || projectActionsDisabled || !unityExportPlan?.ready}>Export to Unity</button></div>
-          {unityExportPlan && <><small>Name: {unityExportPlan.assetName} · {unityExportPlan.ready ? "Ready" : "Blocked"}: {unityExportPlan.frameCount} frames{unityExportPlan.width && unityExportPlan.height ? ` · ${unityExportPlan.width}×${unityExportPlan.height}` : ""} · {unityExportPlan.frameRate} fps · {unityExportPlan.loopAnimation ? "loop" : "once"}</small><small title={unityExportPlan.destinationPath}>Target: {unityExportPlan.destinationPath}</small>{unityExportPlan.errors.length > 0 && <small>Issues: {unityExportPlan.errors.join(" · ")}</small>}{unityExportPlan.conflicts.length > 0 && <small>Conflicts: {unityExportPlan.conflicts.length}</small>}</>}
+          <div><strong>Unity export</strong><span>Preview RGBA first, name the animation, then plan and publish atomically.</span></div><label>Asset / animation name<input value={exportAssetName} maxLength={80} onChange={(event) => { onExportAssetNameChange(event.target.value); setUnityExportPlan(null); setUnityExportResult(null); }} placeholder="dash" /></label>
+          <div className="unity-export-plan__actions"><button type="button" className="secondary" onClick={() => void buildUnityExportPlan()} disabled={submitting || projectActionsDisabled || !engineStatus.compatible || !workspaceStatus?.rgbaHasFiles || !exportAssetName.trim()}>Build export plan</button><button type="button" onClick={() => void executeUnityExport()} disabled={submitting || projectActionsDisabled || !unityExportPlan?.ready}>Export to Unity</button></div>
+          {unityExportPlan && <><small>Name: {unityExportPlan.assetName} Â· {unityExportPlan.ready ? "Ready" : "Blocked"}: {unityExportPlan.frameCount} frames{unityExportPlan.width && unityExportPlan.height ? ` Â· ${unityExportPlan.width}Ã—${unityExportPlan.height}` : ""} Â· {unityExportPlan.frameRate} fps Â· {unityExportPlan.loopAnimation ? "loop" : "once"}</small><small title={unityExportPlan.destinationPath}>Target: {unityExportPlan.destinationPath}</small>{unityExportPlan.errors.length > 0 && <small>Issues: {unityExportPlan.errors.join(" Â· ")}</small>}{unityExportPlan.conflicts.length > 0 && <small>Conflicts: {unityExportPlan.conflicts.length}</small>}</>}
           {unityExportResult && <><small>Exported {unityExportResult.copiedFrames} frames.</small><small title={unityExportResult.manifestPath}>Manifest: {unityExportResult.manifestPath}</small><small title={unityExportResult.editorScriptPath}>Editor script: {unityExportResult.editorScriptPath}</small></>}
         </div>
       )}
@@ -267,7 +267,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
           {workspaceStatus.nonEmptyOutputDirectories.length > 0 && <small>Output folders must be empty: {workspaceStatus.nonEmptyOutputDirectories.join(", ")}</small>}
         </div>
       )}
-      {loading ? <div className="project-dashboard__state">Loading projectsâ€¦</div> : projects.length === 0 ? <div className="project-dashboard__state"><strong>No active projects</strong><span>Create a project to bind a workspace and engine profile.</span></div> : (
+      {loading ? <div className="project-dashboard__state">Loading projectsÃ¢â‚¬Â¦</div> : projects.length === 0 ? <div className="project-dashboard__state"><strong>No active projects</strong><span>Create a project to bind a workspace and engine profile.</span></div> : (
         <div className="project-card-grid">{projects.map((project) => { const selected = activeProject?.id === project.id; return <article key={project.id} className={`project-card${selected ? " project-card--selected" : ""}`}><div><span className="project-card__profile">{project.engineProfile}</span><h3>{project.name}</h3><p title={project.workspacePath}>{project.workspacePath}</p></div><div className="project-card__actions"><button type="button" onClick={() => onSelectProject(project)} disabled={selected || submitting || projectActionsDisabled}>{selected ? "Active" : "Open"}</button><button type="button" className="danger" onClick={() => void archiveProject(project)} disabled={submitting || projectActionsDisabled}>Archive</button></div></article>; })}</div>
       )}
     </section>

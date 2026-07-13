@@ -309,7 +309,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - Finalize animation manifest schema.
 - Export adapter interface.
 - Artifact transaction and rollback.
-- Naming templates.
+- Naming templates. Locked initial convention: `<asset_name>_frame_0001.png`; the approved asset name is shared by preview, dry run, manifest, Unity destination, and future `.anim` output.
 - PPU/pivot/FPS/loop profiles.
 - Export validation and dry-run report.
 

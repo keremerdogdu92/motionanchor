@@ -16,6 +16,7 @@ type PreviewMode = "rgba" | "before-after" | "alpha" | "onion-skin";
 type Props = {
   rgbaFrames: PreviewFrame[];
   sourceFrames: PreviewFrame[];
+  animationName: string;
 };
 
 function AlphaCanvas({ frame }: { frame: PreviewFrame }) {
@@ -47,7 +48,7 @@ function AlphaCanvas({ frame }: { frame: PreviewFrame }) {
   return <canvas ref={canvasRef} className="alpha-canvas" aria-label={`Alpha channel ${frame.index}`} />;
 }
 
-export function RgbaPreviewGallery({ rgbaFrames, sourceFrames }: Props) {
+export function RgbaPreviewGallery({ rgbaFrames, sourceFrames, animationName }: Props) {
   const [mode, setMode] = useState<PreviewMode>("rgba");
   const [selectedPosition, setSelectedPosition] = useState(0);
   const [onionOpacity, setOnionOpacity] = useState(0.35);
@@ -75,8 +76,8 @@ export function RgbaPreviewGallery({ rgbaFrames, sourceFrames }: Props) {
     <section className="panel preview-panel rgba-preview-panel">
       <div className="panel-heading rgba-preview-heading">
         <div>
-          <h2>RGBA inspection</h2>
-          <span className="muted">{orderedFrames.length} representative frames</span>
+          <h2>RGBA inspection{animationName.trim() ? ` — ${animationName.trim()}` : ""}</h2>
+          <span className="muted">{orderedFrames.length} representative frames · export pattern: {(animationName.trim() || "animation")}_frame_0001.png</span>
         </div>
         <div className="rgba-mode-tabs" role="tablist" aria-label="RGBA preview mode">
           {(["rgba", "before-after", "alpha", "onion-skin"] as PreviewMode[]).map((item) => (

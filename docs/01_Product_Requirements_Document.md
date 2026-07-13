@@ -580,6 +580,26 @@ A companion Unity Editor package should read the manifest and:
 
 The exporter must not rely on generating reusable `.meta` files outside the target Unity project because GUID and editor-version coupling makes that approach fragile.
 
+
+#### Export Asset Naming Standard
+
+Before Unity export, the user must provide or confirm an animation asset name. The project name may be used as the initial suggestion, but the animation name remains editable per export. The same approved name must be visible in the RGBA preview and used by both dry-run and real export.
+
+The locked individual-frame naming pattern is:
+
+```text
+<asset_name>_frame_<zero-padded 4-digit index>.png
+```
+
+Example:
+
+```text
+warlock_dash_frame_0001.png
+warlock_dash_frame_0002.png
+```
+
+Unsupported filesystem characters and whitespace are normalized deterministically. Changing the asset name invalidates the previous dry-run plan. The export manifest must store the sanitized asset name and exact ordered frame filenames.
+
 ### 10.16 Provider Management
 
 A provider settings area must support one screen per provider while sharing a common interface.
