@@ -1,6 +1,6 @@
 # MotionAnchor Engine-Neutral Manifest v2 and Project Format
 
-**Status:** Initial approved design baseline  
+**Status:** Initial approved design baseline
 **Date:** 2026-07-14
 
 ## 1. Canonical Animation Manifest v2

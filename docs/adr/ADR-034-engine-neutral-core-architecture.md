@@ -1,6 +1,6 @@
 # ADR-034: Engine-Neutral Core Architecture
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-07-14
 
 ## Context
@@ -13,10 +13,10 @@ MotionAnchor is an engine-neutral animation pipeline. The canonical output is An
 
 Adapter priority is:
 
-1. Unity 6 — first production adapter for current project continuity.
-2. Godot 4 — second official adapter and preferred open-source strategic direction.
-3. Unity 2022.3 — compatibility target.
-4. GameMaker, Unreal Paper2D, and others — later feasibility-driven adapters.
+1. Unity 6 â€” first production adapter for current project continuity.
+2. Godot 4 â€” second official adapter and preferred open-source strategic direction.
+3. Unity 2022.3 â€” compatibility target.
+4. GameMaker, Unreal Paper2D, and others â€” later feasibility-driven adapters.
 
 The `.motionanchor` format will become a separate versioned project container. It will not replace the portable animation manifest and will never contain credentials.
 
