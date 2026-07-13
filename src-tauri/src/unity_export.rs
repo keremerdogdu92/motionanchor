@@ -1,7 +1,7 @@
 /// src-tauri/src/unity_export.rs
 /// Builds a non-destructive Unity 2022.3 export plan for completed RGBA sequences.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use std::cmp::Ordering;
 use std::fs;
@@ -16,10 +16,11 @@ pub struct UnityExportResult {
     pub copied_frames: usize,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UnityExportManifest {
     pub schema_version: u32,
+    pub asset_name: String,
     pub frame_rate: f64,
     pub loop_animation: bool,
     pub width: u32,
@@ -34,6 +35,7 @@ pub struct UnityExportManifest {
 #[serde(rename_all = "camelCase")]
 pub struct UnityExportPlan {
     pub supported: bool,
+    pub asset_name: String,
     pub ready: bool,
     pub destination_path: String,
     pub frame_count: usize,
@@ -92,9 +94,10 @@ fn png_dimensions(path: &Path) -> Result<(u32, u32), String> {
     Ok((u32::from_be_bytes(bytes[16..20].try_into().unwrap()), u32::from_be_bytes(bytes[20..24].try_into().unwrap())))
 }
 
-fn build_plan(workspace: &Path, project_name: &str, engine_profile: &str, frame_rate: f64, loop_animation: bool) -> Result<UnityExportPlan, String> {
+fn build_plan(workspace: &Path, asset_name: &str, engine_profile: &str, frame_rate: f64, loop_animation: bool) -> Result<UnityExportPlan, String> {
     if !frame_rate.is_finite() || !(1.0..=240.0).contains(&frame_rate) { return Err("frame rate must be between 1 and 240".into()); }
-    let destination = workspace.join("Assets/MotionAnchor").join(sanitize_segment(project_name)?);
+    let asset_name = sanitize_segment(asset_name)?;
+    let destination = workspace.join("Assets/MotionAnchor").join(&asset_name);
     let rgba_directory = workspace.join("artifacts/rgba");
     let supported = engine_profile == "unity-2022.3";
     let mut errors = Vec::new();
@@ -123,6 +126,7 @@ fn build_plan(workspace: &Path, project_name: &str, engine_profile: &str, frame_
     if destination.exists() { errors.push("Unity destination already exists".into()); }
     Ok(UnityExportPlan {
         supported,
+        asset_name,
         ready: supported && errors.is_empty(),
         destination_path: destination.to_string_lossy().into_owned(),
         frame_count: frames.len(),
@@ -137,9 +141,9 @@ fn build_plan(workspace: &Path, project_name: &str, engine_profile: &str, frame_
 }
 
 #[tauri::command]
-pub fn build_unity_export_plan(workspace_path: &str, project_name: &str, engine_profile: &str, frame_rate: f64, loop_animation: bool) -> Result<UnityExportPlan, String> {
+pub fn build_unity_export_plan(workspace_path: &str, asset_name: &str, engine_profile: &str, frame_rate: f64, loop_animation: bool) -> Result<UnityExportPlan, String> {
     let workspace = Path::new(workspace_path).canonicalize().map_err(|error| format!("invalid project workspace path: {error}"))?;
-    build_plan(&workspace, project_name, engine_profile, frame_rate, loop_animation)
+    build_plan(&workspace, asset_name, engine_profile, frame_rate, loop_animation)
 }
 
 const EDITOR_SCRIPT: &str = r#"using UnityEditor;
@@ -162,9 +166,9 @@ public sealed class MotionAnchorTexturePostprocessor : AssetPostprocessor
 "#;
 
 #[tauri::command]
-pub fn execute_unity_export(workspace_path: &str, project_name: &str, engine_profile: &str, frame_rate: f64, loop_animation: bool) -> Result<UnityExportResult, String> {
+pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profile: &str, frame_rate: f64, loop_animation: bool) -> Result<UnityExportResult, String> {
     let workspace = Path::new(workspace_path).canonicalize().map_err(|error| format!("invalid project workspace path: {error}"))?;
-    let plan = build_plan(&workspace, project_name, engine_profile, frame_rate, loop_animation)?;
+    let plan = build_plan(&workspace, asset_name, engine_profile, frame_rate, loop_animation)?;
     if !plan.ready { return Err(format!("Unity export plan is blocked: {}", plan.errors.join("; "))); }
     let destination = PathBuf::from(&plan.destination_path);
     let parent = destination.parent().ok_or_else(|| "Unity destination has no parent directory".to_string())?;
@@ -176,15 +180,17 @@ pub fn execute_unity_export(workspace_path: &str, project_name: &str, engine_pro
         fs::create_dir_all(&frames_dir).map_err(|error| format!("could not create staging frames directory: {error}"))?;
         fs::create_dir_all(&editor_dir).map_err(|error| format!("could not create staging editor directory: {error}"))?;
         let mut exported_frames = Vec::with_capacity(plan.frames.len());
-        for source in &plan.frames {
+        let digits = usize::max(4, plan.frame_count.to_string().len());
+        for (index, source) in plan.frames.iter().enumerate() {
             let source_path = Path::new(source);
-            let filename = source_path.file_name().ok_or_else(|| format!("invalid frame path: {}", source_path.display()))?;
-            let target = frames_dir.join(filename);
+            let filename = format!("{}_frame_{:0width$}.png", plan.asset_name, index + 1, width = digits);
+            let target = frames_dir.join(&filename);
             fs::copy(source_path, &target).map_err(|error| format!("could not copy {}: {error}", source_path.display()))?;
-            exported_frames.push(format!("Frames/{}", filename.to_string_lossy()));
+            exported_frames.push(format!("Frames/{filename}"));
         }
         let manifest = UnityExportManifest {
             schema_version: 1,
+            asset_name: plan.asset_name.clone(),
             frame_rate: plan.frame_rate,
             loop_animation: plan.loop_animation,
             width: plan.width.ok_or_else(|| "export width is unavailable".to_string())?,
@@ -226,7 +232,7 @@ mod tests {
         fs::create_dir_all(directory.path().join("artifacts/rgba")).unwrap();
         fs::create_dir(directory.path().join("Assets")).unwrap();
         for name in ["frame_10.png", "frame_2.png", "frame_1.png"] { fs::write(directory.path().join("artifacts/rgba").join(name), png(64, 32)).unwrap(); }
-        let plan = build_plan(directory.path(), "Cat Trap", "unity-2022.3", 30.0, true).unwrap();
+        let plan = build_plan(directory.path(), "Dash", "unity-2022.3", 30.0, true).unwrap();
         assert!(plan.ready); assert_eq!(plan.frame_count, 3); assert!(plan.frames[0].ends_with("frame_1.png")); assert_eq!(plan.width, Some(64));
     }
 
@@ -258,10 +264,13 @@ mod tests {
         fs::create_dir(directory.path().join("Assets")).unwrap();
         fs::write(directory.path().join("artifacts/rgba/frame_1.png"), png(32, 16)).unwrap();
         fs::write(directory.path().join("artifacts/rgba/frame_2.png"), png(32, 16)).unwrap();
-        let result = execute_unity_export(directory.path().to_str().unwrap(), "Test", "unity-2022.3", 30.0, true).unwrap();
+        let result = execute_unity_export(directory.path().to_str().unwrap(), "Dash", "unity-2022.3", 30.0, true).unwrap();
         assert_eq!(result.copied_frames, 2);
         assert!(Path::new(&result.manifest_path).is_file());
         assert!(Path::new(&result.editor_script_path).is_file());
-        assert!(Path::new(&result.destination_path).join("Frames/frame_1.png").is_file());
+        assert!(Path::new(&result.destination_path).join("Frames/Dash_frame_0001.png").is_file());
+        let manifest: UnityExportManifest = serde_json::from_slice(&fs::read(&result.manifest_path).unwrap()).unwrap();
+        assert_eq!(manifest.asset_name, "Dash");
+        assert_eq!(manifest.frames[1], "Frames/Dash_frame_0002.png");
     }
 }
