@@ -8,7 +8,7 @@ import { PromptEditor } from "./prompt-editor/PromptEditor";
 import { RgbaPreviewGallery } from "./rgba-preview/RgbaPreviewGallery";
 import { JobHistory, type JobHistoryEntry, type JobRequest } from "./job-history/JobHistory";
 import { RecoveryNotice } from "./job-recovery/RecoveryNotice";
-import { ProjectDashboard, type ProjectRecord } from "./project-dashboard/ProjectDashboard";
+import { ProjectDashboard, type ProjectRecord, type WorkspaceReadiness } from "./project-dashboard/ProjectDashboard";
 import { deriveProjectWorkspacePaths } from "./project-dashboard/projectPaths";
 import { Sam2Presets, type Sam2Settings } from "./sam2-settings/Sam2Presets";
 import "./App.css";
@@ -116,6 +116,7 @@ function queuedJob(accepted: JobAccepted): JobStatus {
 
 function App() {
   const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
+  const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceReadiness | null>(null);
   const [initialActiveProjectId] = useState(loadActiveProjectId);
   const [sourcePath, setSourcePath] = useState(DEFAULT_SOURCE);
   const [extractionOutput, setExtractionOutput] = useState(DEFAULT_EXTRACTION_OUTPUT);
@@ -230,6 +231,7 @@ function App() {
 
   function selectProject(project: ProjectRecord | null) {
     setActiveProject(project);
+    setWorkspaceStatus(null);
     setProbe(null);
     setPreviews([]);
     setRgbaPreviews([]);
@@ -291,6 +293,8 @@ function App() {
 
   async function startExtraction(event: FormEvent) {
     event.preventDefault();
+    if (!activeProject) { setError("Select an active project before starting extraction."); return; }
+    if (!workspaceStatus?.extractionReady) { setError("Extraction requires a prepared workspace, media/source.mp4, and an empty artifacts/frames directory."); return; }
     setBusy(true);
     setError("");
     try {
@@ -326,6 +330,8 @@ function App() {
 
   async function startSegmentation(event: FormEvent) {
     event.preventDefault();
+    if (!activeProject) { setError("Select an active project before starting segmentation."); return; }
+    if (!workspaceStatus?.segmentationReady) { setError("Segmentation requires extracted frames, prompts/sam2-prompts.json, and an empty artifacts/rgba directory."); return; }
     setBusy(true);
     setError("");
     try {
@@ -467,6 +473,7 @@ function App() {
         initialActiveProjectId={initialActiveProjectId}
         projectActionsDisabled={busy || Boolean(job && !terminal)}
         onSelectProject={selectProject}
+        onWorkspaceStatusChange={setWorkspaceStatus}
       />
 
       {activeProject && <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>}
@@ -493,8 +500,8 @@ function App() {
               </span>
             </label>
             <div className="actions">
-              <button type="button" className="secondary" onClick={runProbe} disabled={busy}>Probe video</button>
-              <button type="submit" disabled={busy || Boolean(job && !terminal)}>Start extraction</button>
+              <button type="button" className="secondary" onClick={runProbe} disabled={busy || !activeProject || !workspaceStatus?.sourceExists}>Probe video</button>
+              <button type="submit" disabled={busy || Boolean(job && !terminal) || !workspaceStatus?.extractionReady}>Start extraction</button>
             </div>
           </form>
         </article>
@@ -541,8 +548,8 @@ function App() {
               </label>
             </div>
             <div className="actions">
-              <button type="button" className="secondary" onClick={runSam2Preflight} disabled={busy}>Check GPU runtime</button>
-              <button type="submit" disabled={busy || Boolean(job && !terminal) || sam2Runtime?.ready === false}>Start SAM 2 RGBA</button>
+              <button type="button" className="secondary" onClick={runSam2Preflight} disabled={busy || !activeProject || !workspaceStatus?.segmentationReady}>Check GPU runtime</button>
+              <button type="submit" disabled={busy || Boolean(job && !terminal) || !workspaceStatus?.segmentationReady || sam2Runtime?.ready === false}>Start SAM 2 RGBA</button>
             </div>
             {sam2Runtime && (
               <div className={`runtime-card ${sam2Runtime.ready ? "runtime-ready" : "runtime-blocked"}`}>

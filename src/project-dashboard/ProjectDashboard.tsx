@@ -24,6 +24,10 @@ export type WorkspaceReadiness = {
   nonEmptyOutputDirectories: string[];
   sourceExists: boolean;
   promptExists: boolean;
+  framesHaveFiles: boolean;
+  rgbaHasFiles: boolean;
+  extractionReady: boolean;
+  segmentationReady: boolean;
 };
 
 type Props = {
@@ -31,6 +35,7 @@ type Props = {
   initialActiveProjectId: string | null;
   projectActionsDisabled: boolean;
   onSelectProject: (project: ProjectRecord | null) => void;
+  onWorkspaceStatusChange: (status: WorkspaceReadiness | null) => void;
 };
 
 const ENGINE_PROFILES = [
@@ -39,7 +44,7 @@ const ENGINE_PROFILES = [
   { value: "generic", label: "Generic RGBA Pipeline" },
 ];
 
-export function ProjectDashboard({ activeProject, initialActiveProjectId, projectActionsDisabled, onSelectProject }: Props) {
+export function ProjectDashboard({ activeProject, initialActiveProjectId, projectActionsDisabled, onSelectProject, onWorkspaceStatusChange }: Props) {
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [name, setName] = useState("");
   const [workspacePath, setWorkspacePath] = useState("");
@@ -72,11 +77,14 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   useEffect(() => { void loadProjects(); }, []);
 
   async function refreshWorkspaceStatus(project: ProjectRecord | null) {
-    if (!project) { setWorkspaceStatus(null); return; }
+    if (!project) { setWorkspaceStatus(null); onWorkspaceStatusChange(null); return; }
     try {
-      setWorkspaceStatus(await invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath }));
+      const status = await invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: project.workspacePath });
+      setWorkspaceStatus(status);
+      onWorkspaceStatusChange(status);
     } catch (cause) {
       setWorkspaceStatus(null);
+      onWorkspaceStatusChange(null);
       setError(String(cause));
     }
   }
@@ -88,7 +96,9 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
     setSubmitting(true);
     setError("");
     try {
-      setWorkspaceStatus(await invoke<WorkspaceReadiness>("prepare_project_workspace", { workspacePath: activeProject.workspacePath }));
+      const status = await invoke<WorkspaceReadiness>("prepare_project_workspace", { workspacePath: activeProject.workspacePath });
+      setWorkspaceStatus(status);
+      onWorkspaceStatusChange(status);
     } catch (cause) {
       setError(String(cause));
     } finally {
@@ -150,8 +160,8 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       {error && <div className="project-dashboard__error" role="alert">{error}</div>}
       {activeProject && workspaceStatus && (
         <div className={`workspace-readiness ${workspaceStatus.ready ? "workspace-readiness--ready" : "workspace-readiness--blocked"}`}>
-          <div><strong>{workspaceStatus.ready ? "Workspace ready" : "Workspace needs attention"}</strong><span>{workspaceStatus.sourceExists ? "Source video found" : "Source video missing"} ? {workspaceStatus.promptExists ? "Prompt JSON found" : "Prompt JSON missing"}</span></div>
-          <div className="workspace-readiness__actions"><button type="button" className="secondary" onClick={() => void refreshWorkspaceStatus(activeProject)} disabled={submitting || projectActionsDisabled}>Check</button><button type="button" onClick={() => void prepareWorkspace()} disabled={submitting || projectActionsDisabled || workspaceStatus.ready}>Prepare folders</button></div>
+          <div><strong>{workspaceStatus.ready ? "Workspace structure ready" : "Workspace needs attention"}</strong><span>Extraction: {workspaceStatus.extractionReady ? "ready" : "blocked"} ? Segmentation: {workspaceStatus.segmentationReady ? "ready" : "blocked"}</span></div>
+          <div className="workspace-readiness__actions"><button type="button" className="secondary" onClick={() => void refreshWorkspaceStatus(activeProject)} disabled={submitting || projectActionsDisabled}>Check</button><button type="button" onClick={() => void prepareWorkspace()} disabled={submitting || projectActionsDisabled || workspaceStatus.missingDirectories.length === 0}>Prepare folders</button></div>
           {workspaceStatus.missingDirectories.length > 0 && <small>Missing: {workspaceStatus.missingDirectories.join(", ")}</small>}
           {workspaceStatus.nonEmptyOutputDirectories.length > 0 && <small>Output folders must be empty: {workspaceStatus.nonEmptyOutputDirectories.join(", ")}</small>}
         </div>
