@@ -17,3 +17,8 @@
 .job-history-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 @media (max-width: 760px) { .job-history-list { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .job-history-heading { display: grid; } }
+
+.job-history-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 10px; margin-bottom: 14px; }
+.job-history-filters select { width: 100%; border: 1px solid #34394d; border-radius: 10px; padding: 10px 12px; color: #f4f5ff; background: #0e1018; }
+.error-category { display: inline-flex; width: fit-content; margin-top: 10px; padding: 3px 7px; border: 1px solid #6b3340; border-radius: 999px; color: #ffc0ca; font-size: 0.68rem; }
+@media (max-width: 560px) { .job-history-filters { grid-template-columns: 1fr; } }

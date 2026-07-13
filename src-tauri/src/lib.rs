@@ -1,5 +1,6 @@
 /// src-tauri/src/lib.rs
 /// MotionAnchor Rust host — Tauri application entry and command handlers.
+mod artifact_cleanup;
 mod credential_store;
 mod dev_env_store;
 mod previews;
@@ -119,6 +120,11 @@ fn cancel_job(
 }
 
 #[tauri::command]
+fn delete_job_artifacts(output_path: &str, operation: &str) -> Result<(), String> {
+    artifact_cleanup::delete_job_artifacts(output_path, operation)
+}
+
+#[tauri::command]
 fn get_frame_previews(
     output_path: &str,
     count: usize,
@@ -172,6 +178,7 @@ pub fn run() {
             start_sam2_rgba_job,
             get_job_status,
             cancel_job,
+            delete_job_artifacts,
             get_frame_previews,
             get_rgba_previews,
             load_prompt_document,

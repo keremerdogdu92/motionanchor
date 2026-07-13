@@ -277,6 +277,25 @@ function App() {
     }
   }
 
+  async function deleteHistoryArtifacts(entry: JobHistoryEntry) {
+    if (entry.status !== "completed") return;
+    setBusy(true);
+    setError("");
+    try {
+      await invoke("delete_job_artifacts", {
+        outputPath: entry.request.outputPath,
+        operation: entry.operation,
+      });
+      setJobHistory((current) => current.filter((item) => item.jobId !== entry.jobId));
+      if (entry.request.outputPath === extractionOutput) setPreviews([]);
+      if (entry.request.outputPath === segmentationOutput) setRgbaPreviews([]);
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function openHistoryEntry(entry: JobHistoryEntry) {
     setError("");
     setActiveRequest(entry.request);
@@ -504,6 +523,7 @@ function App() {
         busy={busy}
         onOpen={(entry) => void openHistoryEntry(entry)}
         onRetry={(entry) => void retryHistoryEntry(entry)}
+        onDeleteArtifacts={(entry) => void deleteHistoryArtifacts(entry)}
         onClear={() => setJobHistory([])}
       />
 
