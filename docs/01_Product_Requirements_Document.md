@@ -1053,3 +1053,24 @@ No candidate is selected from reputation alone. Each engine must be tested again
 ## 22. Approval
 
 This PRD establishes the baseline product scope. Changes that affect security, project format, provider abstraction, export manifest, or motion-selection methodology require a documented architecture decision and version update.
+
+## 21. Engine-Neutral Product Direction
+
+MotionAnchor is an engine-neutral AI-assisted 2D animation production pipeline, not a Unity-specific product. The core workflow produces deterministic RGBA frames and a versioned animation manifest before any engine adapter runs.
+
+Official adapter priority:
+
+1. **Godot 4** — strategic open-source target and second official production adapter.
+2. **Unity 6** — first production adapter for current Cat Trap continuity and broad commercial reach.
+3. **Unity 2022.3 LTS** — compatibility target where a legally accessible editor version is available.
+4. **Unreal Paper2D and GameMaker** — later adapters evaluated against demand and automation capability.
+
+The product must always support engine-neutral outputs such as individual PNG frames, sprite sheets, contact sheets, and the Animation Manifest v2. No engine-specific file format may become the authoritative project representation.
+
+### 21.1 Animation Manifest v2
+
+The engine-neutral manifest owns asset name, ordered frame paths, frame rate, loop mode, canvas size, normalized pivot, pixels-per-unit/reference scale, tags, events, provenance, and content hashes. Unity `.anim`, Godot `SpriteFrames`/`.tres`, and other engine assets are derived outputs.
+
+### 21.2 MotionAnchor Project Container
+
+A future `.motionanchor` project container will preserve project metadata, source references, prompts, mask settings, timeline decisions, approvals, manifest versions, previews, and export profiles. It is distinct from the portable Animation Manifest v2 and must not embed credentials.

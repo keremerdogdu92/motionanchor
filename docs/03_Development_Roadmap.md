@@ -646,3 +646,17 @@ Do not trade away the first seven items to add breadth.
 These ranges assume solo implementation and production-grade testing. They can shorten with reduced scope or parallel development, but the acceptance gates should remain unchanged.
 
 - ~~Run the first real Cat Trap temporal mask benchmark. The deterministic temporal-median baseline was measured across all 240 dash frames and rejected for production due to speed-line/dust merging, interior loss, and excessive boundary turnover; see ADR-027.~~
+
+## 19. Engine-Neutral Adapter Roadmap Update
+
+The adapter roadmap is now locked as follows:
+
+1. Finalize Animation Manifest v2 and engine-neutral artifact contracts.
+2. Promote Unity 6 to the first production adapter for Cat Trap validation.
+3. Retain Unity 2022.3 as a compatibility target, not the primary baseline.
+4. Implement Godot 4 as the second official adapter and strategic open-source path.
+5. Deliver deterministic PNG sequence and sprite-sheet exports independent of any engine.
+6. Evaluate GameMaker after a focused automation/API feasibility spike.
+7. Add Unreal Paper2D and a public adapter SDK only after the first two adapters are stable.
+
+No engine adapter may block completion or portability of the core RGBA and manifest workflow.

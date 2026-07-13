@@ -1318,3 +1318,35 @@ Implementation may begin after approval of:
 - Unity package strategy,
 - open-source/module evaluation matrix,
 - component registry and commercial distribution policy.
+
+## 19. Engine-Neutral Core and Adapter Boundary
+
+```text
+Source Video / Frames
+        ↓
+MotionAnchor Core Pipeline
+        ↓
+Animation Manifest v2 + RGBA Artifacts
+        ↓
+┌──────────────┬──────────────┬────────────────┬──────────────┐
+│ Godot 4      │ Unity 6      │ Unity 2022.3   │ Other        │
+│ Adapter      │ Adapter      │ Compatibility  │ Adapters     │
+└──────────────┴──────────────┴────────────────┴──────────────┘
+```
+
+The core domain, persisted project state, review workflow, and artifact naming contract cannot import engine-specific types. Adapters consume a validated Animation Manifest v2 and emit engine-owned assets.
+
+### 19.1 Adapter Priorities
+
+- **Godot 4:** strategic open-source adapter; MIT-licensed engine, no revenue threshold or royalty dependency.
+- **Unity 6:** first production adapter because Cat Trap currently uses Unity and Personal access is available.
+- **Unity 2022.3:** compatibility adapter only; Extended LTS availability must not define the product baseline.
+- **GameMaker:** viable later 2D adapter, but lower priority because editor automation, extensibility, and target-market fit require a separate feasibility spike.
+
+### 19.2 Manifest v2 Boundary
+
+Manifest v2 is engine-neutral and versioned independently from adapters. It contains no Unity GUIDs, `.meta` content, Godot resource UIDs, Unreal package identifiers, or GameMaker project identifiers. Adapter-specific configuration belongs under an optional namespaced `adapterProfiles` section or separate export profile, never in the canonical animation fields.
+
+### 19.3 `.motionanchor` Container Boundary
+
+The `.motionanchor` format is a versioned project container, not merely an export manifest. It may reference or package non-secret project metadata and reproducibility artifacts, while large source media may remain external by policy. The portable Animation Manifest v2 remains independently consumable by adapters and third-party tooling.
