@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { PromptEditor } from "./prompt-editor/PromptEditor";
+import { RgbaPreviewGallery } from "./rgba-preview/RgbaPreviewGallery";
 import "./App.css";
 
 type MediaProbe = {
@@ -359,20 +360,7 @@ function App() {
       </section>
 
       {rgbaPreviews.length > 0 && (
-        <section className="panel preview-panel">
-          <div className="panel-heading">
-            <h2>Representative RGBA frames</h2>
-            <span className="muted">{rgbaPreviews.length} transparent previews</span>
-          </div>
-          <div className="preview-grid rgba-grid">
-            {rgbaPreviews.map((preview) => (
-              <figure key={preview.filename}>
-                <div className="checkerboard"><img src={preview.data_url} alt={`RGBA ${preview.index}`} /></div>
-                <figcaption><span>#{preview.index}</span><span>{preview.filename}</span></figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
+        <RgbaPreviewGallery rgbaFrames={rgbaPreviews} sourceFrames={previews} />
       )}
 
       {previews.length > 0 && (

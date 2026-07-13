@@ -1,0 +1,19 @@
+﻿/* src/rgba-preview/RgbaPreviewGallery.css
+ * Responsive RGBA comparison surfaces for checkerboard, source comparison, and alpha inspection.
+ */
+.rgba-preview-heading { align-items: flex-start; gap: 14px; }
+.rgba-preview-heading > div:first-child { display: grid; gap: 4px; }
+.rgba-mode-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.rgba-preview-surface, .alpha-surface { display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; }
+.alpha-surface { background: #05060a; }
+.alpha-canvas { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: auto; }
+.before-after-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 160px; background: #07080d; }
+.before-after-grid > div { position: relative; display: grid; place-items: center; min-width: 0; overflow: hidden; }
+.before-after-grid > div + div { border-left: 1px solid #34394d; }
+.before-after-grid img { width: 100%; height: 100%; object-fit: contain; }
+.before-after-grid span { position: absolute; top: 8px; left: 8px; z-index: 1; padding: 3px 7px; border-radius: 999px; background: rgba(7, 8, 13, 0.82); font-size: 0.68rem; }
+.before-after-grid p { padding: 12px; color: #878ea7; font-size: 0.75rem; text-align: center; }
+@media (max-width: 560px) {
+  .rgba-preview-heading { display: grid; }
+  .rgba-mode-tabs { display: grid; grid-template-columns: 1fr; }
+}
