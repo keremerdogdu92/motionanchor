@@ -82,6 +82,64 @@ pub fn load_frame_previews(
     Ok(previews)
 }
 
+pub fn load_rgba_previews(
+    output_path: &str,
+    requested: usize,
+) -> Result<Vec<FramePreview>, String> {
+    let root = PathBuf::from(output_path)
+        .canonicalize()
+        .map_err(|error| format!("invalid RGBA output path: {error}"))?;
+    let rgba_root = root
+        .join("rgba")
+        .canonicalize()
+        .map_err(|error| format!("invalid RGBA frame directory: {error}"))?;
+    if !rgba_root.is_dir() || rgba_root.parent() != Some(root.as_path()) {
+        return Err("RGBA frame directory is invalid".into());
+    }
+    let mut paths: Vec<PathBuf> = fs::read_dir(&rgba_root)
+        .map_err(|error| format!("could not read RGBA directory: {error}"))?
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.starts_with("frame_") && name.ends_with(".png"))
+        })
+        .collect();
+    paths.sort();
+    if paths.is_empty() {
+        return Err("RGBA output contains no frame PNG files".into());
+    }
+    let mut total_bytes = 0usize;
+    let mut previews = Vec::new();
+    for position in selected_positions(paths.len(), requested) {
+        let path = paths[position]
+            .canonicalize()
+            .map_err(|error| format!("invalid RGBA frame path: {error}"))?;
+        if path.parent() != Some(rgba_root.as_path()) {
+            return Err("RGBA frame path escaped the output directory".into());
+        }
+        let filename = path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .ok_or_else(|| "RGBA frame filename is invalid".to_string())?;
+        validate_filename(filename)?;
+        let bytes =
+            fs::read(&path).map_err(|error| format!("could not read RGBA preview: {error}"))?;
+        total_bytes = total_bytes.saturating_add(bytes.len());
+        if total_bytes > MAX_TOTAL_BYTES {
+            return Err("RGBA previews exceeded the safety limit".into());
+        }
+        previews.push(FramePreview {
+            index: position,
+            timestamp_seconds: 0.0,
+            filename: filename.to_string(),
+            data_url: format!("data:image/png;base64,{}", STANDARD.encode(bytes)),
+        });
+    }
+    Ok(previews)
+}
+
 fn validate_filename(filename: &str) -> Result<(), String> {
     let path = Path::new(filename);
     let valid_name = path.file_name().and_then(|value| value.to_str()) == Some(filename);
@@ -133,6 +191,24 @@ mod tests {
         assert_eq!(previews.len(), 3);
         assert!(previews[0].data_url.starts_with("data:image/png;base64,"));
         fs::remove_dir_all(root).expect("clean fixture");
+    }
+
+    #[test]
+    fn loads_rgba_previews_from_nested_output() {
+        let root = fixture_root("rgba-previews");
+        let rgba = root.join("rgba");
+        fs::create_dir_all(&rgba).expect("create RGBA fixture");
+        for index in 0..4 {
+            fs::write(
+                rgba.join(format!("frame_{index:06}.png")),
+                [137, 80, 78, 71],
+            )
+            .expect("write RGBA frame");
+        }
+        let previews = load_rgba_previews(root.to_str().unwrap(), 3).expect("load RGBA previews");
+        assert_eq!(previews.len(), 3);
+        assert!(previews[0].data_url.starts_with("data:image/png;base64,"));
+        fs::remove_dir_all(root).expect("clean RGBA fixture");
     }
 
     #[test]

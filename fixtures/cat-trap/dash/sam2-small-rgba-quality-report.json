@@ -1,0 +1,4587 @@
+{
+  "frame_count": 240,
+  "width": 1280,
+  "height": 720,
+  "empty_frame_count": 0,
+  "edge_touch_frame_count": 0,
+  "maximum_component_count": 6,
+  "minimum_largest_component_ratio": 0.9972561594733338,
+  "minimum_foreground_ratio": 0.20230034722222223,
+  "maximum_foreground_ratio": 0.27698133680555553,
+  "frames": [
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000000.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 193037,
+      "opaque_pixels": 188620,
+      "translucent_pixels": 4417,
+      "foreground_ratio": 0.20945855034722222,
+      "translucent_ratio": 0.004792751736111111,
+      "bbox_xywh": [
+        381,
+        36,
+        490,
+        656
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9991866844180132
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000001.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189104,
+      "opaque_pixels": 184556,
+      "translucent_pixels": 4548,
+      "foreground_ratio": 0.2051909722222222,
+      "translucent_ratio": 0.004934895833333334,
+      "bbox_xywh": [
+        382,
+        32,
+        489,
+        660
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9998783738048904
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000002.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189139,
+      "opaque_pixels": 184597,
+      "translucent_pixels": 4542,
+      "foreground_ratio": 0.20522894965277777,
+      "translucent_ratio": 0.004928385416666667,
+      "bbox_xywh": [
+        382,
+        29,
+        489,
+        663
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9993972686754186
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000003.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189145,
+      "opaque_pixels": 184658,
+      "translucent_pixels": 4487,
+      "foreground_ratio": 0.20523546006944443,
+      "translucent_ratio": 0.004868706597222223,
+      "bbox_xywh": [
+        382,
+        40,
+        490,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9998889740675143
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000004.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188816,
+      "opaque_pixels": 184290,
+      "translucent_pixels": 4526,
+      "foreground_ratio": 0.20487847222222222,
+      "translucent_ratio": 0.004911024305555556,
+      "bbox_xywh": [
+        381,
+        40,
+        491,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.999814634353021
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000005.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188704,
+      "opaque_pixels": 184230,
+      "translucent_pixels": 4474,
+      "foreground_ratio": 0.20475694444444445,
+      "translucent_ratio": 0.004854600694444444,
+      "bbox_xywh": [
+        381,
+        40,
+        491,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999841020858063
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000006.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188626,
+      "opaque_pixels": 184127,
+      "translucent_pixels": 4499,
+      "foreground_ratio": 0.20467230902777778,
+      "translucent_ratio": 0.004881727430555555,
+      "bbox_xywh": [
+        381,
+        41,
+        491,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999257790548493
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000007.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188540,
+      "opaque_pixels": 184033,
+      "translucent_pixels": 4507,
+      "foreground_ratio": 0.20457899305555555,
+      "translucent_ratio": 0.004890407986111111,
+      "bbox_xywh": [
+        381,
+        41,
+        491,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000008.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188125,
+      "opaque_pixels": 183711,
+      "translucent_pixels": 4414,
+      "foreground_ratio": 0.2041286892361111,
+      "translucent_ratio": 0.004789496527777778,
+      "bbox_xywh": [
+        381,
+        42,
+        490,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000009.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188093,
+      "opaque_pixels": 183673,
+      "translucent_pixels": 4420,
+      "foreground_ratio": 0.20409396701388888,
+      "translucent_ratio": 0.004796006944444445,
+      "bbox_xywh": [
+        382,
+        42,
+        488,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000010.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187953,
+      "opaque_pixels": 183529,
+      "translucent_pixels": 4424,
+      "foreground_ratio": 0.20394205729166667,
+      "translucent_ratio": 0.004800347222222222,
+      "bbox_xywh": [
+        382,
+        43,
+        486,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000011.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187845,
+      "opaque_pixels": 183416,
+      "translucent_pixels": 4429,
+      "foreground_ratio": 0.20382486979166667,
+      "translucent_ratio": 0.0048057725694444445,
+      "bbox_xywh": [
+        382,
+        43,
+        485,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000012.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187651,
+      "opaque_pixels": 183163,
+      "translucent_pixels": 4488,
+      "foreground_ratio": 0.20361436631944443,
+      "translucent_ratio": 0.004869791666666666,
+      "bbox_xywh": [
+        382,
+        43,
+        483,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000013.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187351,
+      "opaque_pixels": 182922,
+      "translucent_pixels": 4429,
+      "foreground_ratio": 0.20328884548611112,
+      "translucent_ratio": 0.0048057725694444445,
+      "bbox_xywh": [
+        383,
+        44,
+        480,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.999973312125369
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000014.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187294,
+      "opaque_pixels": 182866,
+      "translucent_pixels": 4428,
+      "foreground_ratio": 0.2032269965277778,
+      "translucent_ratio": 0.0048046875,
+      "bbox_xywh": [
+        383,
+        44,
+        478,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000015.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187336,
+      "opaque_pixels": 182924,
+      "translucent_pixels": 4412,
+      "foreground_ratio": 0.20327256944444444,
+      "translucent_ratio": 0.004787326388888889,
+      "bbox_xywh": [
+        384,
+        44,
+        475,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000016.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187543,
+      "opaque_pixels": 183113,
+      "translucent_pixels": 4430,
+      "foreground_ratio": 0.20349717881944446,
+      "translucent_ratio": 0.004806857638888889,
+      "bbox_xywh": [
+        384,
+        44,
+        474,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999893357789947
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000017.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187491,
+      "opaque_pixels": 182989,
+      "translucent_pixels": 4502,
+      "foreground_ratio": 0.20344075520833332,
+      "translucent_ratio": 0.004884982638888889,
+      "bbox_xywh": [
+        385,
+        43,
+        471,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998933282130875
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000018.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187495,
+      "opaque_pixels": 183024,
+      "translucent_pixels": 4471,
+      "foreground_ratio": 0.20344509548611112,
+      "translucent_ratio": 0.004851345486111111,
+      "bbox_xywh": [
+        385,
+        43,
+        470,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000019.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187629,
+      "opaque_pixels": 183188,
+      "translucent_pixels": 4441,
+      "foreground_ratio": 0.20359049479166666,
+      "translucent_ratio": 0.004818793402777778,
+      "bbox_xywh": [
+        385,
+        42,
+        469,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999946703334772
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000020.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187908,
+      "opaque_pixels": 183476,
+      "translucent_pixels": 4432,
+      "foreground_ratio": 0.20389322916666666,
+      "translucent_ratio": 0.0048090277777777775,
+      "bbox_xywh": [
+        386,
+        42,
+        467,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998829214296358
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000021.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187902,
+      "opaque_pixels": 183572,
+      "translucent_pixels": 4330,
+      "foreground_ratio": 0.20388671875,
+      "translucent_ratio": 0.004698350694444444,
+      "bbox_xywh": [
+        386,
+        41,
+        467,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999893561537397
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000022.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188004,
+      "opaque_pixels": 183608,
+      "translucent_pixels": 4396,
+      "foreground_ratio": 0.20399739583333334,
+      "translucent_ratio": 0.0047699652777777775,
+      "bbox_xywh": [
+        386,
+        41,
+        467,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999840428927044
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000023.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188454,
+      "opaque_pixels": 184049,
+      "translucent_pixels": 4405,
+      "foreground_ratio": 0.20448567708333334,
+      "translucent_ratio": 0.004779730902777778,
+      "bbox_xywh": [
+        386,
+        40,
+        468,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000024.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188696,
+      "opaque_pixels": 184276,
+      "translucent_pixels": 4420,
+      "foreground_ratio": 0.2047482638888889,
+      "translucent_ratio": 0.004796006944444445,
+      "bbox_xywh": [
+        387,
+        40,
+        468,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999947004705982
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000025.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188767,
+      "opaque_pixels": 184311,
+      "translucent_pixels": 4456,
+      "foreground_ratio": 0.20482530381944444,
+      "translucent_ratio": 0.004835069444444445,
+      "bbox_xywh": [
+        387,
+        40,
+        470,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000026.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188840,
+      "opaque_pixels": 184436,
+      "translucent_pixels": 4404,
+      "foreground_ratio": 0.2049045138888889,
+      "translucent_ratio": 0.0047786458333333335,
+      "bbox_xywh": [
+        387,
+        39,
+        471,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9998570218174115
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000027.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189090,
+      "opaque_pixels": 184718,
+      "translucent_pixels": 4372,
+      "foreground_ratio": 0.20517578125,
+      "translucent_ratio": 0.004743923611111111,
+      "bbox_xywh": [
+        387,
+        39,
+        473,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999894230260722
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000028.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189371,
+      "opaque_pixels": 185022,
+      "translucent_pixels": 4349,
+      "foreground_ratio": 0.2054806857638889,
+      "translucent_ratio": 0.004718967013888889,
+      "bbox_xywh": [
+        387,
+        39,
+        476,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000029.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189430,
+      "opaque_pixels": 184990,
+      "translucent_pixels": 4440,
+      "foreground_ratio": 0.20554470486111112,
+      "translucent_ratio": 0.0048177083333333336,
+      "bbox_xywh": [
+        387,
+        39,
+        479,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998996990972919
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000030.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189517,
+      "opaque_pixels": 185067,
+      "translucent_pixels": 4450,
+      "foreground_ratio": 0.20563910590277779,
+      "translucent_ratio": 0.004828559027777778,
+      "bbox_xywh": [
+        387,
+        38,
+        482,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999208514275764
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000031.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189691,
+      "opaque_pixels": 185242,
+      "translucent_pixels": 4449,
+      "foreground_ratio": 0.2058279079861111,
+      "translucent_ratio": 0.004827473958333333,
+      "bbox_xywh": [
+        387,
+        38,
+        485,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000032.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189795,
+      "opaque_pixels": 185368,
+      "translucent_pixels": 4427,
+      "foreground_ratio": 0.20594075520833333,
+      "translucent_ratio": 0.004803602430555555,
+      "bbox_xywh": [
+        387,
+        38,
+        488,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999789246292052
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000033.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189938,
+      "opaque_pixels": 185505,
+      "translucent_pixels": 4433,
+      "foreground_ratio": 0.2060959201388889,
+      "translucent_ratio": 0.004810112847222222,
+      "bbox_xywh": [
+        387,
+        38,
+        491,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999947351240931
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000034.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190021,
+      "opaque_pixels": 185528,
+      "translucent_pixels": 4493,
+      "foreground_ratio": 0.2061859809027778,
+      "translucent_ratio": 0.004875217013888889,
+      "bbox_xywh": [
+        387,
+        38,
+        493,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999736871187921
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000035.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190104,
+      "opaque_pixels": 185599,
+      "translucent_pixels": 4505,
+      "foreground_ratio": 0.20627604166666666,
+      "translucent_ratio": 0.004888237847222222,
+      "bbox_xywh": [
+        387,
+        38,
+        496,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9998842738711442
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000036.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190167,
+      "opaque_pixels": 185634,
+      "translucent_pixels": 4533,
+      "foreground_ratio": 0.20634440104166665,
+      "translucent_ratio": 0.004918619791666667,
+      "bbox_xywh": [
+        387,
+        38,
+        498,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999947414640815
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000037.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190171,
+      "opaque_pixels": 185539,
+      "translucent_pixels": 4632,
+      "foreground_ratio": 0.20634874131944445,
+      "translucent_ratio": 0.0050260416666666665,
+      "bbox_xywh": [
+        387,
+        38,
+        500,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998948314937609
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000038.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189945,
+      "opaque_pixels": 185304,
+      "translucent_pixels": 4641,
+      "foreground_ratio": 0.206103515625,
+      "translucent_ratio": 0.005035807291666666,
+      "bbox_xywh": [
+        387,
+        38,
+        501,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999947353181184
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000039.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189955,
+      "opaque_pixels": 185296,
+      "translucent_pixels": 4659,
+      "foreground_ratio": 0.20611436631944444,
+      "translucent_ratio": 0.005055338541666667,
+      "bbox_xywh": [
+        387,
+        38,
+        502,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999315627385433
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000040.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189728,
+      "opaque_pixels": 185109,
+      "translucent_pixels": 4619,
+      "foreground_ratio": 0.20586805555555557,
+      "translucent_ratio": 0.005011935763888889,
+      "bbox_xywh": [
+        387,
+        38,
+        503,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 4,
+      "largest_component_ratio": 0.9994676589644123
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000041.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189499,
+      "opaque_pixels": 184895,
+      "translucent_pixels": 4604,
+      "foreground_ratio": 0.20561957465277778,
+      "translucent_ratio": 0.0049956597222222225,
+      "bbox_xywh": [
+        387,
+        38,
+        503,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 4,
+      "largest_component_ratio": 0.9997678088011018
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000042.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189361,
+      "opaque_pixels": 184799,
+      "translucent_pixels": 4562,
+      "foreground_ratio": 0.20546983506944444,
+      "translucent_ratio": 0.004950086805555556,
+      "bbox_xywh": [
+        387,
+        38,
+        503,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000043.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189134,
+      "opaque_pixels": 184563,
+      "translucent_pixels": 4571,
+      "foreground_ratio": 0.20522352430555554,
+      "translucent_ratio": 0.0049598524305555555,
+      "bbox_xywh": [
+        387,
+        38,
+        502,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000044.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188797,
+      "opaque_pixels": 184168,
+      "translucent_pixels": 4629,
+      "foreground_ratio": 0.20485785590277777,
+      "translucent_ratio": 0.0050227864583333335,
+      "bbox_xywh": [
+        387,
+        38,
+        501,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000045.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188357,
+      "opaque_pixels": 183749,
+      "translucent_pixels": 4608,
+      "foreground_ratio": 0.20438042534722223,
+      "translucent_ratio": 0.005,
+      "bbox_xywh": [
+        387,
+        39,
+        500,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000046.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187926,
+      "opaque_pixels": 183318,
+      "translucent_pixels": 4608,
+      "foreground_ratio": 0.20391276041666667,
+      "translucent_ratio": 0.005,
+      "bbox_xywh": [
+        387,
+        39,
+        498,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000047.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187657,
+      "opaque_pixels": 183090,
+      "translucent_pixels": 4567,
+      "foreground_ratio": 0.20362087673611112,
+      "translucent_ratio": 0.004955512152777778,
+      "bbox_xywh": [
+        387,
+        39,
+        496,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9998561204751222
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000048.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187358,
+      "opaque_pixels": 182818,
+      "translucent_pixels": 4540,
+      "foreground_ratio": 0.20329644097222221,
+      "translucent_ratio": 0.004926215277777778,
+      "bbox_xywh": [
+        387,
+        40,
+        494,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000049.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187342,
+      "opaque_pixels": 182798,
+      "translucent_pixels": 4544,
+      "foreground_ratio": 0.2032790798611111,
+      "translucent_ratio": 0.004930555555555555,
+      "bbox_xywh": [
+        387,
+        40,
+        491,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000050.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187319,
+      "opaque_pixels": 182777,
+      "translucent_pixels": 4542,
+      "foreground_ratio": 0.2032541232638889,
+      "translucent_ratio": 0.004928385416666667,
+      "bbox_xywh": [
+        387,
+        40,
+        489,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000051.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187370,
+      "opaque_pixels": 182865,
+      "translucent_pixels": 4505,
+      "foreground_ratio": 0.20330946180555556,
+      "translucent_ratio": 0.004888237847222222,
+      "bbox_xywh": [
+        387,
+        40,
+        486,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000052.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 186931,
+      "opaque_pixels": 182341,
+      "translucent_pixels": 4590,
+      "foreground_ratio": 0.20283311631944445,
+      "translucent_ratio": 0.00498046875,
+      "bbox_xywh": [
+        387,
+        41,
+        484,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000053.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 186712,
+      "opaque_pixels": 182140,
+      "translucent_pixels": 4572,
+      "foreground_ratio": 0.2025954861111111,
+      "translucent_ratio": 0.0049609375,
+      "bbox_xywh": [
+        387,
+        41,
+        481,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9997429195766743
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000054.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 186440,
+      "opaque_pixels": 181943,
+      "translucent_pixels": 4497,
+      "foreground_ratio": 0.20230034722222223,
+      "translucent_ratio": 0.004879557291666667,
+      "bbox_xywh": [
+        387,
+        41,
+        479,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9998283630122291
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000055.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 186522,
+      "opaque_pixels": 182061,
+      "translucent_pixels": 4461,
+      "foreground_ratio": 0.20238932291666667,
+      "translucent_ratio": 0.004840494791666667,
+      "bbox_xywh": [
+        387,
+        41,
+        476,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998016319790695
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000056.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 186570,
+      "opaque_pixels": 182138,
+      "translucent_pixels": 4432,
+      "foreground_ratio": 0.20244140625,
+      "translucent_ratio": 0.0048090277777777775,
+      "bbox_xywh": [
+        387,
+        41,
+        475,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999464008147076
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000057.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 186775,
+      "opaque_pixels": 182365,
+      "translucent_pixels": 4410,
+      "foreground_ratio": 0.2026638454861111,
+      "translucent_ratio": 0.00478515625,
+      "bbox_xywh": [
+        387,
+        42,
+        474,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000058.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187226,
+      "opaque_pixels": 182807,
+      "translucent_pixels": 4419,
+      "foreground_ratio": 0.20315321180555557,
+      "translucent_ratio": 0.004794921875,
+      "bbox_xywh": [
+        387,
+        43,
+        473,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999946588614829
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000059.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187769,
+      "opaque_pixels": 183291,
+      "translucent_pixels": 4478,
+      "foreground_ratio": 0.2037424045138889,
+      "translucent_ratio": 0.004858940972222222,
+      "bbox_xywh": [
+        386,
+        44,
+        474,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.999989348614521
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000060.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188648,
+      "opaque_pixels": 184147,
+      "translucent_pixels": 4501,
+      "foreground_ratio": 0.20469618055555555,
+      "translucent_ratio": 0.004883897569444445,
+      "bbox_xywh": [
+        385,
+        45,
+        476,
+        647
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999734956108731
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000061.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189635,
+      "opaque_pixels": 185113,
+      "translucent_pixels": 4522,
+      "foreground_ratio": 0.20576714409722222,
+      "translucent_ratio": 0.004906684027777778,
+      "bbox_xywh": [
+        385,
+        46,
+        478,
+        646
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000062.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190731,
+      "opaque_pixels": 186168,
+      "translucent_pixels": 4563,
+      "foreground_ratio": 0.20695638020833335,
+      "translucent_ratio": 0.004951171875,
+      "bbox_xywh": [
+        383,
+        46,
+        485,
+        646
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000063.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191919,
+      "opaque_pixels": 187408,
+      "translucent_pixels": 4511,
+      "foreground_ratio": 0.20824544270833334,
+      "translucent_ratio": 0.004894748263888889,
+      "bbox_xywh": [
+        382,
+        45,
+        492,
+        647
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000064.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192886,
+      "opaque_pixels": 188372,
+      "translucent_pixels": 4514,
+      "foreground_ratio": 0.20929470486111112,
+      "translucent_ratio": 0.004898003472222222,
+      "bbox_xywh": [
+        380,
+        45,
+        503,
+        647
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000065.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 194143,
+      "opaque_pixels": 189596,
+      "translucent_pixels": 4547,
+      "foreground_ratio": 0.21065863715277777,
+      "translucent_ratio": 0.004933810763888889,
+      "bbox_xywh": [
+        379,
+        44,
+        513,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000066.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 195549,
+      "opaque_pixels": 190978,
+      "translucent_pixels": 4571,
+      "foreground_ratio": 0.21218424479166667,
+      "translucent_ratio": 0.0049598524305555555,
+      "bbox_xywh": [
+        377,
+        43,
+        525,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000067.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 196829,
+      "opaque_pixels": 192233,
+      "translucent_pixels": 4596,
+      "foreground_ratio": 0.21357313368055555,
+      "translucent_ratio": 0.0049869791666666665,
+      "bbox_xywh": [
+        376,
+        43,
+        534,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000068.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 198100,
+      "opaque_pixels": 193507,
+      "translucent_pixels": 4593,
+      "foreground_ratio": 0.21495225694444445,
+      "translucent_ratio": 0.0049837239583333335,
+      "bbox_xywh": [
+        375,
+        42,
+        544,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000069.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199133,
+      "opaque_pixels": 194553,
+      "translucent_pixels": 4580,
+      "foreground_ratio": 0.21607313368055556,
+      "translucent_ratio": 0.004969618055555555,
+      "bbox_xywh": [
+        374,
+        42,
+        553,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9995580842954207
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000070.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199731,
+      "opaque_pixels": 195230,
+      "translucent_pixels": 4501,
+      "foreground_ratio": 0.21672200520833335,
+      "translucent_ratio": 0.004883897569444445,
+      "bbox_xywh": [
+        372,
+        42,
+        561,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000071.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200068,
+      "opaque_pixels": 195505,
+      "translucent_pixels": 4563,
+      "foreground_ratio": 0.21708767361111111,
+      "translucent_ratio": 0.004951171875,
+      "bbox_xywh": [
+        368,
+        42,
+        568,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000072.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200486,
+      "opaque_pixels": 195897,
+      "translucent_pixels": 4589,
+      "foreground_ratio": 0.2175412326388889,
+      "translucent_ratio": 0.004979383680555556,
+      "bbox_xywh": [
+        362,
+        44,
+        576,
+        646
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999800484821882
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000073.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200741,
+      "opaque_pixels": 196081,
+      "translucent_pixels": 4660,
+      "foreground_ratio": 0.21781792534722222,
+      "translucent_ratio": 0.005056423611111111,
+      "bbox_xywh": [
+        355,
+        46,
+        584,
+        643
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999651291963276
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000074.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200755,
+      "opaque_pixels": 196059,
+      "translucent_pixels": 4696,
+      "foreground_ratio": 0.21783311631944444,
+      "translucent_ratio": 0.005095486111111111,
+      "bbox_xywh": [
+        349,
+        50,
+        591,
+        639
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998455829244601
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000075.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200533,
+      "opaque_pixels": 195840,
+      "translucent_pixels": 4693,
+      "foreground_ratio": 0.21759223090277777,
+      "translucent_ratio": 0.0050922309027777776,
+      "bbox_xywh": [
+        343,
+        53,
+        599,
+        636
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999900265791665
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000076.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200514,
+      "opaque_pixels": 195802,
+      "translucent_pixels": 4712,
+      "foreground_ratio": 0.21757161458333332,
+      "translucent_ratio": 0.005112847222222223,
+      "bbox_xywh": [
+        338,
+        56,
+        605,
+        634
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000077.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200027,
+      "opaque_pixels": 195266,
+      "translucent_pixels": 4761,
+      "foreground_ratio": 0.2170431857638889,
+      "translucent_ratio": 0.005166015625,
+      "bbox_xywh": [
+        335,
+        58,
+        608,
+        632
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999950006749089
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000078.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199495,
+      "opaque_pixels": 194789,
+      "translucent_pixels": 4706,
+      "foreground_ratio": 0.21646592881944443,
+      "translucent_ratio": 0.005106336805555556,
+      "bbox_xywh": [
+        333,
+        59,
+        609,
+        631
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.999969924058247
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000079.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199087,
+      "opaque_pixels": 194425,
+      "translucent_pixels": 4662,
+      "foreground_ratio": 0.2160232204861111,
+      "translucent_ratio": 0.00505859375,
+      "bbox_xywh": [
+        332,
+        60,
+        608,
+        630
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000080.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 198854,
+      "opaque_pixels": 194191,
+      "translucent_pixels": 4663,
+      "foreground_ratio": 0.21577039930555555,
+      "translucent_ratio": 0.005059678819444444,
+      "bbox_xywh": [
+        331,
+        60,
+        606,
+        630
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.999879308437346
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000081.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199082,
+      "opaque_pixels": 194474,
+      "translucent_pixels": 4608,
+      "foreground_ratio": 0.21601779513888889,
+      "translucent_ratio": 0.005,
+      "bbox_xywh": [
+        331,
+        59,
+        604,
+        631
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999045619393014
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000082.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199231,
+      "opaque_pixels": 194630,
+      "translucent_pixels": 4601,
+      "foreground_ratio": 0.2161794704861111,
+      "translucent_ratio": 0.004992404513888889,
+      "bbox_xywh": [
+        331,
+        59,
+        600,
+        631
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999397684095347
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000083.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199144,
+      "opaque_pixels": 194482,
+      "translucent_pixels": 4662,
+      "foreground_ratio": 0.21608506944444444,
+      "translucent_ratio": 0.00505859375,
+      "bbox_xywh": [
+        331,
+        58,
+        597,
+        632
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000084.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199089,
+      "opaque_pixels": 194423,
+      "translucent_pixels": 4666,
+      "foreground_ratio": 0.216025390625,
+      "translucent_ratio": 0.005062934027777778,
+      "bbox_xywh": [
+        332,
+        58,
+        592,
+        632
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000085.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199423,
+      "opaque_pixels": 194755,
+      "translucent_pixels": 4668,
+      "foreground_ratio": 0.21638780381944445,
+      "translucent_ratio": 0.0050651041666666665,
+      "bbox_xywh": [
+        332,
+        58,
+        590,
+        632
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000086.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199606,
+      "opaque_pixels": 194944,
+      "translucent_pixels": 4662,
+      "foreground_ratio": 0.21658637152777777,
+      "translucent_ratio": 0.00505859375,
+      "bbox_xywh": [
+        332,
+        57,
+        588,
+        633
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999949901305571
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000087.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 199873,
+      "opaque_pixels": 195236,
+      "translucent_pixels": 4637,
+      "foreground_ratio": 0.21687608506944445,
+      "translucent_ratio": 0.005031467013888889,
+      "bbox_xywh": [
+        332,
+        57,
+        586,
+        633
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9997598475031645
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000088.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200257,
+      "opaque_pixels": 195645,
+      "translucent_pixels": 4612,
+      "foreground_ratio": 0.21729275173611112,
+      "translucent_ratio": 0.005004340277777778,
+      "bbox_xywh": [
+        333,
+        57,
+        584,
+        633
+      ],
+      "touches_edge": false,
+      "component_count": 4,
+      "largest_component_ratio": 0.999915109084826
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000089.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200736,
+      "opaque_pixels": 196130,
+      "translucent_pixels": 4606,
+      "foreground_ratio": 0.2178125,
+      "translucent_ratio": 0.004997829861111111,
+      "bbox_xywh": [
+        333,
+        57,
+        584,
+        633
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.999980073330145
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000090.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 200977,
+      "opaque_pixels": 196244,
+      "translucent_pixels": 4733,
+      "foreground_ratio": 0.2180740017361111,
+      "translucent_ratio": 0.005135633680555555,
+      "bbox_xywh": [
+        334,
+        56,
+        583,
+        634
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999452673689029
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000091.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 201429,
+      "opaque_pixels": 196700,
+      "translucent_pixels": 4729,
+      "foreground_ratio": 0.218564453125,
+      "translucent_ratio": 0.005131293402777778,
+      "bbox_xywh": [
+        334,
+        54,
+        583,
+        636
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.999980141886223
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000092.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 201745,
+      "opaque_pixels": 196959,
+      "translucent_pixels": 4786,
+      "foreground_ratio": 0.21890733506944443,
+      "translucent_ratio": 0.005193142361111111,
+      "bbox_xywh": [
+        334,
+        51,
+        584,
+        639
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999306054672978
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000093.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 201950,
+      "opaque_pixels": 197148,
+      "translucent_pixels": 4802,
+      "foreground_ratio": 0.21912977430555555,
+      "translucent_ratio": 0.005210503472222222,
+      "bbox_xywh": [
+        334,
+        52,
+        584,
+        638
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999257241891557
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000094.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 201957,
+      "opaque_pixels": 197071,
+      "translucent_pixels": 4886,
+      "foreground_ratio": 0.21913736979166668,
+      "translucent_ratio": 0.005301649305555556,
+      "bbox_xywh": [
+        334,
+        49,
+        586,
+        641
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999455329599866
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000095.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 201921,
+      "opaque_pixels": 197029,
+      "translucent_pixels": 4892,
+      "foreground_ratio": 0.21909830729166666,
+      "translucent_ratio": 0.005308159722222222,
+      "bbox_xywh": [
+        334,
+        47,
+        587,
+        643
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999405708172998
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000096.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 202210,
+      "opaque_pixels": 197324,
+      "translucent_pixels": 4886,
+      "foreground_ratio": 0.2194118923611111,
+      "translucent_ratio": 0.005301649305555556,
+      "bbox_xywh": [
+        332,
+        53,
+        592,
+        637
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998961475693586
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000097.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 202640,
+      "opaque_pixels": 197715,
+      "translucent_pixels": 4925,
+      "foreground_ratio": 0.21987847222222223,
+      "translucent_ratio": 0.005343967013888889,
+      "bbox_xywh": [
+        326,
+        53,
+        604,
+        637
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000098.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 203892,
+      "opaque_pixels": 198913,
+      "translucent_pixels": 4979,
+      "foreground_ratio": 0.22123697916666665,
+      "translucent_ratio": 0.005402560763888889,
+      "bbox_xywh": [
+        312,
+        52,
+        631,
+        638
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998920997390776
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000099.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 206408,
+      "opaque_pixels": 201231,
+      "translucent_pixels": 5177,
+      "foreground_ratio": 0.2239670138888889,
+      "translucent_ratio": 0.005617404513888889,
+      "bbox_xywh": [
+        292,
+        67,
+        667,
+        623
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9997093135924964
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000100.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 210799,
+      "opaque_pixels": 205496,
+      "translucent_pixels": 5303,
+      "foreground_ratio": 0.22873155381944443,
+      "translucent_ratio": 0.005754123263888889,
+      "bbox_xywh": [
+        267,
+        68,
+        712,
+        622
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9993168848049564
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000101.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 211739,
+      "opaque_pixels": 206606,
+      "translucent_pixels": 5133,
+      "foreground_ratio": 0.22975151909722222,
+      "translucent_ratio": 0.005569661458333333,
+      "bbox_xywh": [
+        239,
+        79,
+        754,
+        611
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.999886652907589
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000102.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 212542,
+      "opaque_pixels": 207225,
+      "translucent_pixels": 5317,
+      "foreground_ratio": 0.2306228298611111,
+      "translucent_ratio": 0.005769314236111111,
+      "bbox_xywh": [
+        215,
+        89,
+        787,
+        600
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000103.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 213925,
+      "opaque_pixels": 208529,
+      "translucent_pixels": 5396,
+      "foreground_ratio": 0.2321234809027778,
+      "translucent_ratio": 0.005855034722222222,
+      "bbox_xywh": [
+        195,
+        82,
+        812,
+        605
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000104.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 239205,
+      "opaque_pixels": 234682,
+      "translucent_pixels": 4523,
+      "foreground_ratio": 0.25955403645833336,
+      "translucent_ratio": 0.004907769097222223,
+      "bbox_xywh": [
+        181,
+        73,
+        827,
+        611
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000105.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 240350,
+      "opaque_pixels": 235668,
+      "translucent_pixels": 4682,
+      "foreground_ratio": 0.2607964409722222,
+      "translucent_ratio": 0.0050802951388888885,
+      "bbox_xywh": [
+        175,
+        66,
+        835,
+        604
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000106.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 220693,
+      "opaque_pixels": 214758,
+      "translucent_pixels": 5935,
+      "foreground_ratio": 0.23946723090277777,
+      "translucent_ratio": 0.0064398871527777775,
+      "bbox_xywh": [
+        172,
+        63,
+        846,
+        581
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000107.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 222214,
+      "opaque_pixels": 215993,
+      "translucent_pixels": 6221,
+      "foreground_ratio": 0.24111762152777777,
+      "translucent_ratio": 0.0067502170138888885,
+      "bbox_xywh": [
+        173,
+        62,
+        855,
+        582
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000108.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 221738,
+      "opaque_pixels": 215059,
+      "translucent_pixels": 6679,
+      "foreground_ratio": 0.24060112847222223,
+      "translucent_ratio": 0.0072471788194444445,
+      "bbox_xywh": [
+        175,
+        64,
+        867,
+        607
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000109.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 222174,
+      "opaque_pixels": 215592,
+      "translucent_pixels": 6582,
+      "foreground_ratio": 0.24107421875,
+      "translucent_ratio": 0.0071419270833333335,
+      "bbox_xywh": [
+        176,
+        69,
+        877,
+        613
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000110.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 218679,
+      "opaque_pixels": 212153,
+      "translucent_pixels": 6526,
+      "foreground_ratio": 0.23728190104166666,
+      "translucent_ratio": 0.007081163194444445,
+      "bbox_xywh": [
+        177,
+        77,
+        880,
+        606
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9992363235610187
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000111.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 213377,
+      "opaque_pixels": 207267,
+      "translucent_pixels": 6110,
+      "foreground_ratio": 0.2315288628472222,
+      "translucent_ratio": 0.006629774305555555,
+      "bbox_xywh": [
+        174,
+        84,
+        882,
+        600
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000112.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 208852,
+      "opaque_pixels": 202878,
+      "translucent_pixels": 5974,
+      "foreground_ratio": 0.2266189236111111,
+      "translucent_ratio": 0.006482204861111111,
+      "bbox_xywh": [
+        170,
+        85,
+        882,
+        599
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000113.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 206271,
+      "opaque_pixels": 200603,
+      "translucent_pixels": 5668,
+      "foreground_ratio": 0.223818359375,
+      "translucent_ratio": 0.0061501736111111115,
+      "bbox_xywh": [
+        164,
+        81,
+        890,
+        602
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000114.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 208500,
+      "opaque_pixels": 202812,
+      "translucent_pixels": 5688,
+      "foreground_ratio": 0.22623697916666666,
+      "translucent_ratio": 0.006171875,
+      "bbox_xywh": [
+        157,
+        75,
+        904,
+        605
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000115.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 212351,
+      "opaque_pixels": 206380,
+      "translucent_pixels": 5971,
+      "foreground_ratio": 0.23041558159722222,
+      "translucent_ratio": 0.0064789496527777775,
+      "bbox_xywh": [
+        151,
+        69,
+        907,
+        596
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000116.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 214776,
+      "opaque_pixels": 208791,
+      "translucent_pixels": 5985,
+      "foreground_ratio": 0.233046875,
+      "translucent_ratio": 0.006494140625,
+      "bbox_xywh": [
+        146,
+        64,
+        903,
+        587
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000117.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 217856,
+      "opaque_pixels": 212055,
+      "translucent_pixels": 5801,
+      "foreground_ratio": 0.2363888888888889,
+      "translucent_ratio": 0.006294487847222223,
+      "bbox_xywh": [
+        145,
+        63,
+        893,
+        591
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000118.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 221078,
+      "opaque_pixels": 215281,
+      "translucent_pixels": 5797,
+      "foreground_ratio": 0.23988498263888888,
+      "translucent_ratio": 0.006290147569444444,
+      "bbox_xywh": [
+        145,
+        65,
+        878,
+        596
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000119.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 225940,
+      "opaque_pixels": 220122,
+      "translucent_pixels": 5818,
+      "foreground_ratio": 0.24516059027777778,
+      "translucent_ratio": 0.0063129340277777776,
+      "bbox_xywh": [
+        147,
+        70,
+        871,
+        613
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000120.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 255266,
+      "opaque_pixels": 250295,
+      "translucent_pixels": 4971,
+      "foreground_ratio": 0.27698133680555553,
+      "translucent_ratio": 0.005393880208333333,
+      "bbox_xywh": [
+        152,
+        78,
+        871,
+        607
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000121.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 230204,
+      "opaque_pixels": 224438,
+      "translucent_pixels": 5766,
+      "foreground_ratio": 0.2497873263888889,
+      "translucent_ratio": 0.006256510416666666,
+      "bbox_xywh": [
+        157,
+        85,
+        874,
+        600
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000122.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 229119,
+      "opaque_pixels": 223383,
+      "translucent_pixels": 5736,
+      "foreground_ratio": 0.24861002604166665,
+      "translucent_ratio": 0.006223958333333333,
+      "bbox_xywh": [
+        161,
+        86,
+        882,
+        599
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000123.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 221926,
+      "opaque_pixels": 215952,
+      "translucent_pixels": 5974,
+      "foreground_ratio": 0.24080512152777778,
+      "translucent_ratio": 0.006482204861111111,
+      "bbox_xywh": [
+        163,
+        82,
+        888,
+        602
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000124.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 221179,
+      "opaque_pixels": 215016,
+      "translucent_pixels": 6163,
+      "foreground_ratio": 0.23999457465277776,
+      "translucent_ratio": 0.006687282986111111,
+      "bbox_xywh": [
+        166,
+        75,
+        888,
+        607
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000125.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 219481,
+      "opaque_pixels": 213232,
+      "translucent_pixels": 6249,
+      "foreground_ratio": 0.2381521267361111,
+      "translucent_ratio": 0.006780598958333333,
+      "bbox_xywh": [
+        166,
+        67,
+        884,
+        603
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000126.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 216823,
+      "opaque_pixels": 210445,
+      "translucent_pixels": 6378,
+      "foreground_ratio": 0.2352680121527778,
+      "translucent_ratio": 0.006920572916666667,
+      "bbox_xywh": [
+        167,
+        62,
+        880,
+        577
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000127.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 216540,
+      "opaque_pixels": 210015,
+      "translucent_pixels": 6525,
+      "foreground_ratio": 0.2349609375,
+      "translucent_ratio": 0.007080078125,
+      "bbox_xywh": [
+        168,
+        61,
+        880,
+        581
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9991641267202365
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000128.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 216521,
+      "opaque_pixels": 209965,
+      "translucent_pixels": 6556,
+      "foreground_ratio": 0.23494032118055555,
+      "translucent_ratio": 0.007113715277777778,
+      "bbox_xywh": [
+        169,
+        65,
+        882,
+        601
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9995427695235104
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000129.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 215157,
+      "opaque_pixels": 208685,
+      "translucent_pixels": 6472,
+      "foreground_ratio": 0.23346028645833333,
+      "translucent_ratio": 0.007022569444444444,
+      "bbox_xywh": [
+        170,
+        71,
+        887,
+        611
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000130.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 214362,
+      "opaque_pixels": 207997,
+      "translucent_pixels": 6365,
+      "foreground_ratio": 0.23259765625,
+      "translucent_ratio": 0.006906467013888889,
+      "bbox_xywh": [
+        170,
+        78,
+        891,
+        606
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000131.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 210452,
+      "opaque_pixels": 204410,
+      "translucent_pixels": 6042,
+      "foreground_ratio": 0.2283550347222222,
+      "translucent_ratio": 0.006555989583333333,
+      "bbox_xywh": [
+        169,
+        82,
+        893,
+        603
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000132.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 211747,
+      "opaque_pixels": 206017,
+      "translucent_pixels": 5730,
+      "foreground_ratio": 0.22976019965277777,
+      "translucent_ratio": 0.006217447916666666,
+      "bbox_xywh": [
+        160,
+        77,
+        880,
+        607
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9972561594733338
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000133.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 216557,
+      "opaque_pixels": 210767,
+      "translucent_pixels": 5790,
+      "foreground_ratio": 0.23497938368055554,
+      "translucent_ratio": 0.0062825520833333336,
+      "bbox_xywh": [
+        155,
+        69,
+        868,
+        612
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9994227847633649
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000134.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 218802,
+      "opaque_pixels": 212797,
+      "translucent_pixels": 6005,
+      "foreground_ratio": 0.23741536458333334,
+      "translucent_ratio": 0.006515842013888889,
+      "bbox_xywh": [
+        150,
+        63,
+        864,
+        604
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000135.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 221107,
+      "opaque_pixels": 215049,
+      "translucent_pixels": 6058,
+      "foreground_ratio": 0.23991644965277778,
+      "translucent_ratio": 0.006573350694444444,
+      "bbox_xywh": [
+        146,
+        59,
+        870,
+        586
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.999972863817066
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000136.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 224202,
+      "opaque_pixels": 217912,
+      "translucent_pixels": 6290,
+      "foreground_ratio": 0.24327473958333334,
+      "translucent_ratio": 0.006825086805555556,
+      "bbox_xywh": [
+        145,
+        58,
+        878,
+        592
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998706523581413
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000137.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 225725,
+      "opaque_pixels": 219260,
+      "translucent_pixels": 6465,
+      "foreground_ratio": 0.2449273003472222,
+      "translucent_ratio": 0.0070149739583333336,
+      "bbox_xywh": [
+        146,
+        60,
+        887,
+        613
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9995481227156938
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000138.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 225148,
+      "opaque_pixels": 218782,
+      "translucent_pixels": 6366,
+      "foreground_ratio": 0.2443012152777778,
+      "translucent_ratio": 0.006907552083333333,
+      "bbox_xywh": [
+        149,
+        67,
+        899,
+        616
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999955584770907
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000139.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 223855,
+      "opaque_pixels": 217655,
+      "translucent_pixels": 6200,
+      "foreground_ratio": 0.24289822048611112,
+      "translucent_ratio": 0.006727430555555556,
+      "bbox_xywh": [
+        152,
+        75,
+        902,
+        610
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000140.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 216933,
+      "opaque_pixels": 210877,
+      "translucent_pixels": 6056,
+      "foreground_ratio": 0.23538736979166666,
+      "translucent_ratio": 0.006571180555555556,
+      "bbox_xywh": [
+        155,
+        81,
+        898,
+        604
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000141.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 210113,
+      "opaque_pixels": 204321,
+      "translucent_pixels": 5792,
+      "foreground_ratio": 0.22798719618055555,
+      "translucent_ratio": 0.006284722222222222,
+      "bbox_xywh": [
+        157,
+        81,
+        894,
+        604
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000142.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 211366,
+      "opaque_pixels": 205395,
+      "translucent_pixels": 5971,
+      "foreground_ratio": 0.22934678819444446,
+      "translucent_ratio": 0.0064789496527777775,
+      "bbox_xywh": [
+        157,
+        76,
+        894,
+        606
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000143.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 236119,
+      "opaque_pixels": 231126,
+      "translucent_pixels": 4993,
+      "foreground_ratio": 0.25620551215277776,
+      "translucent_ratio": 0.0054177517361111115,
+      "bbox_xywh": [
+        157,
+        69,
+        896,
+        600
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000144.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 215940,
+      "opaque_pixels": 209859,
+      "translucent_pixels": 6081,
+      "foreground_ratio": 0.23430989583333334,
+      "translucent_ratio": 0.006598307291666667,
+      "bbox_xywh": [
+        155,
+        62,
+        891,
+        584
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000145.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 219736,
+      "opaque_pixels": 213482,
+      "translucent_pixels": 6254,
+      "foreground_ratio": 0.23842881944444444,
+      "translucent_ratio": 0.0067860243055555556,
+      "bbox_xywh": [
+        155,
+        59,
+        871,
+        589
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000146.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 223216,
+      "opaque_pixels": 216810,
+      "translucent_pixels": 6406,
+      "foreground_ratio": 0.2422048611111111,
+      "translucent_ratio": 0.006950954861111111,
+      "bbox_xywh": [
+        155,
+        59,
+        862,
+        604
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000147.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 225764,
+      "opaque_pixels": 219305,
+      "translucent_pixels": 6459,
+      "foreground_ratio": 0.24496961805555556,
+      "translucent_ratio": 0.007008463541666667,
+      "bbox_xywh": [
+        156,
+        61,
+        865,
+        617
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000148.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 250822,
+      "opaque_pixels": 245386,
+      "translucent_pixels": 5436,
+      "foreground_ratio": 0.27215928819444446,
+      "translucent_ratio": 0.0058984375,
+      "bbox_xywh": [
+        157,
+        67,
+        874,
+        616
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000149.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 222974,
+      "opaque_pixels": 216645,
+      "translucent_pixels": 6329,
+      "foreground_ratio": 0.24194227430555557,
+      "translucent_ratio": 0.006867404513888889,
+      "bbox_xywh": [
+        162,
+        71,
+        878,
+        613
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999955151721726
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000150.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 220645,
+      "opaque_pixels": 214525,
+      "translucent_pixels": 6120,
+      "foreground_ratio": 0.23941514756944443,
+      "translucent_ratio": 0.006640625,
+      "bbox_xywh": [
+        173,
+        76,
+        876,
+        608
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000151.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 217359,
+      "opaque_pixels": 211732,
+      "translucent_pixels": 5627,
+      "foreground_ratio": 0.235849609375,
+      "translucent_ratio": 0.006105685763888889,
+      "bbox_xywh": [
+        189,
+        80,
+        862,
+        604
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000152.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 212048,
+      "opaque_pixels": 206785,
+      "translucent_pixels": 5263,
+      "foreground_ratio": 0.23008680555555555,
+      "translucent_ratio": 0.005710720486111111,
+      "bbox_xywh": [
+        209,
+        83,
+        837,
+        607
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000153.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 206325,
+      "opaque_pixels": 201265,
+      "translucent_pixels": 5060,
+      "foreground_ratio": 0.223876953125,
+      "translucent_ratio": 0.0054904513888888885,
+      "bbox_xywh": [
+        225,
+        81,
+        812,
+        611
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000154.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 202107,
+      "opaque_pixels": 197077,
+      "translucent_pixels": 5030,
+      "foreground_ratio": 0.21930013020833333,
+      "translucent_ratio": 0.005457899305555555,
+      "bbox_xywh": [
+        239,
+        77,
+        788,
+        615
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998466159014779
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000155.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 198549,
+      "opaque_pixels": 193663,
+      "translucent_pixels": 4886,
+      "foreground_ratio": 0.215439453125,
+      "translucent_ratio": 0.005301649305555556,
+      "bbox_xywh": [
+        252,
+        72,
+        767,
+        620
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9990229112209077
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000156.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 196402,
+      "opaque_pixels": 191772,
+      "translucent_pixels": 4630,
+      "foreground_ratio": 0.2131098090277778,
+      "translucent_ratio": 0.005023871527777778,
+      "bbox_xywh": [
+        265,
+        67,
+        743,
+        625
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9998014276840358
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000157.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 195053,
+      "opaque_pixels": 190551,
+      "translucent_pixels": 4502,
+      "foreground_ratio": 0.21164605034722223,
+      "translucent_ratio": 0.004884982638888889,
+      "bbox_xywh": [
+        277,
+        61,
+        715,
+        631
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000158.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 194011,
+      "opaque_pixels": 189578,
+      "translucent_pixels": 4433,
+      "foreground_ratio": 0.21051540798611112,
+      "translucent_ratio": 0.004810112847222222,
+      "bbox_xywh": [
+        289,
+        57,
+        678,
+        635
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9991546871053704
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000159.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 193339,
+      "opaque_pixels": 188969,
+      "translucent_pixels": 4370,
+      "foreground_ratio": 0.20978624131944446,
+      "translucent_ratio": 0.004741753472222222,
+      "bbox_xywh": [
+        299,
+        53,
+        639,
+        639
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9996327693843456
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000160.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191803,
+      "opaque_pixels": 187425,
+      "translucent_pixels": 4378,
+      "foreground_ratio": 0.20811957465277778,
+      "translucent_ratio": 0.004750434027777778,
+      "bbox_xywh": [
+        308,
+        52,
+        577,
+        640
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000161.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190922,
+      "opaque_pixels": 186464,
+      "translucent_pixels": 4458,
+      "foreground_ratio": 0.20716362847222222,
+      "translucent_ratio": 0.004837239583333333,
+      "bbox_xywh": [
+        317,
+        50,
+        547,
+        642
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000162.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190918,
+      "opaque_pixels": 186451,
+      "translucent_pixels": 4467,
+      "foreground_ratio": 0.20715928819444446,
+      "translucent_ratio": 0.004847005208333333,
+      "bbox_xywh": [
+        322,
+        49,
+        525,
+        643
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000163.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191050,
+      "opaque_pixels": 186584,
+      "translucent_pixels": 4466,
+      "foreground_ratio": 0.2073025173611111,
+      "translucent_ratio": 0.004845920138888889,
+      "bbox_xywh": [
+        328,
+        47,
+        509,
+        645
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000164.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191332,
+      "opaque_pixels": 186852,
+      "translucent_pixels": 4480,
+      "foreground_ratio": 0.20760850694444444,
+      "translucent_ratio": 0.004861111111111111,
+      "bbox_xywh": [
+        332,
+        46,
+        505,
+        646
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999634143791942
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000165.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191344,
+      "opaque_pixels": 186887,
+      "translucent_pixels": 4457,
+      "foreground_ratio": 0.2076215277777778,
+      "translucent_ratio": 0.0048361545138888885,
+      "bbox_xywh": [
+        337,
+        45,
+        500,
+        647
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000166.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191615,
+      "opaque_pixels": 187148,
+      "translucent_pixels": 4467,
+      "foreground_ratio": 0.20791558159722223,
+      "translucent_ratio": 0.004847005208333333,
+      "bbox_xywh": [
+        338,
+        45,
+        499,
+        647
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000167.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192102,
+      "opaque_pixels": 187615,
+      "translucent_pixels": 4487,
+      "foreground_ratio": 0.20844401041666666,
+      "translucent_ratio": 0.004868706597222223,
+      "bbox_xywh": [
+        338,
+        45,
+        501,
+        647
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000168.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192889,
+      "opaque_pixels": 188410,
+      "translucent_pixels": 4479,
+      "foreground_ratio": 0.20929796006944446,
+      "translucent_ratio": 0.004860026041666667,
+      "bbox_xywh": [
+        339,
+        45,
+        506,
+        647
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000169.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 193496,
+      "opaque_pixels": 188989,
+      "translucent_pixels": 4507,
+      "foreground_ratio": 0.20995659722222224,
+      "translucent_ratio": 0.004890407986111111,
+      "bbox_xywh": [
+        339,
+        46,
+        513,
+        646
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000170.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 193741,
+      "opaque_pixels": 189189,
+      "translucent_pixels": 4552,
+      "foreground_ratio": 0.2102224392361111,
+      "translucent_ratio": 0.004939236111111111,
+      "bbox_xywh": [
+        340,
+        46,
+        521,
+        646
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000171.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 194569,
+      "opaque_pixels": 190014,
+      "translucent_pixels": 4555,
+      "foreground_ratio": 0.2111208767361111,
+      "translucent_ratio": 0.004942491319444444,
+      "bbox_xywh": [
+        342,
+        47,
+        529,
+        645
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000172.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 195631,
+      "opaque_pixels": 191081,
+      "translucent_pixels": 4550,
+      "foreground_ratio": 0.2122732204861111,
+      "translucent_ratio": 0.004937065972222222,
+      "bbox_xywh": [
+        343,
+        48,
+        538,
+        644
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999948883356932
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000173.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 196445,
+      "opaque_pixels": 191924,
+      "translucent_pixels": 4521,
+      "foreground_ratio": 0.21315646701388888,
+      "translucent_ratio": 0.004905598958333333,
+      "bbox_xywh": [
+        346,
+        49,
+        544,
+        643
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000174.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 197070,
+      "opaque_pixels": 192525,
+      "translucent_pixels": 4545,
+      "foreground_ratio": 0.21383463541666667,
+      "translucent_ratio": 0.004931640625,
+      "bbox_xywh": [
+        349,
+        50,
+        549,
+        642
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000175.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 197192,
+      "opaque_pixels": 192620,
+      "translucent_pixels": 4572,
+      "foreground_ratio": 0.2139670138888889,
+      "translucent_ratio": 0.0049609375,
+      "bbox_xywh": [
+        352,
+        50,
+        553,
+        642
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000176.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 196929,
+      "opaque_pixels": 192374,
+      "translucent_pixels": 4555,
+      "foreground_ratio": 0.213681640625,
+      "translucent_ratio": 0.004942491319444444,
+      "bbox_xywh": [
+        356,
+        49,
+        554,
+        643
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000177.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 194918,
+      "opaque_pixels": 190181,
+      "translucent_pixels": 4737,
+      "foreground_ratio": 0.21149956597222222,
+      "translucent_ratio": 0.005139973958333334,
+      "bbox_xywh": [
+        359,
+        47,
+        554,
+        645
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999948696374886
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000178.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 193575,
+      "opaque_pixels": 188909,
+      "translucent_pixels": 4666,
+      "foreground_ratio": 0.21004231770833334,
+      "translucent_ratio": 0.005062934027777778,
+      "bbox_xywh": [
+        364,
+        47,
+        549,
+        645
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9998915149166989
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000179.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192328,
+      "opaque_pixels": 187715,
+      "translucent_pixels": 4613,
+      "foreground_ratio": 0.20868923611111112,
+      "translucent_ratio": 0.005005425347222222,
+      "bbox_xywh": [
+        368,
+        45,
+        543,
+        647
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000180.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187568,
+      "opaque_pixels": 182447,
+      "translucent_pixels": 5121,
+      "foreground_ratio": 0.20352430555555556,
+      "translucent_ratio": 0.005556640625,
+      "bbox_xywh": [
+        372,
+        44,
+        532,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 6,
+      "largest_component_ratio": 0.9994935170178282
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000181.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190623,
+      "opaque_pixels": 186123,
+      "translucent_pixels": 4500,
+      "foreground_ratio": 0.20683919270833334,
+      "translucent_ratio": 0.0048828125,
+      "bbox_xywh": [
+        374,
+        44,
+        524,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000182.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190356,
+      "opaque_pixels": 185896,
+      "translucent_pixels": 4460,
+      "foreground_ratio": 0.20654947916666666,
+      "translucent_ratio": 0.004839409722222222,
+      "bbox_xywh": [
+        376,
+        43,
+        515,
+        649
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000183.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189936,
+      "opaque_pixels": 185415,
+      "translucent_pixels": 4521,
+      "foreground_ratio": 0.20609375,
+      "translucent_ratio": 0.004905598958333333,
+      "bbox_xywh": [
+        377,
+        42,
+        509,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000184.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189806,
+      "opaque_pixels": 185304,
+      "translucent_pixels": 4502,
+      "foreground_ratio": 0.2059526909722222,
+      "translucent_ratio": 0.004884982638888889,
+      "bbox_xywh": [
+        379,
+        41,
+        502,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000185.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189752,
+      "opaque_pixels": 185278,
+      "translucent_pixels": 4474,
+      "foreground_ratio": 0.2058940972222222,
+      "translucent_ratio": 0.004854600694444444,
+      "bbox_xywh": [
+        380,
+        41,
+        497,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999894599266411
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000186.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189736,
+      "opaque_pixels": 185348,
+      "translucent_pixels": 4388,
+      "foreground_ratio": 0.20587673611111112,
+      "translucent_ratio": 0.004761284722222222,
+      "bbox_xywh": [
+        381,
+        41,
+        494,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9997101235400767
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000187.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189812,
+      "opaque_pixels": 185518,
+      "translucent_pixels": 4294,
+      "foreground_ratio": 0.2059592013888889,
+      "translucent_ratio": 0.004659288194444444,
+      "bbox_xywh": [
+        382,
+        40,
+        492,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999525846627189
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000188.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189884,
+      "opaque_pixels": 185578,
+      "translucent_pixels": 4306,
+      "foreground_ratio": 0.2060373263888889,
+      "translucent_ratio": 0.004672309027777778,
+      "bbox_xywh": [
+        381,
+        40,
+        493,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000189.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189739,
+      "opaque_pixels": 185320,
+      "translucent_pixels": 4419,
+      "foreground_ratio": 0.20587999131944446,
+      "translucent_ratio": 0.004794921875,
+      "bbox_xywh": [
+        380,
+        39,
+        495,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000190.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189733,
+      "opaque_pixels": 185326,
+      "translucent_pixels": 4407,
+      "foreground_ratio": 0.20587348090277777,
+      "translucent_ratio": 0.0047819010416666665,
+      "bbox_xywh": [
+        379,
+        39,
+        498,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000191.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189462,
+      "opaque_pixels": 185038,
+      "translucent_pixels": 4424,
+      "foreground_ratio": 0.20557942708333332,
+      "translucent_ratio": 0.004800347222222222,
+      "bbox_xywh": [
+        378,
+        39,
+        500,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000192.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189360,
+      "opaque_pixels": 184929,
+      "translucent_pixels": 4431,
+      "foreground_ratio": 0.20546875,
+      "translucent_ratio": 0.004807942708333333,
+      "bbox_xywh": [
+        377,
+        39,
+        502,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000193.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189218,
+      "opaque_pixels": 184800,
+      "translucent_pixels": 4418,
+      "foreground_ratio": 0.20531467013888888,
+      "translucent_ratio": 0.0047938368055555555,
+      "bbox_xywh": [
+        375,
+        38,
+        506,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000194.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189214,
+      "opaque_pixels": 184812,
+      "translucent_pixels": 4402,
+      "foreground_ratio": 0.2053103298611111,
+      "translucent_ratio": 0.004776475694444444,
+      "bbox_xywh": [
+        375,
+        38,
+        507,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000195.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189129,
+      "opaque_pixels": 184740,
+      "translucent_pixels": 4389,
+      "foreground_ratio": 0.20521809895833334,
+      "translucent_ratio": 0.004762369791666667,
+      "bbox_xywh": [
+        374,
+        38,
+        508,
+        646
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000196.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189103,
+      "opaque_pixels": 184717,
+      "translucent_pixels": 4386,
+      "foreground_ratio": 0.20518988715277778,
+      "translucent_ratio": 0.004759114583333333,
+      "bbox_xywh": [
+        373,
+        38,
+        508,
+        644
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000197.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189066,
+      "opaque_pixels": 184681,
+      "translucent_pixels": 4385,
+      "foreground_ratio": 0.20514973958333332,
+      "translucent_ratio": 0.0047580295138888885,
+      "bbox_xywh": [
+        373,
+        38,
+        507,
+        644
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000198.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188912,
+      "opaque_pixels": 184445,
+      "translucent_pixels": 4467,
+      "foreground_ratio": 0.2049826388888889,
+      "translucent_ratio": 0.004847005208333333,
+      "bbox_xywh": [
+        373,
+        38,
+        506,
+        644
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000199.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188955,
+      "opaque_pixels": 184503,
+      "translucent_pixels": 4452,
+      "foreground_ratio": 0.205029296875,
+      "translucent_ratio": 0.004830729166666666,
+      "bbox_xywh": [
+        373,
+        38,
+        504,
+        644
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000200.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188964,
+      "opaque_pixels": 184513,
+      "translucent_pixels": 4451,
+      "foreground_ratio": 0.2050390625,
+      "translucent_ratio": 0.004829644097222223,
+      "bbox_xywh": [
+        373,
+        39,
+        502,
+        643
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999947079867064
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000201.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188598,
+      "opaque_pixels": 184074,
+      "translucent_pixels": 4524,
+      "foreground_ratio": 0.20464192708333334,
+      "translucent_ratio": 0.004908854166666666,
+      "bbox_xywh": [
+        374,
+        39,
+        498,
+        645
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000202.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188494,
+      "opaque_pixels": 183975,
+      "translucent_pixels": 4519,
+      "foreground_ratio": 0.2045290798611111,
+      "translucent_ratio": 0.004903428819444444,
+      "bbox_xywh": [
+        374,
+        40,
+        496,
+        646
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000203.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188321,
+      "opaque_pixels": 183858,
+      "translucent_pixels": 4463,
+      "foreground_ratio": 0.20434136284722224,
+      "translucent_ratio": 0.004842664930555555,
+      "bbox_xywh": [
+        375,
+        40,
+        492,
+        648
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9994636816924294
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000204.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188088,
+      "opaque_pixels": 183579,
+      "translucent_pixels": 4509,
+      "foreground_ratio": 0.20408854166666668,
+      "translucent_ratio": 0.004892578125,
+      "bbox_xywh": [
+        376,
+        41,
+        489,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999840500191399
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000205.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187891,
+      "opaque_pixels": 183372,
+      "translucent_pixels": 4519,
+      "foreground_ratio": 0.2038747829861111,
+      "translucent_ratio": 0.004903428819444444,
+      "bbox_xywh": [
+        377,
+        42,
+        485,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000206.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187834,
+      "opaque_pixels": 183367,
+      "translucent_pixels": 4467,
+      "foreground_ratio": 0.20381293402777778,
+      "translucent_ratio": 0.004847005208333333,
+      "bbox_xywh": [
+        378,
+        42,
+        482,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999946761502178
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000207.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187675,
+      "opaque_pixels": 183208,
+      "translucent_pixels": 4467,
+      "foreground_ratio": 0.2036404079861111,
+      "translucent_ratio": 0.004847005208333333,
+      "bbox_xywh": [
+        379,
+        42,
+        479,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000208.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187727,
+      "opaque_pixels": 183259,
+      "translucent_pixels": 4468,
+      "foreground_ratio": 0.2036968315972222,
+      "translucent_ratio": 0.0048480902777777776,
+      "bbox_xywh": [
+        381,
+        42,
+        476,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000209.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187878,
+      "opaque_pixels": 183344,
+      "translucent_pixels": 4534,
+      "foreground_ratio": 0.20386067708333333,
+      "translucent_ratio": 0.004919704861111111,
+      "bbox_xywh": [
+        382,
+        42,
+        474,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999467739703425
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000210.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 187963,
+      "opaque_pixels": 183432,
+      "translucent_pixels": 4531,
+      "foreground_ratio": 0.2039529079861111,
+      "translucent_ratio": 0.004916449652777778,
+      "bbox_xywh": [
+        383,
+        42,
+        473,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9998882758840836
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000211.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188142,
+      "opaque_pixels": 183658,
+      "translucent_pixels": 4484,
+      "foreground_ratio": 0.20414713541666665,
+      "translucent_ratio": 0.004865451388888889,
+      "bbox_xywh": [
+        383,
+        42,
+        473,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999946848656865
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000212.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188549,
+      "opaque_pixels": 184064,
+      "translucent_pixels": 4485,
+      "foreground_ratio": 0.20458875868055557,
+      "translucent_ratio": 0.004866536458333333,
+      "bbox_xywh": [
+        384,
+        42,
+        473,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999681780332964
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000213.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 188919,
+      "opaque_pixels": 184440,
+      "translucent_pixels": 4479,
+      "foreground_ratio": 0.204990234375,
+      "translucent_ratio": 0.004860026041666667,
+      "bbox_xywh": [
+        384,
+        42,
+        474,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999947067261631
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000214.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189072,
+      "opaque_pixels": 184519,
+      "translucent_pixels": 4553,
+      "foreground_ratio": 0.20515625,
+      "translucent_ratio": 0.004940321180555556,
+      "bbox_xywh": [
+        385,
+        42,
+        474,
+        650
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000215.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189439,
+      "opaque_pixels": 184871,
+      "translucent_pixels": 4568,
+      "foreground_ratio": 0.2055544704861111,
+      "translucent_ratio": 0.0049565972222222225,
+      "bbox_xywh": [
+        385,
+        41,
+        476,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999683275355128
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000216.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189781,
+      "opaque_pixels": 185228,
+      "translucent_pixels": 4553,
+      "foreground_ratio": 0.2059255642361111,
+      "translucent_ratio": 0.004940321180555556,
+      "bbox_xywh": [
+        385,
+        41,
+        477,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999894615372455
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000217.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 189986,
+      "opaque_pixels": 185444,
+      "translucent_pixels": 4542,
+      "foreground_ratio": 0.20614800347222223,
+      "translucent_ratio": 0.004928385416666667,
+      "bbox_xywh": [
+        385,
+        41,
+        479,
+        651
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000218.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190260,
+      "opaque_pixels": 185740,
+      "translucent_pixels": 4520,
+      "foreground_ratio": 0.2064453125,
+      "translucent_ratio": 0.004904513888888889,
+      "bbox_xywh": [
+        385,
+        40,
+        481,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999842321034375
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000219.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190443,
+      "opaque_pixels": 185949,
+      "translucent_pixels": 4494,
+      "foreground_ratio": 0.20664388020833332,
+      "translucent_ratio": 0.004876302083333333,
+      "bbox_xywh": [
+        385,
+        40,
+        483,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999579926802246
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000220.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190635,
+      "opaque_pixels": 186199,
+      "translucent_pixels": 4436,
+      "foreground_ratio": 0.20685221354166666,
+      "translucent_ratio": 0.004813368055555556,
+      "bbox_xywh": [
+        385,
+        40,
+        485,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000221.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190727,
+      "opaque_pixels": 186298,
+      "translucent_pixels": 4429,
+      "foreground_ratio": 0.20695203993055555,
+      "translucent_ratio": 0.0048057725694444445,
+      "bbox_xywh": [
+        386,
+        40,
+        487,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999895138076937
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000222.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190826,
+      "opaque_pixels": 186401,
+      "translucent_pixels": 4425,
+      "foreground_ratio": 0.20705946180555557,
+      "translucent_ratio": 0.004801432291666667,
+      "bbox_xywh": [
+        386,
+        40,
+        490,
+        652
+      ],
+      "touches_edge": false,
+      "component_count": 3,
+      "largest_component_ratio": 0.9999895192479012
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000223.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 190977,
+      "opaque_pixels": 186571,
+      "translucent_pixels": 4406,
+      "foreground_ratio": 0.20722330729166666,
+      "translucent_ratio": 0.004780815972222222,
+      "bbox_xywh": [
+        386,
+        39,
+        492,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999214565104698
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000224.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191158,
+      "opaque_pixels": 186726,
+      "translucent_pixels": 4432,
+      "foreground_ratio": 0.2074197048611111,
+      "translucent_ratio": 0.0048090277777777775,
+      "bbox_xywh": [
+        386,
+        39,
+        496,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999895374506952
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000225.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191289,
+      "opaque_pixels": 186847,
+      "translucent_pixels": 4442,
+      "foreground_ratio": 0.20756184895833332,
+      "translucent_ratio": 0.004819878472222222,
+      "bbox_xywh": [
+        386,
+        39,
+        499,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000226.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191413,
+      "opaque_pixels": 186934,
+      "translucent_pixels": 4479,
+      "foreground_ratio": 0.20769639756944444,
+      "translucent_ratio": 0.004860026041666667,
+      "bbox_xywh": [
+        387,
+        39,
+        502,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000227.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192678,
+      "opaque_pixels": 188422,
+      "translucent_pixels": 4256,
+      "foreground_ratio": 0.20906901041666667,
+      "translucent_ratio": 0.004618055555555556,
+      "bbox_xywh": [
+        387,
+        39,
+        505,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.9999584799510064
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000228.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 191760,
+      "opaque_pixels": 187326,
+      "translucent_pixels": 4434,
+      "foreground_ratio": 0.20807291666666666,
+      "translucent_ratio": 0.004811197916666667,
+      "bbox_xywh": [
+        387,
+        39,
+        508,
+        653
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000229.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192008,
+      "opaque_pixels": 187543,
+      "translucent_pixels": 4465,
+      "foreground_ratio": 0.2083420138888889,
+      "translucent_ratio": 0.004844835069444445,
+      "bbox_xywh": [
+        387,
+        38,
+        512,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000230.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192156,
+      "opaque_pixels": 187696,
+      "translucent_pixels": 4460,
+      "foreground_ratio": 0.20850260416666666,
+      "translucent_ratio": 0.004839409722222222,
+      "bbox_xywh": [
+        388,
+        38,
+        515,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000231.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192306,
+      "opaque_pixels": 187829,
+      "translucent_pixels": 4477,
+      "foreground_ratio": 0.20866536458333335,
+      "translucent_ratio": 0.004857855902777777,
+      "bbox_xywh": [
+        388,
+        38,
+        518,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000232.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192462,
+      "opaque_pixels": 188007,
+      "translucent_pixels": 4455,
+      "foreground_ratio": 0.20883463541666666,
+      "translucent_ratio": 0.004833984375,
+      "bbox_xywh": [
+        388,
+        38,
+        520,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000233.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192588,
+      "opaque_pixels": 188131,
+      "translucent_pixels": 4457,
+      "foreground_ratio": 0.20897135416666668,
+      "translucent_ratio": 0.0048361545138888885,
+      "bbox_xywh": [
+        388,
+        38,
+        523,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000234.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192652,
+      "opaque_pixels": 188138,
+      "translucent_pixels": 4514,
+      "foreground_ratio": 0.2090407986111111,
+      "translucent_ratio": 0.004898003472222222,
+      "bbox_xywh": [
+        388,
+        38,
+        526,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000235.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192802,
+      "opaque_pixels": 188269,
+      "translucent_pixels": 4533,
+      "foreground_ratio": 0.2092035590277778,
+      "translucent_ratio": 0.004918619791666667,
+      "bbox_xywh": [
+        388,
+        38,
+        529,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000236.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192904,
+      "opaque_pixels": 188353,
+      "translucent_pixels": 4551,
+      "foreground_ratio": 0.2093142361111111,
+      "translucent_ratio": 0.004938151041666667,
+      "bbox_xywh": [
+        388,
+        38,
+        531,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 2,
+      "largest_component_ratio": 0.999958528594534
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000237.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192890,
+      "opaque_pixels": 188360,
+      "translucent_pixels": 4530,
+      "foreground_ratio": 0.2092990451388889,
+      "translucent_ratio": 0.004915364583333333,
+      "bbox_xywh": [
+        388,
+        38,
+        532,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000238.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192723,
+      "opaque_pixels": 188175,
+      "translucent_pixels": 4548,
+      "foreground_ratio": 0.20911783854166666,
+      "translucent_ratio": 0.004934895833333334,
+      "bbox_xywh": [
+        388,
+        38,
+        534,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    },
+    {
+      "path": "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000239.png",
+      "width": 1280,
+      "height": 720,
+      "foreground_pixels": 192548,
+      "opaque_pixels": 187993,
+      "translucent_pixels": 4555,
+      "foreground_ratio": 0.2089279513888889,
+      "translucent_ratio": 0.004942491319444444,
+      "bbox_xywh": [
+        388,
+        38,
+        535,
+        654
+      ],
+      "touches_edge": false,
+      "component_count": 1,
+      "largest_component_ratio": 1.0
+    }
+  ],
+  "frames_by_fragmentation": [
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000132.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000155.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000158.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000127.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000000.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000110.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000100.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000002.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000133.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000203.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000040.png",
+    "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\dash\\rgba-sam2.1-small-v2-defringed\\frame_000180.png"
+  ]
+}

@@ -1,3 +1,4 @@
+- ~~Add temporal mask stability diagnostics with centroid-aligned IoU, area-change, centroid-shift, and boundary-turnover metrics. Verified by deterministic tests and ADR-026.~~
 # MotionAnchor
 ## Development Roadmap
 
@@ -84,8 +85,10 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - ~~Connect Rust/Tauri to persistent worker jobs. Verified with lazy managed sidecar state, typed submit/status/cancel reports, real Cat Trap completion and cancellation tests, partial-artifact cleanup, and ADR-022.~~
 - ~~Wire cancellable frame extraction into the worker job protocol. Verified with submit/status/cancel NDJSON messages, Popen supervision, bounded progress polling, terminate/kill escalation, partial artifact cleanup, structured job lookup errors, and ADR-021.~~
 - Establish deterministic OpenCV fixture and mask-adapter baseline. ~~Verified with pinned OpenCV/NumPy, `MaskEngine`, existing-alpha and chroma-key implementations, reproducible hashes, edge-contact metadata, synthetic thin-feature fixtures, and ADR-015. Real Cat Trap quality evaluation remains open.~~
-- Test one local background-removal approach on real Cat Trap hair, cape, sword, staff, and glow. Shared benchmark harness is ready with IoU, precision, recall, boundary F1, fixture provenance, and ADR-016; real assets and approved masks remain required.
-- Create a Unity 2022.3 editor script that reads a small manifest and creates a sliced texture/Animation Clip.
+- ~~Test one local background-removal approach on real Cat Trap hair, cape, sword, staff, and glow. SAM 2.1 Hiera Small completed the 240-frame dash benchmark with mean aligned IoU `0.9446`, minimum aligned IoU `0.7052`, `5.95 FPS` on RTX 3060 Ti, deterministic RGBA composition, inward feathering, and defringing. Manual ground-truth scoring and clean-machine packaging remain open; see ADR-030.~~
+- ~~Expose SAM 2 readiness and RGBA review in the desktop workflow. Verified with isolated Torch/CUDA/checkpoint preflight, pinned checkpoint checksum validation, structured worker/Tauri reporting, bounded path-safe RGBA previews, checkerboard rendering, 105 Python tests, 18 Rust tests, and ADR-032.~~
+- ~~Connect SAM 2 RGBA production to the worker job protocol and Tauri UI. Verified with an isolated Python 3.12 subprocess, bounded stderr draining, cooperative cancellation, atomic artifact publication, final-path rebasing, prompt JSON input, React controls, a fake-child integration fixture, 103 Python tests, 17 Rust tests, TypeScript validation, and a production Vite build; see ADR-031.~~
+- Create a Unity 2022.3 editor script that reads a small manifest and creates a sliced texture/Animation Clip. Engine-neutral manifest schema `1.0`, strict validator, provenance fields, safe relative paths, and repository fixture are complete under ADR-028; Unity Editor importer and real clip creation remain blocked until Unity 2022.3 LTS is installed.
 - Complete code, model-weight, checkpoint, binary, and transitive-dependency license inventory.
 - Build the Open Source & Model Evaluation Matrix.
 - Benchmark FFmpeg, OpenCV, PySceneDetect, ruptures, rembg, SAM 2, Cutie/XMem, TAPIR/TAPNext, RAFT, DINOv2, aisuite/LiteLLM, Instructor, and keyring candidates only where relevant to the first release.
@@ -641,3 +644,5 @@ Do not trade away the first seven items to add breadth.
 | Commercial v1.0 | 34ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“36 weeks |
 
 These ranges assume solo implementation and production-grade testing. They can shorten with reduced scope or parallel development, but the acceptance gates should remain unchanged.
+
+- ~~Run the first real Cat Trap temporal mask benchmark. The deterministic temporal-median baseline was measured across all 240 dash frames and rejected for production due to speed-line/dust merging, interior loss, and excessive boundary turnover; see ADR-027.~~

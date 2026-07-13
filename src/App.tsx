@@ -1,6 +1,10 @@
+// src/App.tsx
+// MotionAnchor desktop UI for media extraction and SAM 2 RGBA production jobs.
+
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
+import { PromptEditor } from "./prompt-editor/PromptEditor";
 import "./App.css";
 
 type MediaProbe = {
@@ -15,6 +19,19 @@ type MediaProbe = {
 };
 
 type JobAccepted = { job_id: string; operation: string };
+type Sam2Preflight = {
+  ready: boolean;
+  python: string;
+  torch_available: boolean;
+  torch_version: string | null;
+  cuda_available: boolean;
+  gpu: string | null;
+  vram_bytes: number | null;
+  checkpoint_exists: boolean;
+  checkpoint_sha256: string | null;
+  checkpoint_valid: boolean;
+  error: string | null;
+};
 type FramePreview = {
   index: number;
   timestamp_seconds: number;
@@ -23,6 +40,7 @@ type FramePreview = {
 };
 type JobStatus = {
   job_id: string;
+  operation: string;
   status: "queued" | "running" | "completed" | "failed" | "cancelled";
   progress: number;
   message: string | null;
@@ -30,22 +48,45 @@ type JobStatus = {
   error: { code: string; message: string } | null;
   cancellation_requested: boolean;
 };
-const DEFAULT_SOURCE =
-  "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\videos\\dash.mp4";
-const DEFAULT_OUTPUT =
-  "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap\\ui-extract";
+
+const ROOT = "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap";
+const DEFAULT_SOURCE = `${ROOT}\\videos\\dash.mp4`;
+const DEFAULT_FRAMES = `${ROOT}\\dash\\frames`;
+const DEFAULT_EXTRACTION_OUTPUT = `${ROOT}\\ui-extract`;
+const DEFAULT_SEGMENTATION_OUTPUT = `${ROOT}\\ui-sam2-output`;
+const DEFAULT_PROMPTS = `${ROOT}\\dash\\sam2-prompts.json`;
+
+function queuedJob(accepted: JobAccepted): JobStatus {
+  return {
+    job_id: accepted.job_id,
+    operation: accepted.operation,
+    status: "queued",
+    progress: 0,
+    message: "Job accepted",
+    result: null,
+    error: null,
+    cancellation_requested: false,
+  };
+}
 
 function App() {
   const [sourcePath, setSourcePath] = useState(DEFAULT_SOURCE);
-  const [outputPath, setOutputPath] = useState(DEFAULT_OUTPUT);
+  const [extractionOutput, setExtractionOutput] = useState(DEFAULT_EXTRACTION_OUTPUT);
+  const [framesPath, setFramesPath] = useState(DEFAULT_FRAMES);
+  const [segmentationOutput, setSegmentationOutput] = useState(DEFAULT_SEGMENTATION_OUTPUT);
+  const [promptPath, setPromptPath] = useState(DEFAULT_PROMPTS);
+  const [featherRadius, setFeatherRadius] = useState(1.5);
+  const [defringe, setDefringe] = useState(true);
   const [probe, setProbe] = useState<MediaProbe | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [previews, setPreviews] = useState<FramePreview[]>([]);
+  const [rgbaPreviews, setRgbaPreviews] = useState<FramePreview[]>([]);
+  const [sam2Runtime, setSam2Runtime] = useState<Sam2Preflight | null>(null);
   const [error, setError] = useState("");
 
   const terminal = useMemo(
-    () => job && ["completed", "failed", "cancelled"].includes(job.status),
+    () => Boolean(job && ["completed", "failed", "cancelled"].includes(job.status)),
     [job],
   );
 
@@ -61,31 +102,36 @@ function App() {
     return () => window.clearInterval(timer);
   }, [job?.job_id, terminal]);
 
-
   useEffect(() => {
-    if (job?.status !== "completed") return;
-    invoke<FramePreview[]>("get_frame_previews", { outputPath, count: 8 })
+    if (job?.status !== "completed" || job.operation !== "media.extract_frames") return;
+    invoke<FramePreview[]>("get_frame_previews", { outputPath: extractionOutput, count: 8 })
       .then(setPreviews)
       .catch((cause) => setError(String(cause)));
-  }, [job?.status, outputPath]);
+  }, [job?.status, job?.operation, extractionOutput]);
 
-  async function chooseSource() {
-    const selected = await open({
-      multiple: false,
-      directory: false,
-      filters: [{ name: "Video", extensions: ["mp4", "mov", "mkv", "webm", "avi"] }],
-    });
+
+  useEffect(() => {
+    if (job?.status !== "completed" || job.operation !== "segmentation.sam2_rgba") return;
+    invoke<FramePreview[]>("get_rgba_previews", { outputPath: segmentationOutput, count: 8 })
+      .then(setRgbaPreviews)
+      .catch((cause) => setError(String(cause)));
+  }, [job?.status, job?.operation, segmentationOutput]);
+
+  async function chooseFile(
+    setter: (path: string) => void,
+    filters?: { name: string; extensions: string[] }[],
+  ) {
+    const selected = await open({ multiple: false, directory: false, filters });
     if (typeof selected === "string") {
-      setSourcePath(selected);
-      setProbe(null);
+      setter(selected);
       setError("");
     }
   }
 
-  async function chooseOutput() {
+  async function chooseDirectory(setter: (path: string) => void) {
     const selected = await open({ multiple: false, directory: true });
     if (typeof selected === "string") {
-      setOutputPath(selected);
+      setter(selected);
       setError("");
     }
   }
@@ -110,18 +156,11 @@ function App() {
     try {
       const accepted = await invoke<JobAccepted>("start_frame_extraction_job", {
         sourcePath,
-        outputPath,
+        outputPath: extractionOutput,
       });
       setPreviews([]);
-      setJob({
-        job_id: accepted.job_id,
-        status: "queued",
-        progress: 0,
-        message: "Job accepted",
-        result: null,
-        error: null,
-        cancellation_requested: false,
-      });
+      setRgbaPreviews([]);
+      setJob(queuedJob(accepted));
     } catch (cause) {
       setError(String(cause));
     } finally {
@@ -129,7 +168,47 @@ function App() {
     }
   }
 
-  async function cancelExtraction() {
+
+  async function runSam2Preflight() {
+    setBusy(true);
+    setError("");
+    try {
+      setSam2Runtime(await invoke<Sam2Preflight>("sam2_preflight"));
+    } catch (cause) {
+      setSam2Runtime(null);
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function startSegmentation(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const runtime = await invoke<Sam2Preflight>("sam2_preflight");
+      setSam2Runtime(runtime);
+      if (!runtime.ready) {
+        throw new Error(runtime.error ?? "SAM 2 runtime is not ready");
+      }
+      const accepted = await invoke<JobAccepted>("start_sam2_rgba_job", {
+        framesPath,
+        outputPath: segmentationOutput,
+        promptPath,
+        featherRadius,
+        defringe,
+      });
+      setRgbaPreviews([]);
+      setJob(queuedJob(accepted));
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function cancelActiveJob() {
     if (!job) return;
     setError("");
     try {
@@ -140,53 +219,108 @@ function App() {
     }
   }
 
+  const jobTitle = job?.operation === "segmentation.sam2_rgba" ? "SAM 2 RGBA job" : "Extraction job";
+
   return (
     <main className="app-shell">
       <header className="hero">
         <div>
-          <p className="eyebrow">Phase 0 Media Pipeline</p>
+          <p className="eyebrow">Production Media Pipeline</p>
           <h1>MotionAnchor</h1>
-          <p>Probe media, extract timestamped frames, monitor progress, and cancel safely.</p>
+          <p>Extract deterministic frames, propagate SAM 2 masks, and publish defringed RGBA sequences.</p>
         </div>
-        <span className="status-pill">Local worker</span>
+        <span className="status-pill">Keremev worker</span>
       </header>
 
-      <section className="panel">
-        <form onSubmit={startExtraction}>
-          <label>
-            Source video
-            <span className="path-control">
-              <input value={sourcePath} onChange={(e) => setSourcePath(e.target.value)} />
-              <button type="button" className="browse" onClick={chooseSource}>Browse</button>
-            </span>
-          </label>
-          <label>
-            Output directory
-            <span className="path-control">
-              <input value={outputPath} onChange={(e) => setOutputPath(e.target.value)} />
-              <button type="button" className="browse" onClick={chooseOutput}>Browse</button>
-            </span>
-          </label>
-          <div className="actions">
-            <button type="button" className="secondary" onClick={runProbe} disabled={busy}>
-              Probe video
-            </button>
-            <button type="submit" disabled={busy || Boolean(job && !terminal)}>
-              Start extraction
-            </button>
-            <button
-              type="button"
-              className="danger"
-              onClick={cancelExtraction}
-              disabled={!job || Boolean(terminal) || job.cancellation_requested}
-            >
-              Cancel
-            </button>
+      <section className="workflow-grid">
+        <article className="panel">
+          <div className="panel-heading">
+            <h2>1. Extract frames</h2>
+            <span className="step-badge">FFmpeg</span>
           </div>
-        </form>
+          <form onSubmit={startExtraction}>
+            <label>
+              Source video
+              <span className="path-control">
+                <input value={sourcePath} onChange={(event) => setSourcePath(event.target.value)} />
+                <button type="button" className="browse" onClick={() => chooseFile(setSourcePath, [{ name: "Video", extensions: ["mp4", "mov", "mkv", "webm", "avi"] }])}>Browse</button>
+              </span>
+            </label>
+            <label>
+              Empty output directory
+              <span className="path-control">
+                <input value={extractionOutput} onChange={(event) => setExtractionOutput(event.target.value)} />
+                <button type="button" className="browse" onClick={() => chooseDirectory(setExtractionOutput)}>Browse</button>
+              </span>
+            </label>
+            <div className="actions">
+              <button type="button" className="secondary" onClick={runProbe} disabled={busy}>Probe video</button>
+              <button type="submit" disabled={busy || Boolean(job && !terminal)}>Start extraction</button>
+            </div>
+          </form>
+        </article>
+
+        <article className="panel">
+          <div className="panel-heading">
+            <h2>2. Build RGBA sequence</h2>
+            <span className="step-badge">SAM 2.1 Small</span>
+          </div>
+          <form onSubmit={startSegmentation}>
+            <label>
+              Extracted frames directory
+              <span className="path-control">
+                <input value={framesPath} onChange={(event) => setFramesPath(event.target.value)} />
+                <button type="button" className="browse" onClick={() => chooseDirectory(setFramesPath)}>Browse</button>
+              </span>
+            </label>
+            <label>
+              Prompt JSON
+              <span className="path-control">
+                <input value={promptPath} onChange={(event) => setPromptPath(event.target.value)} />
+                <button type="button" className="browse" onClick={() => chooseFile(setPromptPath, [{ name: "JSON", extensions: ["json"] }])}>Browse</button>
+              </span>
+            </label>
+            <label>
+              Empty output directory
+              <span className="path-control">
+                <input value={segmentationOutput} onChange={(event) => setSegmentationOutput(event.target.value)} />
+                <button type="button" className="browse" onClick={() => chooseDirectory(setSegmentationOutput)}>Browse</button>
+              </span>
+            </label>
+            <div className="setting-row">
+              <label>
+                Feather radius
+                <input type="number" min="0" max="8" step="0.25" value={featherRadius} onChange={(event) => setFeatherRadius(Number(event.target.value))} />
+              </label>
+              <label className="checkbox-label">
+                <input type="checkbox" checked={defringe} onChange={(event) => setDefringe(event.target.checked)} />
+                Defringe translucent edges
+              </label>
+            </div>
+            <div className="actions">
+              <button type="button" className="secondary" onClick={runSam2Preflight} disabled={busy}>Check GPU runtime</button>
+              <button type="submit" disabled={busy || Boolean(job && !terminal) || sam2Runtime?.ready === false}>Start SAM 2 RGBA</button>
+            </div>
+            {sam2Runtime && (
+              <div className={`runtime-card ${sam2Runtime.ready ? "runtime-ready" : "runtime-blocked"}`}>
+                <strong>{sam2Runtime.ready ? "SAM 2 runtime ready" : "SAM 2 runtime blocked"}</strong>
+                <span>{sam2Runtime.gpu ?? "No CUDA GPU"}</span>
+                <span>{sam2Runtime.vram_bytes ? `${(sam2Runtime.vram_bytes / 1073741824).toFixed(1)} GB VRAM` : "VRAM unavailable"}</span>
+                <span>Checkpoint: {sam2Runtime.checkpoint_valid ? "verified" : "missing or invalid"}</span>
+              </div>
+            )}
+          </form>
+        </article>
       </section>
 
       {error && <section className="alert">{error}</section>}
+
+      <PromptEditor
+        framesPath={framesPath}
+        promptPath={promptPath}
+        onPromptPathChange={setPromptPath}
+        onError={setError}
+      />
 
       <section className="dashboard">
         <article className="panel metric-panel">
@@ -194,20 +328,18 @@ function App() {
           {probe ? (
             <dl className="metrics">
               <div><dt>Codec</dt><dd>{probe.codec}</dd></div>
-              <div><dt>Resolution</dt><dd>{probe.width} × {probe.height}</dd></div>
+              <div><dt>Resolution</dt><dd>{probe.width} ? {probe.height}</dd></div>
               <div><dt>Duration</dt><dd>{probe.duration_seconds.toFixed(2)} s</dd></div>
               <div><dt>Frame rate</dt><dd>{probe.avg_frame_rate}</dd></div>
               <div><dt>Frames</dt><dd>{probe.frame_count ?? "Unknown"}</dd></div>
               <div><dt>Variable FPS</dt><dd>{probe.variable_frame_rate ? "Yes" : "No"}</dd></div>
             </dl>
-          ) : (
-            <p className="muted">Probe the selected video to inspect its metadata.</p>
-          )}
+          ) : <p className="muted">Probe the selected video to inspect metadata.</p>}
         </article>
 
         <article className="panel job-panel">
           <div className="panel-heading">
-            <h2>Extraction job</h2>
+            <h2>{jobTitle}</h2>
             {job && <span className={`job-state state-${job.status}`}>{job.status}</span>}
           </div>
           {job ? (
@@ -218,31 +350,42 @@ function App() {
                 <span>{job.message ?? "Waiting for worker"}</span>
               </div>
               <code>{job.job_id}</code>
+              <button type="button" className="danger cancel-button" onClick={cancelActiveJob} disabled={terminal || job.cancellation_requested}>Cancel active job</button>
               {job.error && <p className="inline-error">{job.error.message}</p>}
-              {job.result && (
-                <pre>{JSON.stringify(job.result, null, 2)}</pre>
-              )}
+              {job.result && <pre>{JSON.stringify(job.result, null, 2)}</pre>}
             </>
-          ) : (
-            <p className="muted">No extraction job has been submitted.</p>
-          )}
+          ) : <p className="muted">No production job has been submitted.</p>}
         </article>
       </section>
+
+      {rgbaPreviews.length > 0 && (
+        <section className="panel preview-panel">
+          <div className="panel-heading">
+            <h2>Representative RGBA frames</h2>
+            <span className="muted">{rgbaPreviews.length} transparent previews</span>
+          </div>
+          <div className="preview-grid rgba-grid">
+            {rgbaPreviews.map((preview) => (
+              <figure key={preview.filename}>
+                <div className="checkerboard"><img src={preview.data_url} alt={`RGBA ${preview.index}`} /></div>
+                <figcaption><span>#{preview.index}</span><span>{preview.filename}</span></figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
       {previews.length > 0 && (
         <section className="panel preview-panel">
           <div className="panel-heading">
-            <h2>Representative frames</h2>
-            <span className="muted">{previews.length} of {probe?.frame_count ?? "?"} frames</span>
+            <h2>Representative extracted frames</h2>
+            <span className="muted">{previews.length} previews</span>
           </div>
           <div className="preview-grid">
             {previews.map((preview) => (
               <figure key={preview.filename}>
                 <img src={preview.data_url} alt={`Frame ${preview.index}`} />
-                <figcaption>
-                  <span>#{preview.index}</span>
-                  <span>{preview.timestamp_seconds.toFixed(3)} s</span>
-                </figcaption>
+                <figcaption><span>#{preview.index}</span><span>{preview.timestamp_seconds.toFixed(3)} s</span></figcaption>
               </figure>
             ))}
           </div>

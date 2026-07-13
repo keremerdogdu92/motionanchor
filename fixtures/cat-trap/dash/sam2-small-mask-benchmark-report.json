@@ -1,0 +1,158 @@
+{
+  "frame_count": 240,
+  "pair_count": 239,
+  "mean_aligned_iou": 0.9446441946262681,
+  "minimum_aligned_iou": 0.7052244493559942,
+  "mean_area_change_ratio": 0.007503461701439385,
+  "maximum_area_change_ratio": 0.11488408170300785,
+  "mean_centroid_shift_pixels": 2.3008127668775913,
+  "maximum_centroid_shift_pixels": 33.72168944996284,
+  "mean_boundary_turnover_ratio": 0.7217873068288831,
+  "maximum_boundary_turnover_ratio": 0.9901446071658838,
+  "engine_id": "sam2.1.video.hiera-small.v1",
+  "sam2_commit": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+  "checkpoint_sha256": "6d1aa6f30de5c92224f8172114de081d104bbd23dd9dc5c58996f0cad5dc4d38",
+  "torch_version": "2.7.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 3060 Ti",
+  "anchor_prompts": {
+    "0": {
+      "box": [
+        350.0,
+        20.0,
+        905.0,
+        710.0
+      ],
+      "positive": [
+        [
+          640.0,
+          190.0
+        ],
+        [
+          620.0,
+          390.0
+        ],
+        [
+          560.0,
+          555.0
+        ],
+        [
+          430.0,
+          180.0
+        ],
+        [
+          800.0,
+          430.0
+        ]
+      ],
+      "negative": [
+        [
+          360.0,
+          350.0
+        ],
+        [
+          895.0,
+          120.0
+        ],
+        [
+          895.0,
+          675.0
+        ]
+      ]
+    },
+    "120": {
+      "box": [
+        145.0,
+        65.0,
+        1040.0,
+        700.0
+      ],
+      "positive": [
+        [
+          475.0,
+          220.0
+        ],
+        [
+          580.0,
+          370.0
+        ],
+        [
+          500.0,
+          520.0
+        ],
+        [
+          235.0,
+          280.0
+        ],
+        [
+          850.0,
+          330.0
+        ]
+      ],
+      "negative": [
+        [
+          80.0,
+          350.0
+        ],
+        [
+          1110.0,
+          300.0
+        ],
+        [
+          1120.0,
+          650.0
+        ]
+      ]
+    },
+    "180": {
+      "box": [
+        360.0,
+        30.0,
+        920.0,
+        705.0
+      ],
+      "positive": [
+        [
+          640.0,
+          200.0
+        ],
+        [
+          620.0,
+          390.0
+        ],
+        [
+          620.0,
+          570.0
+        ],
+        [
+          420.0,
+          190.0
+        ],
+        [
+          820.0,
+          500.0
+        ]
+      ],
+      "negative": [
+        [
+          300.0,
+          580.0
+        ],
+        [
+          930.0,
+          100.0
+        ],
+        [
+          1120.0,
+          600.0
+        ]
+      ]
+    }
+  },
+  "mean_foreground_ratio": 0.21523130967881945,
+  "minimum_foreground_ratio": 0.20230034722222223,
+  "maximum_foreground_ratio": 0.27698133680555553,
+  "elapsed_seconds": 40.35614899999928,
+  "frames_per_second": 5.947049110161733,
+  "approval_status": "experimental_pending_visual_review",
+  "assessment": "Multi-anchor SAM 2.1 small propagation completed. Manual ground-truth masks are still required before production approval."
+}

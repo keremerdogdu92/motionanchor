@@ -248,3 +248,7 @@ The media workflow uses the official Tauri dialog plugin for single-video and ou
 ## Representative Frame Preview
 
 Completed frame-extraction jobs automatically load eight evenly spaced previews from `frames.json`. Rust validates every manifest filename, canonicalizes each child path, caps the total payload at 12 MiB, and returns PNG data URLs without granting general filesystem access. See `docs/adr/ADR-025-bounded-frame-preview-gallery.md`.
+
+## Real Mask Baseline Result
+
+The 240-frame Cat Trap dash fixture was evaluated with a deterministic temporal-median background baseline and centroid-aligned temporal metrics. The candidate was rejected for production because it merges speed lines and dust, loses interior character regions, and produces excessive boundary turnover. Aggregate results and the worst-pair diagnostic sheet live under `fixtures/cat-trap/dash/`; see `docs/adr/ADR-027-cat-trap-temporal-median-mask-baseline.md`.

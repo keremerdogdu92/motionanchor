@@ -1,0 +1,87 @@
+{
+  "frame_count": 240,
+  "pair_count": 239,
+  "mean_aligned_iou": 0.8379824777429711,
+  "minimum_aligned_iou": 0.395631474632721,
+  "mean_area_change_ratio": 0.021684040939167745,
+  "maximum_area_change_ratio": 0.3678441624232055,
+  "mean_centroid_shift_pixels": 6.1615055848672515,
+  "maximum_centroid_shift_pixels": 73.36434136192213,
+  "mean_boundary_turnover_ratio": 0.8058699144965765,
+  "maximum_boundary_turnover_ratio": 0.9904251373857927,
+  "engine_id": "opencv.temporal-median.v1",
+  "lab_distance_threshold": 12.0,
+  "sample_count": 30,
+  "minimum_component_pixels": 300,
+  "mean_foreground_ratio": 0.24590257432725696,
+  "minimum_foreground_ratio": 0.12893012152777777,
+  "maximum_foreground_ratio": 0.7093695746527777,
+  "worst_pairs": [
+    {
+      "previous_index": 152,
+      "current_index": 153,
+      "aligned_iou": 0.395631474632721,
+      "area_change_ratio": 0.3678441624232055,
+      "centroid_shift_pixels": 73.36434136192213,
+      "boundary_turnover_ratio": 0.9904251373857927
+    },
+    {
+      "previous_index": 133,
+      "current_index": 134,
+      "aligned_iou": 0.5659299511675837,
+      "area_change_ratio": 0.02837133099501569,
+      "centroid_shift_pixels": 51.699639263800755,
+      "boundary_turnover_ratio": 0.9856051283518874
+    },
+    {
+      "previous_index": 186,
+      "current_index": 187,
+      "aligned_iou": 0.5738234828077959,
+      "area_change_ratio": 0.024440890755901376,
+      "centroid_shift_pixels": 9.035615871817628,
+      "boundary_turnover_ratio": 0.9547577078887961
+    },
+    {
+      "previous_index": 132,
+      "current_index": 133,
+      "aligned_iou": 0.589640422989117,
+      "area_change_ratio": 0.05007790708506942,
+      "centroid_shift_pixels": 48.987383442050856,
+      "boundary_turnover_ratio": 0.9864336878662904
+    },
+    {
+      "previous_index": 169,
+      "current_index": 170,
+      "aligned_iou": 0.594233849439402,
+      "area_change_ratio": 0.05195343322004611,
+      "centroid_shift_pixels": 23.04631183480495,
+      "boundary_turnover_ratio": 0.9752808171871024
+    },
+    {
+      "previous_index": 107,
+      "current_index": 108,
+      "aligned_iou": 0.6045630124918114,
+      "area_change_ratio": 0.04800147013244906,
+      "centroid_shift_pixels": 43.68180881928639,
+      "boundary_turnover_ratio": 0.9879508825786646
+    },
+    {
+      "previous_index": 131,
+      "current_index": 132,
+      "aligned_iou": 0.6130656407021481,
+      "area_change_ratio": 0.03305420189663364,
+      "centroid_shift_pixels": 16.883071020330707,
+      "boundary_turnover_ratio": 0.9831709044722894
+    },
+    {
+      "previous_index": 127,
+      "current_index": 128,
+      "aligned_iou": 0.613324225598389,
+      "area_change_ratio": 0.1373473221850535,
+      "centroid_shift_pixels": 36.72472195969924,
+      "boundary_turnover_ratio": 0.9841347063434147
+    }
+  ],
+  "approval_status": "rejected_for_production",
+  "assessment": "Temporal median baseline isolates broad motion but merges speed lines and dust, loses interior character regions, and has excessive boundary turnover. No manually approved ground truth exists yet."
+}

@@ -16,6 +16,9 @@ class FakeJobs:
     def submit_extract_frames(self, source: str, output: str) -> str:
         return "job-123"
 
+    def submit_sam2_rgba(self, frames: str, output: str, prompt: str, **settings) -> str:
+        return "job-sam2"
+
     def status(self, job_id: str) -> dict:
         if job_id == "unknown-job":
             raise JobNotFoundError(job_id)
@@ -46,6 +49,24 @@ class TestJobProtocol(unittest.TestCase):
         self.assertEqual(response["type"], "job.accepted")
         self.assertEqual(response["message_id"], "submit-1")
         self.assertEqual(response["job_id"], "job-123")
+
+    def test_submit_sam2_rgba_returns_job_id(self) -> None:
+        request = make_envelope(
+            message_type="job.submit.segmentation.sam2_rgba",
+            message_id="submit-sam2",
+            payload={
+                "frames_path": "frames",
+                "output_path": "rgba",
+                "prompt_path": "prompts.json",
+                "model": "small",
+                "feather_radius": 1.5,
+                "defringe": True,
+            },
+        )
+        response = run_messages([request], FakeJobs())[1]
+        self.assertEqual(response["type"], "job.accepted")
+        self.assertEqual(response["job_id"], "job-sam2")
+        self.assertEqual(response["payload"]["operation"], "segmentation.sam2_rgba")
 
     def test_status_returns_snapshot(self) -> None:
         request = make_envelope(

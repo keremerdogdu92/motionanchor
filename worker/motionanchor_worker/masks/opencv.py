@@ -69,3 +69,38 @@ class ChromaKeyMaskEngine:
         background = cv2.inRange(hsv, self.lower_hsv, self.upper_hsv)
         foreground = cv2.bitwise_not(background)
         return _result(self.engine_id, source, output, foreground)
+
+
+class BorderConnectedMaskEngine:
+    """Segment a near-uniform backdrop using border color and connectivity."""
+
+    engine_id = "opencv.border-connected.v1"
+
+    def __init__(self, lab_distance_threshold: float = 22.0, border_width: int = 8) -> None:
+        if lab_distance_threshold <= 0:
+            raise ValueError("lab distance threshold must be positive")
+        if border_width < 1:
+            raise ValueError("border width must be positive")
+        self.lab_distance_threshold = float(lab_distance_threshold)
+        self.border_width = int(border_width)
+
+    def create_mask(self, source: Path, output: Path) -> MaskResult:
+        image = cv2.imread(str(source.resolve(strict=True)), cv2.IMREAD_COLOR)
+        if image is None:
+            raise ValueError("source is not a readable color image")
+        height, width = image.shape[:2]
+        band = min(self.border_width, max(1, min(height, width) // 4))
+        samples = np.concatenate((
+            image[:band, :, :].reshape(-1, 3), image[-band:, :, :].reshape(-1, 3),
+            image[:, :band, :].reshape(-1, 3), image[:, -band:, :].reshape(-1, 3),
+        ))
+        reference_bgr = np.median(samples, axis=0).astype(np.uint8)
+        lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB).astype(np.float32)
+        reference_lab = cv2.cvtColor(reference_bgr.reshape(1, 1, 3), cv2.COLOR_BGR2LAB)[0, 0].astype(np.float32)
+        distance = np.linalg.norm(lab - reference_lab, axis=2)
+        candidates = (distance <= self.lab_distance_threshold).astype(np.uint8)
+        count, labels = cv2.connectedComponents(candidates, connectivity=8)
+        border_labels = np.unique(np.concatenate((labels[0, :], labels[-1, :], labels[:, 0], labels[:, -1])))
+        background = np.isin(labels, border_labels[border_labels != 0]) if count > 1 else np.zeros_like(candidates, dtype=bool)
+        foreground = np.where(background, 0, 255).astype(np.uint8)
+        return _result(self.engine_id, source, output, foreground)

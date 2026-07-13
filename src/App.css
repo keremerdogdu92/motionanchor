@@ -170,3 +170,82 @@ button.browse:hover {
 @media (max-width: 520px) {
   .preview-grid { grid-template-columns: 1fr; }
 }
+
+
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.step-badge {
+  border: 1px solid #343a55;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #b8c0ff;
+  background: #20243a;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.setting-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.45fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: end;
+}
+
+.checkbox-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 2px;
+}
+
+.checkbox-label input {
+  width: 18px;
+  height: 18px;
+  accent-color: #7482ff;
+}
+
+.cancel-button {
+  margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+  .workflow-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .setting-row { grid-template-columns: 1fr; }
+}
+
+.runtime-card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 14px;
+  padding: 12px 14px;
+  border: 1px solid #343a55;
+  border-radius: 12px;
+  background: #0d0f17;
+  color: #aab0c7;
+  font-size: 0.8rem;
+}
+.runtime-card strong { grid-column: 1 / -1; color: #edf0ff; }
+.runtime-ready { border-color: #2d6751; }
+.runtime-blocked { border-color: #743b48; }
+.checkerboard {
+  background-color: #d9d9d9;
+  background-image: linear-gradient(45deg, #b9b9b9 25%, transparent 25%),
+    linear-gradient(-45deg, #b9b9b9 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #b9b9b9 75%),
+    linear-gradient(-45deg, transparent 75%, #b9b9b9 75%);
+  background-size: 24px 24px;
+  background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+}
+.checkerboard img { background: transparent; }
+@media (max-width: 620px) {
+  .runtime-card { grid-template-columns: 1fr; }
+}

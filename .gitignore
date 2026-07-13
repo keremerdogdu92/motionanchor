@@ -43,3 +43,14 @@ src-tauri/binaries/*.exe
 fixtures/cat-trap/dash/frames/
 fixtures/cat-trap/ui-extract/
 fixtures/cat-trap/incoming/
+
+# Generated Cat Trap benchmark artifacts
+fixtures/cat-trap/dash/masks-*/
+fixtures/cat-trap/dash/rgba-*/
+fixtures/cat-trap/dash/frames-sam2-jpeg/
+fixtures/cat-trap/dash/sam2-smoke/
+
+# Optional SAM 2 evaluation environment
+worker/.venv-sam2/
+
+worker/models/

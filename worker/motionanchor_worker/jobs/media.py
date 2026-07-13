@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from ..media.ffmpeg import FfmpegAdapter
+from ..segmentation import run_sam2_rgba_job
 from .runner import JobRunner
 
 AdapterFactory = Callable[[], FfmpegAdapter]
@@ -45,6 +46,30 @@ class MediaJobService:
             }
 
         return self.runner.submit("media.extract_frames", work)
+
+    def submit_sam2_rgba(
+        self,
+        frames_path: str,
+        output_path: str,
+        prompt_path: str,
+        *,
+        model: str = "small",
+        feather_radius: float = 1.5,
+        defringe: bool = True,
+    ) -> str:
+        def work(report, cancelled) -> dict[str, Any]:
+            return run_sam2_rgba_job(
+                frames_path=frames_path,
+                output_path=output_path,
+                prompt_path=prompt_path,
+                model=model,
+                feather_radius=feather_radius,
+                defringe=defringe,
+                report=report,
+                cancelled=cancelled,
+            )
+
+        return self.runner.submit("segmentation.sam2_rgba", work)
 
     def status(self, job_id: str) -> dict[str, Any]:
         return self.runner.snapshot(job_id)

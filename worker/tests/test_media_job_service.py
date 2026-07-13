@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from motionanchor_worker.jobs.media import MediaJobService
+import motionanchor_worker.jobs.media as media_jobs_module
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,19 @@ class TestMediaJobService(unittest.TestCase):
             self.assertEqual(snapshot["status"], "completed")
             self.assertEqual(snapshot["result"]["frame_count"], 2)
             self.assertTrue(snapshot["result"]["manifest_path"].endswith("frames.json"))
+
+    def test_sam2_job_completes_with_report(self) -> None:
+        original = media_jobs_module.run_sam2_rgba_job
+        media_jobs_module.run_sam2_rgba_job = lambda **kwargs: {"frame_count": 2, "rgba_path": "rgba"}
+        try:
+            service = MediaJobService(adapter_factory=FakeAdapter)
+            job_id = service.submit_sam2_rgba("frames", "output", "prompts.json")
+            snapshot = wait_terminal(service, job_id)
+            self.assertEqual(snapshot["status"], "completed")
+            self.assertEqual(snapshot["operation"], "segmentation.sam2_rgba")
+            self.assertEqual(snapshot["result"]["frame_count"], 2)
+        finally:
+            media_jobs_module.run_sam2_rgba_job = original
 
     def test_extract_job_can_be_cancelled(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -60,3 +60,38 @@ class TestOpenCvMaskEngines(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestBorderConnectedMaskEngine(unittest.TestCase):
+    def test_uniform_border_background_is_removed(self) -> None:
+        from motionanchor_worker.masks import BorderConnectedMaskEngine
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "scene.png"
+            image = np.full((80, 120, 3), (20, 30, 150), dtype=np.uint8)
+            cv2.rectangle(image, (35, 20), (85, 70), (180, 80, 30), -1)
+            cv2.line(image, (60, 20), (60, 5), (255, 255, 255), 2)
+            self.assertTrue(cv2.imwrite(str(source), image))
+
+            result = BorderConnectedMaskEngine().create_mask(source, root / "mask.png")
+            mask = cv2.imread(str(root / "mask.png"), cv2.IMREAD_GRAYSCALE)
+            self.assertEqual(int(mask[0, 0]), 0)
+            self.assertGreater(int(mask[40, 60]), 0)
+            self.assertGreater(int(mask[5, 60]), 0)
+            self.assertFalse(result.touches_edge)
+
+    def test_disconnected_matching_color_is_preserved(self) -> None:
+        from motionanchor_worker.masks import BorderConnectedMaskEngine
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "scene.png"
+            image = np.full((64, 96, 3), (20, 30, 150), dtype=np.uint8)
+            cv2.rectangle(image, (24, 16), (72, 56), (80, 120, 220), -1)
+            cv2.circle(image, (48, 36), 8, (20, 30, 150), -1)
+            self.assertTrue(cv2.imwrite(str(source), image))
+
+            BorderConnectedMaskEngine().create_mask(source, root / "mask.png")
+            mask = cv2.imread(str(root / "mask.png"), cv2.IMREAD_GRAYSCALE)
+            self.assertGreater(int(mask[36, 48]), 0)

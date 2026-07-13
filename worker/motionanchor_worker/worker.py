@@ -19,6 +19,7 @@ from . import PROTOCOL_VERSION
 from .errors import WorkerError, internal, unknown_type
 from .jobs import JobNotFoundError
 from .jobs.media import MediaJobService
+from .segmentation import Sam2ProcessError, probe_sam2_runtime
 from .media.ffmpeg import FfmpegAdapter
 from .media.handlers import (
     AdapterFactory,
@@ -31,8 +32,10 @@ from .protocol import (
     TYPE_JOB_CANCEL,
     TYPE_JOB_STATUS,
     TYPE_JOB_SUBMIT_EXTRACT_FRAMES,
+    TYPE_JOB_SUBMIT_SEGMENT_RGBA,
     TYPE_MEDIA_EXTRACT_FRAMES,
     TYPE_MEDIA_PROBE,
+    TYPE_SEGMENTATION_SAM2_PREFLIGHT,
     TYPE_WORKER_PING,
     TYPE_WORKER_PONG,
     TYPE_WORKER_READY,
@@ -170,6 +173,20 @@ def run_loop(
             _handle_ping(obj, stdout, stderr)
             continue
 
+        if msg_type == TYPE_SEGMENTATION_SAM2_PREFLIGHT:
+            try:
+                _write(stdout, make_envelope(
+                    message_type="segmentation.sam2_preflight_result",
+                    message_id=obj.get("message_id"),
+                    payload=probe_sam2_runtime(),
+                ))
+            except Sam2ProcessError as exc:
+                _write(stdout, make_error_envelope(
+                    WorkerError(code="sam2_preflight_failed", message=str(exc)),
+                    in_reply_to=obj.get("message_id"),
+                ))
+            continue
+
         if msg_type == TYPE_JOB_SUBMIT_EXTRACT_FRAMES:
             try:
                 payload = obj["payload"]
@@ -187,6 +204,39 @@ def run_loop(
                     payload={"job_id": job_id, "operation": "media.extract_frames"},
                 ))
             except MediaRequestError as exc:
+                _write(stdout, make_error_envelope(
+                    WorkerError(code="invalid_request", message=str(exc)),
+                    in_reply_to=obj.get("message_id"),
+                ))
+            continue
+
+        if msg_type == TYPE_JOB_SUBMIT_SEGMENT_RGBA:
+            try:
+                payload = obj["payload"]
+                frames = payload.get("frames_path")
+                output = payload.get("output_path")
+                prompt = payload.get("prompt_path")
+                if not isinstance(frames, str) or not frames.strip():
+                    raise MediaRequestError("payload.frames_path must be a non-empty string")
+                if not isinstance(output, str) or not output.strip():
+                    raise MediaRequestError("payload.output_path must be a non-empty string")
+                if not isinstance(prompt, str) or not prompt.strip():
+                    raise MediaRequestError("payload.prompt_path must be a non-empty string")
+                job_id = jobs.submit_sam2_rgba(
+                    frames,
+                    output,
+                    prompt,
+                    model=payload.get("model", "small"),
+                    feather_radius=payload.get("feather_radius", 1.5),
+                    defringe=payload.get("defringe", True),
+                )
+                _write(stdout, make_envelope(
+                    message_type="job.accepted",
+                    message_id=obj.get("message_id"),
+                    job_id=job_id,
+                    payload={"job_id": job_id, "operation": "segmentation.sam2_rgba"},
+                ))
+            except (MediaRequestError, ValueError) as exc:
                 _write(stdout, make_error_envelope(
                     WorkerError(code="invalid_request", message=str(exc)),
                     in_reply_to=obj.get("message_id"),

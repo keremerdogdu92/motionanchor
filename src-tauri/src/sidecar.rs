@@ -430,6 +430,21 @@ pub fn extract_media_frames(
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct Sam2PreflightReport {
+    pub ready: bool,
+    pub python: String,
+    pub torch_available: bool,
+    pub torch_version: Option<String>,
+    pub cuda_available: bool,
+    pub gpu: Option<String>,
+    pub vram_bytes: Option<u64>,
+    pub checkpoint_exists: bool,
+    pub checkpoint_sha256: Option<String>,
+    pub checkpoint_valid: bool,
+    pub error: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct JobAcceptedReport {
     pub job_id: String,
     pub operation: String,
@@ -504,6 +519,17 @@ impl JobSidecarClient {
         Ok(response)
     }
 
+    pub fn sam2_preflight(&mut self) -> Result<Sam2PreflightReport, SidecarError> {
+        let response = self.request(
+            "segmentation.sam2_preflight",
+            None,
+            json!({}),
+            "segmentation.sam2_preflight_result",
+        )?;
+        serde_json::from_value(response.payload)
+            .map_err(|error| SidecarError::Json(error.to_string()))
+    }
+
     pub fn submit_frame_extraction(
         &mut self,
         source_path: &str,
@@ -520,6 +546,46 @@ impl JobSidecarClient {
             "job.submit.media.extract_frames",
             None,
             json!({"source_path": source, "output_path": output}),
+            "job.accepted",
+        )?;
+        serde_json::from_value(response.payload)
+            .map_err(|error| SidecarError::Json(error.to_string()))
+    }
+
+    pub fn submit_sam2_rgba(
+        &mut self,
+        frames_path: &str,
+        output_path: &str,
+        prompt_path: &str,
+        feather_radius: f64,
+        defringe: bool,
+    ) -> Result<JobAcceptedReport, SidecarError> {
+        let frames = PathBuf::from(frames_path)
+            .canonicalize()
+            .map_err(|error| SidecarError::Io(format!("invalid frames path: {error}")))?;
+        if !frames.is_dir() {
+            return Err(SidecarError::Protocol(
+                "frames path must be a directory".into(),
+            ));
+        }
+        let prompt = PathBuf::from(prompt_path)
+            .canonicalize()
+            .map_err(|error| SidecarError::Io(format!("invalid prompt path: {error}")))?;
+        if !prompt.is_file() {
+            return Err(SidecarError::Protocol("prompt path must be a file".into()));
+        }
+        let output = prepare_output_path(output_path)?;
+        let response = self.request(
+            "job.submit.segmentation.sam2_rgba",
+            None,
+            json!({
+                "frames_path": frames,
+                "output_path": output,
+                "prompt_path": prompt,
+                "model": "small",
+                "feather_radius": feather_radius,
+                "defringe": defringe
+            }),
             "job.accepted",
         )?;
         serde_json::from_value(response.payload)

@@ -1,0 +1,7 @@
+﻿# worker/requirements-sam2-evaluation.txt
+# Optional GPU evaluation environment for SAM 2.1. This file is not part of the packaged worker runtime.
+--index-url https://download.pytorch.org/whl/cu128
+torch==2.7.0
+torchvision==0.22.0
+opencv-python-headless==4.13.0.92
+sam-2 @ git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4
