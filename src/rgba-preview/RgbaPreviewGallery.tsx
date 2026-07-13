@@ -1,5 +1,5 @@
-﻿// src/rgba-preview/RgbaPreviewGallery.tsx
-// Production RGBA comparison gallery with checkerboard, source comparison, and alpha-channel visualization.
+// src/rgba-preview/RgbaPreviewGallery.tsx
+// Production RGBA preview with checkerboard, before/after, alpha, onion skin, and frame scrubbing.
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./RgbaPreviewGallery.css";
@@ -11,7 +11,7 @@ export type PreviewFrame = {
   data_url: string;
 };
 
-type PreviewMode = "rgba" | "before-after" | "alpha";
+type PreviewMode = "rgba" | "before-after" | "alpha" | "onion-skin";
 
 type Props = {
   rgbaFrames: PreviewFrame[];
@@ -49,20 +49,37 @@ function AlphaCanvas({ frame }: { frame: PreviewFrame }) {
 
 export function RgbaPreviewGallery({ rgbaFrames, sourceFrames }: Props) {
   const [mode, setMode] = useState<PreviewMode>("rgba");
+  const [selectedPosition, setSelectedPosition] = useState(0);
+  const [onionOpacity, setOnionOpacity] = useState(0.35);
+
+  const orderedFrames = useMemo(
+    () => [...rgbaFrames].sort((left, right) => left.index - right.index),
+    [rgbaFrames],
+  );
   const sourceByIndex = useMemo(
     () => new Map(sourceFrames.map((frame) => [frame.index, frame])),
     [sourceFrames],
   );
 
+  useEffect(() => {
+    setSelectedPosition((current) => Math.min(current, Math.max(orderedFrames.length - 1, 0)));
+  }, [orderedFrames.length]);
+
+  const selectedFrame = orderedFrames[selectedPosition];
+  const previousFrame = selectedPosition > 0 ? orderedFrames[selectedPosition - 1] : null;
+  const source = selectedFrame ? sourceByIndex.get(selectedFrame.index) : null;
+
+  if (!selectedFrame) return null;
+
   return (
     <section className="panel preview-panel rgba-preview-panel">
       <div className="panel-heading rgba-preview-heading">
         <div>
-          <h2>Representative RGBA frames</h2>
-          <span className="muted">{rgbaFrames.length} transparent previews</span>
+          <h2>RGBA inspection</h2>
+          <span className="muted">{orderedFrames.length} representative frames</span>
         </div>
         <div className="rgba-mode-tabs" role="tablist" aria-label="RGBA preview mode">
-          {(["rgba", "before-after", "alpha"] as PreviewMode[]).map((item) => (
+          {(["rgba", "before-after", "alpha", "onion-skin"] as PreviewMode[]).map((item) => (
             <button
               key={item}
               type="button"
@@ -71,33 +88,125 @@ export function RgbaPreviewGallery({ rgbaFrames, sourceFrames }: Props) {
               role="tab"
               aria-selected={mode === item}
             >
-              {item === "rgba" ? "Checkerboard" : item === "before-after" ? "Before / After" : "Alpha"}
+              {item === "rgba"
+                ? "Checkerboard"
+                : item === "before-after"
+                  ? "Before / After"
+                  : item === "alpha"
+                    ? "Alpha"
+                    : "Onion skin"}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="preview-grid rgba-grid">
-        {rgbaFrames.map((frame) => {
-          const source = sourceByIndex.get(frame.index);
-          return (
-            <figure key={frame.filename}>
-              {mode === "rgba" && (
-                <div className="checkerboard rgba-preview-surface">
-                  <img src={frame.data_url} alt={`RGBA frame ${frame.index}`} />
-                </div>
-              )}
-              {mode === "before-after" && (
-                <div className="before-after-grid">
-                  <div><span>Before</span>{source ? <img src={source.data_url} alt={`Source frame ${frame.index}`} /> : <p>Source unavailable</p>}</div>
-                  <div className="checkerboard"><span>After</span><img src={frame.data_url} alt={`RGBA frame ${frame.index}`} /></div>
-                </div>
-              )}
-              {mode === "alpha" && <div className="alpha-surface"><AlphaCanvas frame={frame} /></div>}
-              <figcaption><span>#{frame.index}</span><span>{frame.filename}</span></figcaption>
-            </figure>
-          );
-        })}
+      <figure className="rgba-stage-figure">
+        {mode === "rgba" && (
+          <div className="checkerboard rgba-stage">
+            <img src={selectedFrame.data_url} alt={`RGBA frame ${selectedFrame.index}`} />
+          </div>
+        )}
+        {mode === "before-after" && (
+          <div className="before-after-grid rgba-stage">
+            <div>
+              <span>Before</span>
+              {source
+                ? <img src={source.data_url} alt={`Source frame ${selectedFrame.index}`} />
+                : <p>Source frame unavailable</p>}
+            </div>
+            <div className="checkerboard">
+              <span>After</span>
+              <img src={selectedFrame.data_url} alt={`RGBA frame ${selectedFrame.index}`} />
+            </div>
+          </div>
+        )}
+        {mode === "alpha" && (
+          <div className="alpha-surface rgba-stage">
+            <AlphaCanvas frame={selectedFrame} />
+          </div>
+        )}
+        {mode === "onion-skin" && (
+          <div className="checkerboard rgba-stage onion-stage">
+            {previousFrame && (
+              <img
+                className="onion-previous"
+                src={previousFrame.data_url}
+                alt={`Previous RGBA frame ${previousFrame.index}`}
+                style={{ opacity: onionOpacity }}
+              />
+            )}
+            <img className="onion-current" src={selectedFrame.data_url} alt={`RGBA frame ${selectedFrame.index}`} />
+            {!previousFrame && <span className="onion-empty">Select a later frame to compare motion.</span>}
+          </div>
+        )}
+        <figcaption>
+          <span>Frame #{selectedFrame.index}</span>
+          <span>{selectedFrame.filename}</span>
+        </figcaption>
+      </figure>
+
+      <div className="rgba-scrubber">
+        <button
+          type="button"
+          className="secondary"
+          onClick={() => setSelectedPosition((current) => Math.max(0, current - 1))}
+          disabled={selectedPosition === 0}
+          aria-label="Previous preview frame"
+        >
+          Previous
+        </button>
+        <label>
+          Frame scrubber
+          <input
+            type="range"
+            min="0"
+            max={Math.max(orderedFrames.length - 1, 0)}
+            step="1"
+            value={selectedPosition}
+            onChange={(event) => setSelectedPosition(Number(event.target.value))}
+          />
+        </label>
+        <button
+          type="button"
+          className="secondary"
+          onClick={() => setSelectedPosition((current) => Math.min(orderedFrames.length - 1, current + 1))}
+          disabled={selectedPosition === orderedFrames.length - 1}
+          aria-label="Next preview frame"
+        >
+          Next
+        </button>
+      </div>
+
+      {mode === "onion-skin" && (
+        <label className="onion-opacity-control">
+          Previous frame opacity
+          <input
+            type="range"
+            min="0.05"
+            max="0.8"
+            step="0.05"
+            value={onionOpacity}
+            onChange={(event) => setOnionOpacity(Number(event.target.value))}
+          />
+          <span>{Math.round(onionOpacity * 100)}%</span>
+        </label>
+      )}
+
+      <div className="rgba-thumbnail-strip" aria-label="RGBA frame timeline">
+        {orderedFrames.map((frame, position) => (
+          <button
+            key={frame.filename}
+            type="button"
+            className={position === selectedPosition ? "rgba-thumbnail-active" : ""}
+            onClick={() => setSelectedPosition(position)}
+            aria-label={`Select frame ${frame.index}`}
+          >
+            <span className="checkerboard">
+              <img src={frame.data_url} alt="" />
+            </span>
+            <small>#{frame.index}</small>
+          </button>
+        ))}
       </div>
     </section>
   );
