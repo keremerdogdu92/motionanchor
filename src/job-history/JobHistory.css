@@ -1,0 +1,19 @@
+/* src/job-history/JobHistory.css
+ * Responsive bounded job history cards integrated with the MotionAnchor shell.
+ */
+.job-history-panel { margin-top: 18px; }
+.job-history-heading { align-items: flex-start; }
+.job-history-heading > div { display: grid; gap: 4px; }
+.job-history-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.job-history-item { display: grid; gap: 10px; min-width: 0; padding: 14px; border: 1px solid #2d3247; border-radius: 14px; background: #0d0f17; }
+.job-history-item.history-active { border-color: #7885ff; box-shadow: 0 0 0 2px rgba(120, 133, 255, 0.12); }
+.job-history-summary { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.job-history-summary > div { display: grid; gap: 4px; min-width: 0; }
+.job-history-summary small, .job-history-item p { color: #9299b2; font-size: 0.76rem; }
+.job-history-item p { margin: 0; min-height: 2.2em; }
+.job-history-item code { margin: 0; padding: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.job-history-progress { height: 6px; overflow: hidden; border-radius: 999px; background: #23273a; }
+.job-history-progress span { display: block; height: 100%; border-radius: inherit; background: #7482ff; }
+.job-history-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 760px) { .job-history-list { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .job-history-heading { display: grid; } }

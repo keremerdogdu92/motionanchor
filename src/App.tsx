@@ -6,6 +6,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { PromptEditor } from "./prompt-editor/PromptEditor";
 import { RgbaPreviewGallery } from "./rgba-preview/RgbaPreviewGallery";
+import { JobHistory, type JobHistoryEntry, type JobRequest } from "./job-history/JobHistory";
 import "./App.css";
 
 type MediaProbe = {
@@ -56,6 +57,22 @@ const DEFAULT_FRAMES = `${ROOT}\\dash\\frames`;
 const DEFAULT_EXTRACTION_OUTPUT = `${ROOT}\\ui-extract`;
 const DEFAULT_SEGMENTATION_OUTPUT = `${ROOT}\\ui-sam2-output`;
 const DEFAULT_PROMPTS = `${ROOT}\\dash\\sam2-prompts.json`;
+const JOB_HISTORY_KEY = "motionanchor.job-history.v1";
+const JOB_HISTORY_LIMIT = 20;
+
+function retryOutputPath(path: string) {
+  return `${path}-retry-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+}
+
+function loadJobHistory(): JobHistoryEntry[] {
+  try {
+    const raw = window.localStorage.getItem(JOB_HISTORY_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.slice(0, JOB_HISTORY_LIMIT) : [];
+  } catch {
+    return [];
+  }
+}
 
 function queuedJob(accepted: JobAccepted): JobStatus {
   return {
@@ -80,6 +97,8 @@ function App() {
   const [defringe, setDefringe] = useState(true);
   const [probe, setProbe] = useState<MediaProbe | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
+  const [activeRequest, setActiveRequest] = useState<JobRequest | null>(null);
+  const [jobHistory, setJobHistory] = useState<JobHistoryEntry[]>(loadJobHistory);
   const [busy, setBusy] = useState(false);
   const [previews, setPreviews] = useState<FramePreview[]>([]);
   const [rgbaPreviews, setRgbaPreviews] = useState<FramePreview[]>([]);
@@ -90,6 +109,30 @@ function App() {
     () => Boolean(job && ["completed", "failed", "cancelled"].includes(job.status)),
     [job],
   );
+
+  useEffect(() => {
+    window.localStorage.setItem(JOB_HISTORY_KEY, JSON.stringify(jobHistory.slice(0, JOB_HISTORY_LIMIT)));
+  }, [jobHistory]);
+
+  useEffect(() => {
+    if (!job || !activeRequest || job.operation !== activeRequest.operation) return;
+    const now = new Date().toISOString();
+    setJobHistory((current) => {
+      const existing = current.find((entry) => entry.jobId === job.job_id);
+      const next: JobHistoryEntry = {
+        jobId: job.job_id,
+        operation: activeRequest.operation,
+        status: job.status,
+        progress: job.progress,
+        message: job.message,
+        error: job.error?.message ?? null,
+        request: activeRequest,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+      };
+      return [next, ...current.filter((entry) => entry.jobId !== job.job_id)].slice(0, JOB_HISTORY_LIMIT);
+    });
+  }, [job, activeRequest]);
 
   useEffect(() => {
     if (!job || terminal) return;
@@ -159,8 +202,10 @@ function App() {
         sourcePath,
         outputPath: extractionOutput,
       });
+      const request: JobRequest = { operation: "media.extract_frames", sourcePath, outputPath: extractionOutput };
       setPreviews([]);
       setRgbaPreviews([]);
+      setActiveRequest(request);
       setJob(queuedJob(accepted));
     } catch (cause) {
       setError(String(cause));
@@ -200,8 +245,77 @@ function App() {
         featherRadius,
         defringe,
       });
+      const request: JobRequest = { operation: "segmentation.sam2_rgba", framesPath, outputPath: segmentationOutput, promptPath, featherRadius, defringe };
       setRgbaPreviews([]);
+      setActiveRequest(request);
       setJob(queuedJob(accepted));
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function openHistoryEntry(entry: JobHistoryEntry) {
+    setError("");
+    setActiveRequest(entry.request);
+    setJob({
+      job_id: entry.jobId,
+      operation: entry.operation,
+      status: entry.status,
+      progress: entry.progress,
+      message: entry.message,
+      result: null,
+      error: entry.error ? { code: "HISTORY", message: entry.error } : null,
+      cancellation_requested: false,
+    });
+    if (entry.request.operation === "media.extract_frames") {
+      setSourcePath(entry.request.sourcePath);
+      setExtractionOutput(entry.request.outputPath);
+      setFramesPath(entry.request.outputPath);
+      if (entry.status === "completed") {
+        setPreviews(await invoke<FramePreview[]>("get_frame_previews", { outputPath: entry.request.outputPath, count: 8 }));
+      }
+    } else {
+      setFramesPath(entry.request.framesPath);
+      setSegmentationOutput(entry.request.outputPath);
+      setPromptPath(entry.request.promptPath);
+      setFeatherRadius(entry.request.featherRadius);
+      setDefringe(entry.request.defringe);
+      if (entry.status === "completed") {
+        setRgbaPreviews(await invoke<FramePreview[]>("get_rgba_previews", { outputPath: entry.request.outputPath, count: 8 }));
+      }
+    }
+  }
+
+  async function retryHistoryEntry(entry: JobHistoryEntry) {
+    setBusy(true);
+    setError("");
+    try {
+      if (entry.request.operation === "media.extract_frames") {
+        const request: JobRequest = { ...entry.request, outputPath: retryOutputPath(entry.request.outputPath) };
+        const accepted = await invoke<JobAccepted>("start_frame_extraction_job", { sourcePath: request.sourcePath, outputPath: request.outputPath });
+        setExtractionOutput(request.outputPath);
+        setActiveRequest(request);
+        setPreviews([]);
+        setJob(queuedJob(accepted));
+      } else {
+        const runtime = await invoke<Sam2Preflight>("sam2_preflight");
+        setSam2Runtime(runtime);
+        if (!runtime.ready) throw new Error(runtime.error ?? "SAM 2 runtime is not ready");
+        const request: JobRequest = { ...entry.request, outputPath: retryOutputPath(entry.request.outputPath) };
+        const accepted = await invoke<JobAccepted>("start_sam2_rgba_job", {
+          framesPath: request.framesPath,
+          outputPath: request.outputPath,
+          promptPath: request.promptPath,
+          featherRadius: request.featherRadius,
+          defringe: request.defringe,
+        });
+        setSegmentationOutput(request.outputPath);
+        setActiveRequest(request);
+        setRgbaPreviews([]);
+        setJob(queuedJob(accepted));
+      }
     } catch (cause) {
       setError(String(cause));
     } finally {
@@ -358,6 +472,15 @@ function App() {
           ) : <p className="muted">No production job has been submitted.</p>}
         </article>
       </section>
+
+      <JobHistory
+        entries={jobHistory}
+        activeJobId={job?.job_id ?? null}
+        busy={busy}
+        onOpen={(entry) => void openHistoryEntry(entry)}
+        onRetry={(entry) => void retryHistoryEntry(entry)}
+        onClear={() => setJobHistory([])}
+      />
 
       {rgbaPreviews.length > 0 && (
         <RgbaPreviewGallery rgbaFrames={rgbaPreviews} sourceFrames={previews} />
