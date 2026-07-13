@@ -6,6 +6,7 @@ import unittest
 from dataclasses import dataclass
 from pathlib import Path
 
+from motionanchor_worker.jobs import JobRunner
 from motionanchor_worker.jobs.media import MediaJobService
 import motionanchor_worker.jobs.media as media_jobs_module
 
@@ -44,7 +45,7 @@ class TestMediaJobService(unittest.TestCase):
             source = Path(tmp) / "source.mp4"
             source.touch()
             output = Path(tmp) / "frames"
-            service = MediaJobService(adapter_factory=FakeAdapter)
+            service = MediaJobService(runner=JobRunner(state_path=False), adapter_factory=FakeAdapter)
             job_id = service.submit_extract_frames(str(source), str(output))
             snapshot = wait_terminal(service, job_id)
             self.assertEqual(snapshot["status"], "completed")
@@ -55,7 +56,7 @@ class TestMediaJobService(unittest.TestCase):
         original = media_jobs_module.run_sam2_rgba_job
         media_jobs_module.run_sam2_rgba_job = lambda **kwargs: {"frame_count": 2, "rgba_path": "rgba"}
         try:
-            service = MediaJobService(adapter_factory=FakeAdapter)
+            service = MediaJobService(runner=JobRunner(state_path=False), adapter_factory=FakeAdapter)
             job_id = service.submit_sam2_rgba("frames", "output", "prompts.json")
             snapshot = wait_terminal(service, job_id)
             self.assertEqual(snapshot["status"], "completed")
@@ -69,7 +70,7 @@ class TestMediaJobService(unittest.TestCase):
             source = Path(tmp) / "source.mp4"
             source.touch()
             output = Path(tmp) / "frames"
-            service = MediaJobService(adapter_factory=FakeAdapter)
+            service = MediaJobService(runner=JobRunner(state_path=False), adapter_factory=FakeAdapter)
             job_id = service.submit_extract_frames(str(source), str(output))
             self.assertTrue(service.cancel(job_id))
             snapshot = wait_terminal(service, job_id)

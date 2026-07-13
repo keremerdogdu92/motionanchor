@@ -131,6 +131,31 @@ function App() {
   }, [jobHistory]);
 
   useEffect(() => {
+    const recoverable = jobHistory.filter((entry) => entry.status === "queued" || entry.status === "running");
+    if (recoverable.length === 0) return;
+    let cancelled = false;
+    void Promise.all(recoverable.map(async (entry) => {
+      try {
+        return await invoke<JobStatus>("get_job_status", { jobId: entry.jobId });
+      } catch {
+        return { job_id: entry.jobId, operation: entry.operation, status: "failed" as const,
+          progress: entry.progress, message: "Worker state unavailable after restart", result: null,
+          error: { code: "job_interrupted", message: "Worker state unavailable after restart" },
+          cancellation_requested: false };
+      }
+    })).then((statuses) => {
+      if (cancelled) return;
+      const byId = new Map(statuses.map((status) => [status.job_id, status]));
+      setJobHistory((current) => current.map((entry) => {
+        const status = byId.get(entry.jobId);
+        return status ? { ...entry, status: status.status, progress: status.progress, message: status.message,
+          error: status.error?.message ?? null, updatedAt: new Date().toISOString() } : entry;
+      }));
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
     window.localStorage.setItem(SAM2_SETTINGS_KEY, JSON.stringify({ featherRadius, defringe }));
   }, [featherRadius, defringe]);
 
