@@ -146,7 +146,32 @@ pub fn build_unity_export_plan(workspace_path: &str, asset_name: &str, engine_pr
     build_plan(&workspace, asset_name, engine_profile, frame_rate, loop_animation)
 }
 
-const EDITOR_SCRIPT: &str = r#"using UnityEditor;
+const EDITOR_SCRIPT: &str = r#"using System;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+
+[Serializable]
+internal sealed class MotionAnchorManifest
+{
+    public int schemaVersion;
+    public string assetName;
+    public double frameRate;
+    public bool loopAnimation;
+    public string[] frames;
+    public double pixelsPerUnit;
+}
+
+[Serializable]
+internal sealed class MotionAnchorImportStatus
+{
+    public string status;
+    public string assetName;
+    public string clipPath;
+    public int importedFrames;
+    public string message;
+}
 
 public sealed class MotionAnchorTexturePostprocessor : AssetPostprocessor
 {
@@ -158,9 +183,77 @@ public sealed class MotionAnchorTexturePostprocessor : AssetPostprocessor
         importer.spriteImportMode = SpriteImportMode.Single;
         importer.alphaIsTransparency = true;
         importer.mipmapEnabled = false;
-        importer.filterMode = UnityEngine.FilterMode.Bilinear;
+        importer.filterMode = FilterMode.Bilinear;
         importer.textureCompression = TextureImporterCompression.Uncompressed;
         importer.spritePixelsPerUnit = 100f;
+    }
+}
+
+[InitializeOnLoad]
+internal static class MotionAnchorAnimationImporter
+{
+    static MotionAnchorAnimationImporter()
+    {
+        EditorApplication.delayCall += ImportPendingManifests;
+    }
+
+    private static void ImportPendingManifests()
+    {
+        foreach (var manifestPath in Directory.GetFiles("Assets/MotionAnchor", "motionanchor-export.json", SearchOption.AllDirectories))
+        {
+            ImportManifest(manifestPath.Replace('\\', '/'));
+        }
+    }
+
+    private static void ImportManifest(string manifestPath)
+    {
+        var directory = Path.GetDirectoryName(manifestPath)?.Replace('\\', '/');
+        if (string.IsNullOrWhiteSpace(directory)) return;
+        var statusPath = directory + "/motionanchor-import-status.json";
+        try
+        {
+            var manifest = JsonUtility.FromJson<MotionAnchorManifest>(File.ReadAllText(manifestPath));
+            if (manifest == null || string.IsNullOrWhiteSpace(manifest.assetName) || manifest.frames == null || manifest.frames.Length == 0)
+                throw new InvalidOperationException("Manifest is missing an asset name or frame list.");
+            if (manifest.frameRate < 1 || manifest.frameRate > 240)
+                throw new InvalidOperationException("Manifest frame rate must be between 1 and 240.");
+
+            var clipPath = directory + "/" + manifest.assetName + ".anim";
+            if (AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath) != null || File.Exists(clipPath))
+                throw new InvalidOperationException("Animation clip already exists; replacement is not automatic.");
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            var sprites = manifest.frames.Select(relative =>
+            {
+                var path = directory + "/" + relative.Replace('\\', '/');
+                return AssetDatabase.LoadAssetAtPath<Sprite>(path) ?? throw new InvalidOperationException("Sprite import unavailable: " + path);
+            }).ToArray();
+
+            var clip = new AnimationClip { frameRate = (float)manifest.frameRate, name = manifest.assetName };
+            var binding = new EditorCurveBinding { type = typeof(SpriteRenderer), path = string.Empty, propertyName = "m_Sprite" };
+            var keys = sprites.Select((sprite, index) => new ObjectReferenceKeyframe
+            {
+                time = index / (float)manifest.frameRate,
+                value = sprite
+            }).ToArray();
+            AnimationUtility.SetObjectReferenceCurve(clip, binding, keys);
+            AnimationUtility.SetAnimationClipSettings(clip, new AnimationClipSettings { loopTime = manifest.loopAnimation });
+            AssetDatabase.CreateAsset(clip, clipPath);
+            AssetDatabase.SaveAssets();
+            WriteStatus(statusPath, "completed", manifest.assetName, clipPath, sprites.Length, "Animation clip created successfully.");
+        }
+        catch (Exception error)
+        {
+            WriteStatus(statusPath, "failed", string.Empty, string.Empty, 0, error.Message);
+            Debug.LogError("MotionAnchor import failed: " + error);
+        }
+    }
+
+    private static void WriteStatus(string path, string status, string assetName, string clipPath, int importedFrames, string message)
+    {
+        var result = new MotionAnchorImportStatus { status = status, assetName = assetName, clipPath = clipPath, importedFrames = importedFrames, message = message };
+        File.WriteAllText(path, JsonUtility.ToJson(result, true));
+        AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
     }
 }
 "#;
@@ -255,6 +348,14 @@ mod tests {
         fs::write(directory.path().join("artifacts/rgba/2.png"), png(64, 32)).unwrap();
         let plan = build_plan(directory.path(), "Test", "unity-2022.3", 24.0, true).unwrap();
         assert!(!plan.ready); assert!(!plan.conflicts.is_empty()); assert!(plan.errors.iter().any(|error| error.contains("dimensions")));
+    }
+
+    #[test]
+    fn editor_script_creates_clip_without_automatic_replacement() {
+        assert!(EDITOR_SCRIPT.contains("AssetDatabase.CreateAsset(clip, clipPath)"));
+        assert!(EDITOR_SCRIPT.contains("replacement is not automatic"));
+        assert!(EDITOR_SCRIPT.contains("motionanchor-import-status.json"));
+        assert!(EDITOR_SCRIPT.contains("loopTime = manifest.loopAnimation"));
     }
 
     #[test]

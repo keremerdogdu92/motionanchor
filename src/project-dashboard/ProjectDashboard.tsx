@@ -91,6 +91,8 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
   const [engineStatus, setEngineStatus] = useState<EngineCompatibility | null>(null);
   const [unityExportPlan, setUnityExportPlan] = useState<UnityExportPlan | null>(null);
   const [unityExportResult, setUnityExportResult] = useState<UnityExportResult | null>(null);
+  const [unityFrameRate, setUnityFrameRate] = useState(30);
+  const [unityLoopAnimation, setUnityLoopAnimation] = useState(true);
 
   async function loadProjects() {
     setLoading(true);
@@ -161,8 +163,8 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
         workspacePath: activeProject.workspacePath,
         assetName: exportAssetName,
         engineProfile: activeProject.engineProfile,
-        frameRate: 30,
-        loopAnimation: true,
+        frameRate: unityFrameRate,
+        loopAnimation: unityLoopAnimation,
       }));
     } catch (cause) {
       setUnityExportPlan(null);
@@ -253,7 +255,7 @@ export function ProjectDashboard({ activeProject, initialActiveProjectId, projec
       )}
       {activeProject && engineStatus?.applicable && (
         <div className="unity-export-plan">
-          <div><strong>Unity export</strong><span>Preview RGBA first, name the animation, then plan and publish atomically.</span></div><label>Asset / animation name<input value={exportAssetName} maxLength={80} onChange={(event) => { onExportAssetNameChange(event.target.value); setUnityExportPlan(null); setUnityExportResult(null); }} placeholder="dash" /></label>
+          <div><strong>Unity export</strong><span>Preview RGBA first, name the animation, then plan and publish atomically.</span></div><label>Asset / animation name<input value={exportAssetName} maxLength={80} onChange={(event) => { onExportAssetNameChange(event.target.value); setUnityExportPlan(null); setUnityExportResult(null); }} placeholder="dash" /></label><div className="unity-export-settings"><label>Frame rate<input type="number" min="1" max="240" step="1" value={unityFrameRate} onChange={(event) => { setUnityFrameRate(Number(event.target.value)); setUnityExportPlan(null); setUnityExportResult(null); }} /></label><label className="checkbox-label"><input type="checkbox" checked={unityLoopAnimation} onChange={(event) => { setUnityLoopAnimation(event.target.checked); setUnityExportPlan(null); setUnityExportResult(null); }} />Loop animation</label></div>
           <div className="unity-export-plan__actions"><button type="button" className="secondary" onClick={() => void buildUnityExportPlan()} disabled={submitting || projectActionsDisabled || !engineStatus.compatible || !workspaceStatus?.rgbaHasFiles || !exportAssetName.trim()}>Build export plan</button><button type="button" onClick={() => void executeUnityExport()} disabled={submitting || projectActionsDisabled || !unityExportPlan?.ready}>Export to Unity</button></div>
           {unityExportPlan && <><small>Name: {unityExportPlan.assetName} Â· {unityExportPlan.ready ? "Ready" : "Blocked"}: {unityExportPlan.frameCount} frames{unityExportPlan.width && unityExportPlan.height ? ` Â· ${unityExportPlan.width}Ã—${unityExportPlan.height}` : ""} Â· {unityExportPlan.frameRate} fps Â· {unityExportPlan.loopAnimation ? "loop" : "once"}</small><small title={unityExportPlan.destinationPath}>Target: {unityExportPlan.destinationPath}</small>{unityExportPlan.errors.length > 0 && <small>Issues: {unityExportPlan.errors.join(" Â· ")}</small>}{unityExportPlan.conflicts.length > 0 && <small>Conflicts: {unityExportPlan.conflicts.length}</small>}</>}
           {unityExportResult && <><small>Exported {unityExportResult.copiedFrames} frames.</small><small title={unityExportResult.manifestPath}>Manifest: {unityExportResult.manifestPath}</small><small title={unityExportResult.editorScriptPath}>Editor script: {unityExportResult.editorScriptPath}</small></>}

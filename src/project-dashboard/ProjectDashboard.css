@@ -41,3 +41,6 @@
 @media (max-width:600px) { .unity-export-plan { grid-template-columns:1fr; } .unity-export-plan button { width:100%; } }
 
 .unity-export-plan__actions { display:flex; gap:.6rem; flex-wrap:wrap; }
+
+.unity-export-settings { display: grid; grid-template-columns: minmax(140px, 220px) 1fr; gap: 12px; align-items: end; }
+.unity-export-settings .checkbox-label { min-height: 42px; }

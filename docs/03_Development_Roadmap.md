@@ -319,7 +319,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - Manifest importer window.
 - Texture import setup.
 - Sprite rectangle/pivot creation.
-- Animation Clip creation.
+- Animation Clip creation from the ordered manifest frame list, with configurable FPS/loop and a non-overwrite status report.
 - Animator Controller create/update.
 - Dry-run diff and conflict handling.
 - Unity integration fixture tests.
