@@ -2,6 +2,8 @@
 /// Builds a non-destructive Unity 2022.3 export plan for completed RGBA sequences.
 
 use serde::{Deserialize, Serialize};
+use crate::animation_manifest::{AnimationFrameV2, AnimationManifestV2, CanvasSize, NormalizedPivot, ANIMATION_MANIFEST_FILENAME, ANIMATION_MANIFEST_SCHEMA_VERSION};
+use std::collections::BTreeMap;
 use uuid::Uuid;
 use std::cmp::Ordering;
 use std::fs;
@@ -27,20 +29,6 @@ pub struct UnityImportStatus {
     pub message: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UnityExportManifest {
-    pub schema_version: u32,
-    pub asset_name: String,
-    pub frame_rate: f64,
-    pub loop_animation: bool,
-    pub width: u32,
-    pub height: u32,
-    pub frames: Vec<String>,
-    pub pixels_per_unit: f64,
-    pub filter_mode: String,
-    pub compression: String,
-}
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -170,8 +158,16 @@ internal sealed class MotionAnchorManifest
     public string assetName;
     public double frameRate;
     public bool loopAnimation;
-    public string[] frames;
+    public MotionAnchorFrame[] frames;
     public double pixelsPerUnit;
+}
+
+[Serializable]
+internal sealed class MotionAnchorFrame
+{
+    public int index;
+    public string path;
+    public double durationMs;
 }
 
 [Serializable]
@@ -210,7 +206,7 @@ internal static class MotionAnchorAnimationImporter
 
     private static void ImportPendingManifests()
     {
-        foreach (var manifestPath in Directory.GetFiles("Assets/MotionAnchor", "motionanchor-export.json", SearchOption.AllDirectories))
+        foreach (var manifestPath in Directory.GetFiles("Assets/MotionAnchor", "motionanchor-animation-v2.json", SearchOption.AllDirectories))
         {
             ImportManifest(manifestPath.Replace('\\', '/'));
         }
@@ -236,7 +232,7 @@ internal static class MotionAnchorAnimationImporter
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             var sprites = manifest.frames.Select(relative =>
             {
-                var path = directory + "/" + relative.Replace('\\', '/');
+                var path = directory + "/" + relative.path.Replace('\\', '/');
                 return AssetDatabase.LoadAssetAtPath<Sprite>(path) ?? throw new InvalidOperationException("Sprite import unavailable: " + path);
             }).ToArray();
 
@@ -290,19 +286,23 @@ pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profi
             fs::copy(source_path, &target).map_err(|error| format!("could not copy {}: {error}", source_path.display()))?;
             exported_frames.push(format!("Frames/{filename}"));
         }
-        let manifest = UnityExportManifest {
-            schema_version: 1,
+        let frame_duration_ms = 1000.0 / plan.frame_rate;
+        let manifest = AnimationManifestV2 {
+            schema_version: ANIMATION_MANIFEST_SCHEMA_VERSION,
             asset_name: plan.asset_name.clone(),
+            frames: exported_frames.into_iter().enumerate().map(|(index, path)| AnimationFrameV2 { index: index + 1, path, duration_ms: frame_duration_ms }).collect(),
             frame_rate: plan.frame_rate,
             loop_animation: plan.loop_animation,
-            width: plan.width.ok_or_else(|| "export width is unavailable".to_string())?,
-            height: plan.height.ok_or_else(|| "export height is unavailable".to_string())?,
-            frames: exported_frames,
+            canvas: CanvasSize { width: plan.width.ok_or_else(|| "export width is unavailable".to_string())?, height: plan.height.ok_or_else(|| "export height is unavailable".to_string())? },
+            pivot: NormalizedPivot { space: "normalized".into(), x: 0.5, y: 0.0 },
             pixels_per_unit: 100.0,
-            filter_mode: "Bilinear".into(),
-            compression: "Uncompressed".into(),
+            tags: Vec::new(),
+            events: Vec::new(),
+            provenance: BTreeMap::from([("adapter".into(), "unity".into())]),
+            content_hashes: BTreeMap::new(),
         };
-        let manifest_path = staging.join("motionanchor-export.json");
+        manifest.validate()?;
+        let manifest_path = staging.join(ANIMATION_MANIFEST_FILENAME);
         fs::write(&manifest_path, serde_json::to_vec_pretty(&manifest).map_err(|error| format!("could not encode Unity export manifest: {error}"))?)
             .map_err(|error| format!("could not write Unity export manifest: {error}"))?;
         let shared_editor_dir = parent.join("Editor");
@@ -319,7 +319,7 @@ pub fn execute_unity_export(workspace_path: &str, asset_name: &str, engine_profi
         fs::rename(&staging, &destination).map_err(|error| format!("could not publish Unity export atomically: {error}"))?;
         Ok(UnityExportResult {
             destination_path: destination.to_string_lossy().into_owned(),
-            manifest_path: destination.join("motionanchor-export.json").to_string_lossy().into_owned(),
+            manifest_path: destination.join(ANIMATION_MANIFEST_FILENAME).to_string_lossy().into_owned(),
             editor_script_path: editor_script_path.to_string_lossy().into_owned(),
             copied_frames: plan.frame_count,
         })
@@ -400,6 +400,8 @@ mod tests {
         assert!(EDITOR_SCRIPT.contains("AssetDatabase.CreateAsset(clip, clipPath)"));
         assert!(EDITOR_SCRIPT.contains("replacement is not automatic"));
         assert!(EDITOR_SCRIPT.contains("motionanchor-import-status.json"));
+        assert!(EDITOR_SCRIPT.contains("motionanchor-animation-v2.json"));
+        assert!(EDITOR_SCRIPT.contains("relative.path"));
         assert!(EDITOR_SCRIPT.contains("loopTime = manifest.loopAnimation"));
     }
 
@@ -431,9 +433,11 @@ mod tests {
         assert_eq!(editor_path.parent().and_then(Path::file_name).and_then(|value| value.to_str()), Some("Editor"));
         assert!(!Path::new(&result.destination_path).join("Editor").exists());
         assert!(Path::new(&result.destination_path).join("Frames/Dash_frame_0001.png").is_file());
-        let manifest: UnityExportManifest = serde_json::from_slice(&fs::read(&result.manifest_path).unwrap()).unwrap();
+        let manifest: AnimationManifestV2 = serde_json::from_slice(&fs::read(&result.manifest_path).unwrap()).unwrap();
         assert_eq!(manifest.asset_name, "Dash");
-        assert_eq!(manifest.frames[1], "Frames/Dash_frame_0002.png");
+        assert_eq!(manifest.schema_version, 2);
+        assert_eq!(manifest.frames[1].path, "Frames/Dash_frame_0002.png");
+        assert_eq!(manifest.frames[0].index, 1);
     }
     #[test]
     fn exports_share_one_unity_importer_without_overwriting_it() {

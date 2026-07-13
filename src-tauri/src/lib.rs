@@ -1,5 +1,6 @@
 /// src-tauri/src/lib.rs
 /// MotionAnchor Rust host Ã¢â‚¬â€ Tauri application entry and command handlers.
+mod animation_manifest;
 mod artifact_cleanup;
 mod credential_store;
 mod database;

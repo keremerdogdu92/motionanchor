@@ -907,7 +907,7 @@ A versioned Unity Editor package imports the manifest and uses Unity editor APIs
 
 This approach is safer than writing external `.meta` files because Unity GUIDs and serialized assets belong to the target project/editor context.
 
-The initial Unity 2022.3 importer reads `motionanchor-export.json`, waits for synchronous sprite import, creates `<asset_name>.anim` at the export root, applies manifest FPS and loop settings, and writes `motionanchor-import-status.json`. Existing Animation Clips are never replaced automatically.
+The Unity adapter reads the canonical `motionanchor-animation-v2.json`, waits for synchronous sprite import, creates `<asset_name>.anim` at the export root, applies manifest FPS and loop settings, and writes `motionanchor-import-status.json`. Existing Animation Clips are never replaced automatically.
 
 
 ### 12.4 Deterministic Export Naming Contract

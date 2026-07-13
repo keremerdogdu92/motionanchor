@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionanchor.local/schemas/animation-manifest-v2.schema.json",
+  "title": "MotionAnchor Animation Manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "assetName",
+    "frames",
+    "frameRate",
+    "loopAnimation",
+    "canvas",
+    "pivot",
+    "pixelsPerUnit",
+    "tags",
+    "events",
+    "provenance",
+    "contentHashes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "assetName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "index",
+          "path",
+          "durationMs"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).+$"
+          },
+          "durationMs": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    },
+    "frameRate": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 240
+    },
+    "loopAnimation": {
+      "type": "boolean"
+    },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "pivot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "space",
+        "x",
+        "y"
+      ],
+      "properties": {
+        "space": {
+          "const": "normalized"
+        },
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "pixelsPerUnit": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frameIndex",
+          "name"
+        ],
+        "properties": {
+          "frameIndex": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "contentHashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  }
+}
