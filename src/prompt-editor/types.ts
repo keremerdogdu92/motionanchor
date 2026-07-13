@@ -17,4 +17,4 @@ export type PromptDocument = {
   anchors: PromptAnchor[];
 };
 
-export type EditorTool = "box" | "positive" | "negative" | "pan";
+export type EditorTool = "box" | "positive" | "negative" | "edit" | "pan";

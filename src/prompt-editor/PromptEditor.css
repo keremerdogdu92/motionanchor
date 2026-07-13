@@ -18,17 +18,21 @@
 .canvas-shell { position: relative; overflow: hidden; min-height: 260px; border: 1px solid #34394d; border-radius: 14px; background: #07080d; }
 .prompt-canvas { display: block; width: 100%; aspect-ratio: 16 / 9; touch-action: none; user-select: none; }
 .prompt-canvas.tool-pan { cursor: grab; }
-.prompt-canvas.tool-positive { cursor: crosshair; }
-.prompt-canvas.tool-negative { cursor: crosshair; }
-.prompt-canvas.tool-box { cursor: crosshair; }
+.prompt-canvas.tool-positive, .prompt-canvas.tool-negative, .prompt-canvas.tool-box { cursor: crosshair; }
+.prompt-canvas.tool-edit { cursor: default; }
 .prompt-box { fill: rgba(102, 116, 255, 0.12); stroke: #8f9aff; stroke-width: 3; vector-effect: non-scaling-stroke; }
+.tool-edit .prompt-box { cursor: move; }
+.box-handle { fill: #edf0ff; stroke: #6674ff; stroke-width: 2; vector-effect: non-scaling-stroke; cursor: nwse-resize; }
+.box-handle[data-box-handle="ne"], .box-handle[data-box-handle="sw"] { cursor: nesw-resize; }
 .prompt-point { stroke: #0b0d14; stroke-width: 3; vector-effect: non-scaling-stroke; }
+.tool-edit .prompt-point { cursor: pointer; }
 .positive-point { fill: #52db91; }
 .negative-point { fill: #ff647d; }
 .canvas-empty { display: grid; min-height: 260px; place-items: center; color: #878ea7; }
 .zoom-row { align-items: center; justify-content: space-between; margin-top: 10px; color: #aab0c7; font-size: 0.82rem; }
 .zoom-row label { display: flex; grid-template-columns: auto minmax(120px, 220px); align-items: center; }
 .zoom-row input { padding: 0; }
+.editor-hint { margin: 10px 0 0; color: #878ea7; font-size: 0.8rem; }
 @media (max-width: 860px) {
   .prompt-editor-layout { grid-template-columns: 1fr; }
   .anchor-list { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 220px; }
