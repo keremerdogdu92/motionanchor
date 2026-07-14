@@ -28,11 +28,19 @@ type JobAccepted = { job_id: string; operation: string };
 type Sam2Preflight = {
   ready: boolean;
   python: string;
+  python_version: string;
+  python_compatible: boolean;
+  runner: string;
+  runner_exists: boolean;
+  packages: Record<string, { available: boolean; version: string | null; distribution: string; error: string | null }>;
+  missing_components: string[];
+  readiness_errors: string[];
   torch_available: boolean;
   torch_version: string | null;
   cuda_available: boolean;
   gpu: string | null;
   vram_bytes: number | null;
+  cuda_version: string | null;
   checkpoint_exists: boolean;
   checkpoint_sha256: string | null;
   checkpoint_valid: boolean;
@@ -560,7 +568,10 @@ function App() {
                 <strong>{sam2Runtime.ready ? "SAM 2 runtime ready" : "SAM 2 runtime blocked"}</strong>
                 <span>{sam2Runtime.gpu ?? "No CUDA GPU"}</span>
                 <span>{sam2Runtime.vram_bytes ? `${(sam2Runtime.vram_bytes / 1073741824).toFixed(1)} GB VRAM` : "VRAM unavailable"}</span>
+                <span>Python: {sam2Runtime.python_version} {sam2Runtime.python_compatible ? "(compatible)" : "(requires 3.12)"}</span>
+                <span>Packages: {sam2Runtime.missing_components.length ? `missing ${sam2Runtime.missing_components.join(", ")}` : "complete"}</span>
                 <span>Checkpoint: {sam2Runtime.checkpoint_valid ? "verified" : "missing or invalid"}</span>
+                {sam2Runtime.readiness_errors.map((message) => <span key={message}>{message}</span>)}
               </div>
             )}
           </form>

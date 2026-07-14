@@ -80,17 +80,46 @@ def _resolve_runner() -> Path:
 
 
 def probe_sam2_runtime() -> dict[str, Any]:
-    """Return a structured SAM 2 readiness report without loading the full model."""
+    """Return a complete dependency and hardware readiness report."""
 
     python = _resolve_python()
+    runner = _resolve_runner()
     checkpoint = Path(__file__).resolve().parents[2] / "models" / "sam2" / "sam2.1_hiera_small.pt"
     script = r"""
 import hashlib
+import importlib
 import json
+import platform
 import sys
 from pathlib import Path
 
-result = {"python": sys.executable}
+result = {
+    "python": sys.executable,
+    "python_version": platform.python_version(),
+    "packages": {},
+}
+for module_name, distribution_name in (
+    ("numpy", "numpy"),
+    ("cv2", "opencv-python-headless"),
+    ("torch", "torch"),
+    ("sam2", "sam2"),
+):
+    try:
+        module = importlib.import_module(module_name)
+        result["packages"][module_name] = {
+            "available": True,
+            "version": getattr(module, "__version__", None),
+            "distribution": distribution_name,
+            "error": None,
+        }
+    except Exception as exc:
+        result["packages"][module_name] = {
+            "available": False,
+            "version": None,
+            "distribution": distribution_name,
+            "error": str(exc),
+        }
+
 try:
     import torch
     result.update({
@@ -103,10 +132,12 @@ try:
         result.update({
             "gpu": torch.cuda.get_device_name(0),
             "vram_bytes": properties.total_memory,
+            "cuda_version": torch.version.cuda,
         })
 except Exception as exc:
     result.update({
         "torch_available": False,
+        "torch_version": None,
         "cuda_available": False,
         "error": str(exc),
     })
@@ -135,15 +166,45 @@ print(json.dumps(result))
         report = json.loads(completed.stdout)
     except json.JSONDecodeError as exc:
         raise Sam2ProcessError("SAM 2 preflight emitted invalid JSON") from exc
+
     expected = "6d1aa6f30de5c92224f8172114de081d104bbd23dd9dc5c58996f0cad5dc4d38"
+    packages = report.get("packages") if isinstance(report.get("packages"), dict) else {}
+    missing_components = [
+        name for name in ("numpy", "cv2", "torch", "sam2")
+        if not isinstance(packages.get(name), dict) or not packages[name].get("available")
+    ]
+    python_version = str(report.get("python_version") or "")
+    report["python_compatible"] = python_version.startswith("3.12.")
+    report["runner"] = str(runner.resolve())
+    report["runner_exists"] = runner.is_file()
     report["checkpoint_valid"] = report.get("checkpoint_sha256") == expected
-    report["ready"] = bool(
-        report.get("torch_available")
-        and report.get("cuda_available")
-        and report["checkpoint_valid"]
-    )
+    report["missing_components"] = missing_components
+    readiness_errors: list[str] = []
+    if not report["python_compatible"]:
+        readiness_errors.append("SAM 2 requires the pinned Python 3.12 runtime")
+    if missing_components:
+        readiness_errors.append("Missing runtime packages: " + ", ".join(missing_components))
+    if not report.get("cuda_available"):
+        readiness_errors.append("CUDA is unavailable in the SAM 2 runtime")
+    if not report["checkpoint_valid"]:
+        readiness_errors.append("SAM 2 checkpoint is missing or invalid")
+    if not report["runner_exists"]:
+        readiness_errors.append("SAM 2 process runner is unavailable")
+    report["readiness_errors"] = readiness_errors
+    report["ready"] = not readiness_errors
+    report["error"] = readiness_errors[0] if readiness_errors else None
     return report
 
+
+def _require_sam2_runtime() -> None:
+    """Block production execution when the isolated runtime is incomplete."""
+
+    if os.environ.get("MOTIONANCHOR_SAM2_RUNNER"):
+        return
+    runtime = probe_sam2_runtime()
+    if not runtime["ready"]:
+        details = "; ".join(runtime.get("readiness_errors") or ["SAM 2 runtime is not ready"])
+        raise Sam2ProcessError(details)
 
 def run_sam2_rgba_job(
     *,
@@ -158,6 +219,7 @@ def run_sam2_rgba_job(
 ) -> dict[str, Any]:
     """Run SAM 2 in an isolated process and atomically publish its artifacts."""
 
+    _require_sam2_runtime()
     frames = _required_directory(frames_path, "frames_path", must_exist=True).resolve()
     output = _prepare_output(output_path)
     prompt = _required_file(prompt_path, "prompt_path").resolve()

@@ -12,6 +12,8 @@ SAM 2 RGBA processing runs as a supervised child process launched by the worker 
 
 The parent worker validates paths and settings, drains child stderr into a bounded buffer, streams NDJSON progress, supports cooperative cancellation with terminate/kill escalation, and publishes artifacts only after successful completion. Child output is created under a temporary sibling directory and atomically moved to the requested destination. Returned mask, RGBA, report, and output paths are rebased after publication.
 
+The runtime preflight reports the Python version, NumPy, OpenCV, PyTorch, SAM 2 package availability, CUDA/GPU details, runner availability, and checkpoint integrity. Production execution performs the same readiness guard server-side before launching the child process, so UI or protocol bypasses cannot submit work to an incomplete runtime.
+
 `MOTIONANCHOR_SAM2_PYTHON` selects the pinned runtime. `MOTIONANCHOR_SAM2_RUNNER` is an explicit test seam for a deterministic fake child process and is not used by the normal application path.
 
 ## Consequences
@@ -19,5 +21,6 @@ The parent worker validates paths and settings, drains child stderr into a bound
 - The main worker remains free of direct PyTorch and SAM 2 imports.
 - Failed or cancelled jobs do not publish partial output directories.
 - Long-running GPU work remains observable through the existing job status protocol.
-- A separate clean-machine packaging and GPU capability gate is still required.
+- Clean-machine dependency installation remains a separate explicit bootstrap operation; preflight never mutates the environment or downloads packages implicitly.
+- Incomplete runtimes return structured missing-component and readiness-error lists instead of failing on the first import.
 - Prompt editing is currently file-based; an interactive box/click editor remains future work.
