@@ -195,6 +195,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - ~~Union-bounds safe crop with deterministic shared-canvas publication.~~
 - ~~Configurable padding with non-overwrite and atomic staging.~~
 - ~~Bottom-center baseline and normalized pivot metadata.~~
+- ~~Calibrate export geometry warnings against the 240-frame Cat Trap Dash SAM 2 quality report: maximum consecutive foreground-area change 12.98%, no substantial detached components, and a conservative 25% warning threshold.~~
 - Onion-skin preview.
 - Deterministic sprite sheet builder.
 - ~~Add conservative export quality gates for empty foreground, edge contact, duplicates, blur outliers, and foreground-area jumps.~~

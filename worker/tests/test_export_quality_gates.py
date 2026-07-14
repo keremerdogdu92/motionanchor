@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -62,6 +63,40 @@ class ExportQualityGateTests(unittest.TestCase):
             self.assertEqual(report.status, "passed")
             self.assertFalse(report.blockers)
             self.assertFalse(report.warnings)
+
+    def test_warns_for_calibrated_area_jump(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            paths = []
+            for index, width in enumerate((10, 13), start=1):
+                path = root / f"frame_{index}.png"
+                alpha = np.zeros((30, 30), dtype=np.uint8)
+                alpha[5:25, 5:5 + width] = 255
+                self._write(path, alpha, value=80 + index * 20)
+                paths.append(path)
+            report = evaluate_export_quality(paths)
+            self.assertEqual(report.status, "warning")
+            self.assertIn("foreground_area_jump", {finding.code for finding in report.warnings})
+
+    def test_warns_only_for_substantial_detached_components(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / "frame_1.png"
+            alpha = np.zeros((40, 40), dtype=np.uint8)
+            alpha[8:30, 8:25] = 255
+            alpha[10:22, 29:37] = 255
+            self._write(path, alpha)
+            report = evaluate_export_quality([path])
+            self.assertIn("detached_foreground_components", {finding.code for finding in report.warnings})
+
+    def test_real_cat_trap_dash_report_fits_calibrated_geometry_thresholds(self) -> None:
+        report_path = Path(__file__).resolve().parents[2] / "fixtures/cat-trap/dash/sam2-small-rgba-quality-report.json"
+        data = json.loads(report_path.read_text(encoding="utf-8"))
+        frames = data["frames"]
+        ratios = [frame["foreground_ratio"] for frame in frames]
+        maximum_jump = max(max(left, right) / min(left, right) for left, right in zip(ratios, ratios[1:]))
+        self.assertLess(maximum_jump, 1.25)
+        self.assertGreaterEqual(min(frame["largest_component_ratio"] for frame in frames), 0.98)
 
 
 if __name__ == "__main__":

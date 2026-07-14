@@ -12,6 +12,9 @@ import numpy as np
 
 from .quality import analyze_rgba_sequence
 
+AREA_JUMP_WARNING_RATIO = 1.25
+DETACHED_FOREGROUND_WARNING_RATIO = 0.98
+
 
 @dataclass(frozen=True)
 class QualityFinding:
@@ -120,7 +123,7 @@ def evaluate_export_quality(paths: list[Path]) -> ExportQualityReport:
         if previous <= 0 or current <= 0:
             continue
         ratio = max(previous, current) / min(previous, current)
-        if ratio >= 1.75:
+        if ratio >= AREA_JUMP_WARNING_RATIO:
             area_jump_indices.extend((index, index + 1))
     if area_jump_indices:
         warnings.append(QualityFinding(
@@ -128,6 +131,20 @@ def evaluate_export_quality(paths: list[Path]) -> ExportQualityReport:
             severity="warning",
             message="Large consecutive foreground-area changes require visual review.",
             frame_indices=tuple(sorted(set(area_jump_indices))),
+        ))
+
+    detached_indices = tuple(
+        index + 1
+        for index, frame in enumerate(quality.frames)
+        if frame.component_count > 1
+        and frame.largest_component_ratio < DETACHED_FOREGROUND_WARNING_RATIO
+    )
+    if detached_indices:
+        warnings.append(QualityFinding(
+            code="detached_foreground_components",
+            severity="warning",
+            message="Frames contain substantial foreground components detached from the main silhouette.",
+            frame_indices=detached_indices,
         ))
 
     status = "blocked" if blockers else ("warning" if warnings else "passed")
