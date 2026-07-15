@@ -1,0 +1,5 @@
+# worker/requirements-sam2-bootstrap.txt
+# Pinned non-PyTorch packages for the user-controlled SAM 2 runtime bootstrap.
+numpy==2.4.6
+opencv-python-headless==4.13.0.92
+sam-2 @ git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4

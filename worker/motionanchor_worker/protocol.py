@@ -32,6 +32,8 @@ TYPE_WORKER_SHUTDOWN: str = "worker.shutdown"
 TYPE_MEDIA_PROBE: str = "media.probe"
 TYPE_MEDIA_EXTRACT_FRAMES: str = "media.extract_frames"
 TYPE_SEGMENTATION_SAM2_PREFLIGHT: str = "segmentation.sam2_preflight"
+TYPE_SEGMENTATION_SAM2_BOOTSTRAP_PLAN: str = "segmentation.sam2_bootstrap_plan"
+TYPE_SEGMENTATION_SAM2_BOOTSTRAP_WRITE: str = "segmentation.sam2_bootstrap_write"
 TYPE_JOB_SUBMIT_EXTRACT_FRAMES: str = "job.submit.media.extract_frames"
 TYPE_JOB_SUBMIT_SEGMENT_RGBA: str = "job.submit.segmentation.sam2_rgba"
 TYPE_JOB_STATUS: str = "job.status"
@@ -46,6 +48,8 @@ TYPE_ERROR: str = "error"
 TYPE_MEDIA_PROBED: str = "media.probed"
 TYPE_MEDIA_FRAMES_EXTRACTED: str = "media.frames_extracted"
 TYPE_SEGMENTATION_SAM2_PREFLIGHT_RESULT: str = "segmentation.sam2_preflight_result"
+TYPE_SEGMENTATION_SAM2_BOOTSTRAP_PLAN_RESULT: str = "segmentation.sam2_bootstrap_plan_result"
+TYPE_SEGMENTATION_SAM2_BOOTSTRAP_WRITE_RESULT: str = "segmentation.sam2_bootstrap_write_result"
 TYPE_JOB_ACCEPTED: str = "job.accepted"
 TYPE_JOB_STATUS_RESULT: str = "job.status_result"
 TYPE_JOB_CANCEL_RESULT: str = "job.cancel_result"
@@ -53,7 +57,7 @@ TYPE_JOB_CANCEL_RESULT: str = "job.cancel_result"
 # All types the worker may produce (for validation helpers)
 
 OUTPUT_TYPES: frozenset[str] = frozenset(
-    {TYPE_WORKER_READY, TYPE_WORKER_PONG, TYPE_WORKER_STOPPED, TYPE_ERROR, TYPE_MEDIA_PROBED, TYPE_MEDIA_FRAMES_EXTRACTED, TYPE_SEGMENTATION_SAM2_PREFLIGHT_RESULT, TYPE_JOB_ACCEPTED, TYPE_JOB_STATUS_RESULT, TYPE_JOB_CANCEL_RESULT}
+    {TYPE_WORKER_READY, TYPE_WORKER_PONG, TYPE_WORKER_STOPPED, TYPE_ERROR, TYPE_MEDIA_PROBED, TYPE_MEDIA_FRAMES_EXTRACTED, TYPE_SEGMENTATION_SAM2_PREFLIGHT_RESULT, TYPE_SEGMENTATION_SAM2_BOOTSTRAP_PLAN_RESULT, TYPE_SEGMENTATION_SAM2_BOOTSTRAP_WRITE_RESULT, TYPE_JOB_ACCEPTED, TYPE_JOB_STATUS_RESULT, TYPE_JOB_CANCEL_RESULT}
 )
 
 

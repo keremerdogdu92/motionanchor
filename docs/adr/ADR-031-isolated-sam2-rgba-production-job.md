@@ -16,6 +16,8 @@ The runtime preflight reports the Python version, NumPy, OpenCV, PyTorch, SAM 2 
 
 `MOTIONANCHOR_SAM2_PYTHON` selects the pinned runtime. `MOTIONANCHOR_SAM2_RUNNER` is an explicit test seam for a deterministic fake child process and is not used by the normal application path.
 
+MotionAnchor exposes a non-executing bootstrap service that produces a reviewable PowerShell script from pinned requirements and the official SAM 2.1 Hiera Small checkpoint URL. Script creation is explicit, non-overwriting, checksum-gated, and separate from execution. The application never silently installs Python packages or model weights.
+
 ## Consequences
 
 - The main worker remains free of direct PyTorch and SAM 2 imports.

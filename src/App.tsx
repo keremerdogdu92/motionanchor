@@ -3,7 +3,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { open } from "@tauri-apps/plugin-dialog";
+import { open, save } from "@tauri-apps/plugin-dialog";
 import { PromptEditor } from "./prompt-editor/PromptEditor";
 import { RgbaPreviewGallery } from "./rgba-preview/RgbaPreviewGallery";
 import { JobHistory, type JobHistoryEntry, type JobRequest } from "./job-history/JobHistory";
@@ -45,6 +45,29 @@ type Sam2Preflight = {
   checkpoint_sha256: string | null;
   checkpoint_valid: boolean;
   error: string | null;
+};
+type Sam2BootstrapStep = {
+  step_id: string;
+  title: string;
+  command: string;
+  already_satisfied: boolean;
+};
+type Sam2BootstrapPlan = {
+  schema_version: number;
+  ready_to_generate: boolean;
+  target_python: string;
+  requirements_path: string;
+  checkpoint_path: string;
+  checkpoint_url: string;
+  checkpoint_sha256: string;
+  script_path: string;
+  blockers: string[];
+  steps: Sam2BootstrapStep[];
+};
+type Sam2BootstrapWriteResult = {
+  plan: Sam2BootstrapPlan;
+  script_path: string;
+  bytes_written: number;
 };
 type FramePreview = {
   index: number;
@@ -144,6 +167,8 @@ function App() {
   const [previews, setPreviews] = useState<FramePreview[]>([]);
   const [rgbaPreviews, setRgbaPreviews] = useState<FramePreview[]>([]);
   const [sam2Runtime, setSam2Runtime] = useState<Sam2Preflight | null>(null);
+  const [sam2Bootstrap, setSam2Bootstrap] = useState<Sam2BootstrapPlan | null>(null);
+  const [sam2BootstrapScript, setSam2BootstrapScript] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const interruptedJobs = useMemo(
@@ -246,6 +271,8 @@ function App() {
     setPreviews([]);
     setRgbaPreviews([]);
     setSam2Runtime(null);
+    setSam2Bootstrap(null);
+    setSam2BootstrapScript(null);
     setActiveRequest(null);
     setJob(null);
     setError("");
@@ -332,6 +359,42 @@ function App() {
       setSam2Runtime(await invoke<Sam2Preflight>("sam2_preflight"));
     } catch (cause) {
       setSam2Runtime(null);
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function buildSam2BootstrapPlan() {
+    setBusy(true);
+    setError("");
+    try {
+      const plan = await invoke<Sam2BootstrapPlan>("sam2_bootstrap_plan", { scriptPath: null });
+      setSam2Bootstrap(plan);
+      setSam2BootstrapScript(null);
+    } catch (cause) {
+      setSam2Bootstrap(null);
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function saveSam2BootstrapScript() {
+    const selected = await save({
+      defaultPath: "sam2-bootstrap.ps1",
+      filters: [{ name: "PowerShell", extensions: ["ps1"] }],
+    });
+    if (typeof selected !== "string") return;
+    setBusy(true);
+    setError("");
+    try {
+      const result = await invoke<Sam2BootstrapWriteResult>("write_sam2_bootstrap_script", {
+        scriptPath: selected,
+      });
+      setSam2Bootstrap(result.plan);
+      setSam2BootstrapScript(result.script_path);
+    } catch (cause) {
       setError(String(cause));
     } finally {
       setBusy(false);
@@ -572,6 +635,20 @@ function App() {
                 <span>Packages: {sam2Runtime.missing_components.length ? `missing ${sam2Runtime.missing_components.join(", ")}` : "complete"}</span>
                 <span>Checkpoint: {sam2Runtime.checkpoint_valid ? "verified" : "missing or invalid"}</span>
                 {sam2Runtime.readiness_errors.map((message) => <span key={message}>{message}</span>)}
+              </div>
+            )}
+            {sam2Runtime?.ready === false && (
+              <div className="runtime-card runtime-blocked">
+                <strong>SAM 2 setup</strong>
+                <div className="actions">
+                  <button type="button" className="secondary" onClick={buildSam2BootstrapPlan} disabled={busy}>Build setup plan</button>
+                  <button type="button" onClick={saveSam2BootstrapScript} disabled={busy || sam2Bootstrap?.ready_to_generate === false}>Save setup script</button>
+                </div>
+                {sam2Bootstrap?.blockers.map((blocker) => <span key={blocker}>{blocker}</span>)}
+                {sam2Bootstrap?.steps.map((step) => (
+                  <span key={step.step_id}>{step.already_satisfied ? "Ready" : "Required"}: {step.title}</span>
+                ))}
+                {sam2BootstrapScript && <span>Saved: {sam2BootstrapScript}</span>}
               </div>
             )}
           </form>

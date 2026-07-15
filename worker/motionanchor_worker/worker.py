@@ -13,13 +13,19 @@ script.
 from __future__ import annotations
 
 import sys
+from dataclasses import asdict
 from typing import IO, Optional
 
 from . import PROTOCOL_VERSION
 from .errors import WorkerError, internal, unknown_type
 from .jobs import JobNotFoundError
 from .jobs.media import MediaJobService
-from .segmentation import Sam2ProcessError, probe_sam2_runtime
+from .segmentation import (
+    Sam2ProcessError,
+    build_sam2_bootstrap_plan,
+    probe_sam2_runtime,
+    write_sam2_bootstrap_script,
+)
 from .media.ffmpeg import FfmpegAdapter
 from .media.handlers import (
     AdapterFactory,
@@ -35,6 +41,8 @@ from .protocol import (
     TYPE_JOB_SUBMIT_SEGMENT_RGBA,
     TYPE_MEDIA_EXTRACT_FRAMES,
     TYPE_MEDIA_PROBE,
+    TYPE_SEGMENTATION_SAM2_BOOTSTRAP_PLAN,
+    TYPE_SEGMENTATION_SAM2_BOOTSTRAP_WRITE,
     TYPE_SEGMENTATION_SAM2_PREFLIGHT,
     TYPE_WORKER_PING,
     TYPE_WORKER_PONG,
@@ -183,6 +191,41 @@ def run_loop(
             except Sam2ProcessError as exc:
                 _write(stdout, make_error_envelope(
                     WorkerError(code="sam2_preflight_failed", message=str(exc)),
+                    in_reply_to=obj.get("message_id"),
+                ))
+            continue
+
+        if msg_type == TYPE_SEGMENTATION_SAM2_BOOTSTRAP_PLAN:
+            payload = obj["payload"]
+            script_path = payload.get("script_path")
+            if script_path is not None and not isinstance(script_path, str):
+                _write(stdout, make_error_envelope(
+                    WorkerError(code="invalid_request", message="payload.script_path must be a string"),
+                    in_reply_to=obj.get("message_id"),
+                ))
+                continue
+            plan = build_sam2_bootstrap_plan(script_path)
+            _write(stdout, make_envelope(
+                message_type="segmentation.sam2_bootstrap_plan_result",
+                message_id=obj.get("message_id"),
+                payload=asdict(plan),
+            ))
+            continue
+
+        if msg_type == TYPE_SEGMENTATION_SAM2_BOOTSTRAP_WRITE:
+            try:
+                script_path = obj["payload"].get("script_path")
+                if not isinstance(script_path, str) or not script_path.strip():
+                    raise ValueError("payload.script_path must be a non-empty string")
+                result = write_sam2_bootstrap_script(script_path)
+                _write(stdout, make_envelope(
+                    message_type="segmentation.sam2_bootstrap_write_result",
+                    message_id=obj.get("message_id"),
+                    payload=result,
+                ))
+            except ValueError as exc:
+                _write(stdout, make_error_envelope(
+                    WorkerError(code="sam2_bootstrap_blocked", message=str(exc)),
                     in_reply_to=obj.get("message_id"),
                 ))
             continue

@@ -90,6 +90,22 @@ fn sam2_preflight(
 }
 
 #[tauri::command]
+fn sam2_bootstrap_plan(
+    script_path: Option<&str>,
+    state: tauri::State<'_, JobSidecarState>,
+) -> Result<sidecar::Sam2BootstrapPlan, String> {
+    with_job_client(&state, |client| client.sam2_bootstrap_plan(script_path))
+}
+
+#[tauri::command]
+fn write_sam2_bootstrap_script(
+    script_path: &str,
+    state: tauri::State<'_, JobSidecarState>,
+) -> Result<sidecar::Sam2BootstrapWriteResult, String> {
+    with_job_client(&state, |client| client.write_sam2_bootstrap_script(script_path))
+}
+
+#[tauri::command]
 fn start_sam2_rgba_job(
     frames_path: &str,
     output_path: &str,
@@ -187,6 +203,8 @@ pub fn run() {
             extract_frames,
             start_frame_extraction_job,
             sam2_preflight,
+            sam2_bootstrap_plan,
+            write_sam2_bootstrap_script,
             start_sam2_rgba_job,
             get_job_status,
             cancel_job,

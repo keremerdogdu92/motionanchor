@@ -453,6 +453,35 @@ pub struct Sam2PreflightReport {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct Sam2BootstrapStep {
+    pub step_id: String,
+    pub title: String,
+    pub command: String,
+    pub already_satisfied: bool,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Sam2BootstrapPlan {
+    pub schema_version: u32,
+    pub ready_to_generate: bool,
+    pub target_python: String,
+    pub requirements_path: String,
+    pub checkpoint_path: String,
+    pub checkpoint_url: String,
+    pub checkpoint_sha256: String,
+    pub script_path: String,
+    pub blockers: Vec<String>,
+    pub steps: Vec<Sam2BootstrapStep>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Sam2BootstrapWriteResult {
+    pub plan: Sam2BootstrapPlan,
+    pub script_path: String,
+    pub bytes_written: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct JobAcceptedReport {
     pub job_id: String,
     pub operation: String,
@@ -533,6 +562,34 @@ impl JobSidecarClient {
             None,
             json!({}),
             "segmentation.sam2_preflight_result",
+        )?;
+        serde_json::from_value(response.payload)
+            .map_err(|error| SidecarError::Json(error.to_string()))
+    }
+
+    pub fn sam2_bootstrap_plan(
+        &mut self,
+        script_path: Option<&str>,
+    ) -> Result<Sam2BootstrapPlan, SidecarError> {
+        let response = self.request(
+            "segmentation.sam2_bootstrap_plan",
+            None,
+            json!({"script_path": script_path}),
+            "segmentation.sam2_bootstrap_plan_result",
+        )?;
+        serde_json::from_value(response.payload)
+            .map_err(|error| SidecarError::Json(error.to_string()))
+    }
+
+    pub fn write_sam2_bootstrap_script(
+        &mut self,
+        script_path: &str,
+    ) -> Result<Sam2BootstrapWriteResult, SidecarError> {
+        let response = self.request(
+            "segmentation.sam2_bootstrap_write",
+            None,
+            json!({"script_path": script_path}),
+            "segmentation.sam2_bootstrap_write_result",
         )?;
         serde_json::from_value(response.payload)
             .map_err(|error| SidecarError::Json(error.to_string()))
