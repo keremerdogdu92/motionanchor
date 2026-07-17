@@ -248,6 +248,14 @@ function App() {
     return () => window.clearInterval(timer);
   }, [job?.job_id, terminal]);
 
+
+  useEffect(() => {
+    if (job?.status !== "completed" || job.operation !== "segmentation.sam2_bootstrap") return;
+    invoke<Sam2Preflight>("sam2_preflight")
+      .then((runtime) => { setSam2Runtime(runtime); setSam2Bootstrap(null); })
+      .catch((cause) => setError(String(cause)));
+  }, [job?.status, job?.operation]);
+
   useEffect(() => {
     if (job?.status !== "completed" || job.operation !== "media.extract_frames") return;
     invoke<FramePreview[]>("get_frame_previews", { outputPath: extractionOutput, count: 8 })
@@ -401,6 +409,22 @@ function App() {
     }
   }
 
+
+  async function runSam2Bootstrap() {
+    if (!sam2BootstrapScript) { setError("Save the MotionAnchor setup script before running it."); return; }
+    setBusy(true);
+    setError("");
+    try {
+      const accepted = await invoke<JobAccepted>("start_sam2_bootstrap_job", { scriptPath: sam2BootstrapScript });
+      setActiveRequest(null);
+      setJob(queuedJob(accepted));
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function startSegmentation(event: FormEvent) {
     event.preventDefault();
     if (!activeProject) { setError("Select an active project before starting segmentation."); return; }
@@ -528,7 +552,7 @@ function App() {
     }
   }
 
-  const jobTitle = job?.operation === "segmentation.sam2_rgba" ? "SAM 2 RGBA job" : "Extraction job";
+  const jobTitle = job?.operation === "segmentation.sam2_bootstrap" ? "SAM 2 setup job" : job?.operation === "segmentation.sam2_rgba" ? "SAM 2 RGBA job" : "Extraction job";
 
   return (
     <main className="app-shell">
@@ -643,6 +667,7 @@ function App() {
                 <div className="actions">
                   <button type="button" className="secondary" onClick={buildSam2BootstrapPlan} disabled={busy}>Build setup plan</button>
                   <button type="button" onClick={saveSam2BootstrapScript} disabled={busy || sam2Bootstrap?.ready_to_generate === false}>Save setup script</button>
+                  <button type="button" onClick={runSam2Bootstrap} disabled={busy || Boolean(job && !terminal) || !sam2BootstrapScript}>Run setup</button>
                 </div>
                 {sam2Bootstrap?.blockers.map((blocker) => <span key={blocker}>{blocker}</span>)}
                 {sam2Bootstrap?.steps.map((step) => (

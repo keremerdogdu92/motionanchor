@@ -39,6 +39,7 @@ from .protocol import (
     TYPE_JOB_STATUS,
     TYPE_JOB_SUBMIT_EXTRACT_FRAMES,
     TYPE_JOB_SUBMIT_SEGMENT_RGBA,
+    TYPE_JOB_SUBMIT_SAM2_BOOTSTRAP,
     TYPE_MEDIA_EXTRACT_FRAMES,
     TYPE_MEDIA_PROBE,
     TYPE_SEGMENTATION_SAM2_BOOTSTRAP_PLAN,
@@ -245,6 +246,26 @@ def run_loop(
                     message_id=obj.get("message_id"),
                     job_id=job_id,
                     payload={"job_id": job_id, "operation": "media.extract_frames"},
+                ))
+            except MediaRequestError as exc:
+                _write(stdout, make_error_envelope(
+                    WorkerError(code="invalid_request", message=str(exc)),
+                    in_reply_to=obj.get("message_id"),
+                ))
+            continue
+
+
+        if msg_type == TYPE_JOB_SUBMIT_SAM2_BOOTSTRAP:
+            try:
+                script_path = obj["payload"].get("script_path")
+                if not isinstance(script_path, str) or not script_path.strip():
+                    raise MediaRequestError("payload.script_path must be a non-empty string")
+                job_id = jobs.submit_sam2_bootstrap(script_path)
+                _write(stdout, make_envelope(
+                    message_type="job.accepted",
+                    message_id=obj.get("message_id"),
+                    job_id=job_id,
+                    payload={"job_id": job_id, "operation": "segmentation.sam2_bootstrap"},
                 ))
             except MediaRequestError as exc:
                 _write(stdout, make_error_envelope(

@@ -5,6 +5,7 @@ from .sam2_bootstrap import (
     Sam2BootstrapPlan,
     build_sam2_bootstrap_plan,
     write_sam2_bootstrap_script,
+    run_sam2_bootstrap_job,
 )
 from .sam2_job import (
     Sam2ProcessError,
@@ -21,4 +22,5 @@ __all__ = [
     "probe_sam2_runtime",
     "run_sam2_rgba_job",
     "write_sam2_bootstrap_script",
+    "run_sam2_bootstrap_job",
 ]

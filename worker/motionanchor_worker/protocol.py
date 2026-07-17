@@ -36,6 +36,7 @@ TYPE_SEGMENTATION_SAM2_BOOTSTRAP_PLAN: str = "segmentation.sam2_bootstrap_plan"
 TYPE_SEGMENTATION_SAM2_BOOTSTRAP_WRITE: str = "segmentation.sam2_bootstrap_write"
 TYPE_JOB_SUBMIT_EXTRACT_FRAMES: str = "job.submit.media.extract_frames"
 TYPE_JOB_SUBMIT_SEGMENT_RGBA: str = "job.submit.segmentation.sam2_rgba"
+TYPE_JOB_SUBMIT_SAM2_BOOTSTRAP: str = "job.submit.segmentation.sam2_bootstrap"
 TYPE_JOB_STATUS: str = "job.status"
 TYPE_JOB_CANCEL: str = "job.cancel"
 

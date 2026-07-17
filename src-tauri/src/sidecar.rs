@@ -595,6 +595,27 @@ impl JobSidecarClient {
             .map_err(|error| SidecarError::Json(error.to_string()))
     }
 
+
+    pub fn submit_sam2_bootstrap(
+        &mut self,
+        script_path: &str,
+    ) -> Result<JobAcceptedReport, SidecarError> {
+        let script = PathBuf::from(script_path)
+            .canonicalize()
+            .map_err(|error| SidecarError::Io(format!("invalid bootstrap script path: {error}")))?;
+        if !script.is_file() {
+            return Err(SidecarError::Protocol("bootstrap script must be a file".into()));
+        }
+        let response = self.request(
+            "job.submit.segmentation.sam2_bootstrap",
+            None,
+            json!({"script_path": script}),
+            "job.accepted",
+        )?;
+        serde_json::from_value(response.payload)
+            .map_err(|error| SidecarError::Json(error.to_string()))
+    }
+
     pub fn submit_frame_extraction(
         &mut self,
         source_path: &str,
