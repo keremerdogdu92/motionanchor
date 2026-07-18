@@ -56,6 +56,7 @@ class MediaJobService:
         max_frames: int = 48,
         preview_width: int = 192,
         uniform_fraction: float = 0.5,
+        prompt_path: str | None = None,
     ) -> str:
         def work(report, cancelled) -> dict[str, Any]:
             return materialize_motion_selection(
@@ -64,6 +65,7 @@ class MediaJobService:
                 max_frames=max_frames,
                 preview_width=preview_width,
                 uniform_fraction=uniform_fraction,
+                prompt_path=prompt_path,
                 report=report,
                 cancelled=cancelled,
             )

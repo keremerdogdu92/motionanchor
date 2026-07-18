@@ -270,6 +270,7 @@ function App() {
   useEffect(() => {
     if (job?.status !== "completed" || job.operation !== "media.select_motion_frames") return;
     setFramesPath(motionOutput);
+    setPromptPath(`${motionOutput}\\sam2-prompts.selected.json`);
     invoke<FramePreview[]>("get_motion_previews", { outputPath: motionOutput, count: 8 })
       .then(setPreviews)
       .catch((cause) => setError(String(cause)));
@@ -383,8 +384,9 @@ function App() {
         framesPath,
         outputPath: motionOutput,
         maxFrames: maxMotionFrames,
+        promptPath,
       });
-      const request: JobRequest = { operation: "media.select_motion_frames", framesPath, outputPath: motionOutput, maxFrames: maxMotionFrames };
+      const request: JobRequest = { operation: "media.select_motion_frames", framesPath, outputPath: motionOutput, promptPath, maxFrames: maxMotionFrames };
       setPreviews([]);
       setRgbaPreviews([]);
       setActiveRequest(request);
@@ -534,6 +536,7 @@ function App() {
       setFramesPath(entry.request.framesPath);
       setMotionOutput(entry.request.outputPath);
       setMaxMotionFrames(entry.request.maxFrames);
+      setPromptPath(entry.request.promptPath);
       if (entry.status === "completed") {
         setPreviews(await invoke<FramePreview[]>("get_motion_previews", { outputPath: entry.request.outputPath, count: 8 }));
       }
@@ -562,7 +565,7 @@ function App() {
         setJob(queuedJob(accepted));
       } else if (entry.request.operation === "media.select_motion_frames") {
         const request: JobRequest = { ...entry.request, outputPath: retryOutputPath(entry.request.outputPath) };
-        const accepted = await invoke<JobAccepted>("start_motion_selection_job", { framesPath: request.framesPath, outputPath: request.outputPath, maxFrames: request.maxFrames });
+        const accepted = await invoke<JobAccepted>("start_motion_selection_job", { framesPath: request.framesPath, outputPath: request.outputPath, maxFrames: request.maxFrames, promptPath: request.promptPath });
         setMotionOutput(request.outputPath);
         setActiveRequest(request);
         setPreviews([]);

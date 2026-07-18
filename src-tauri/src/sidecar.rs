@@ -644,6 +644,7 @@ impl JobSidecarClient {
         frames_path: &str,
         output_path: &str,
         max_frames: u32,
+        prompt_path: Option<&str>,
     ) -> Result<JobAcceptedReport, SidecarError> {
         let frames = PathBuf::from(frames_path)
             .canonicalize()
@@ -654,10 +655,14 @@ impl JobSidecarClient {
             ));
         }
         let output = prepare_output_path(output_path)?;
+        let prompt = match prompt_path {
+            Some(value) => Some(PathBuf::from(value).canonicalize().map_err(|error| SidecarError::Io(format!("invalid prompt path: {error}")))?),
+            None => None,
+        };
         let response = self.request(
             "job.submit.media.select_motion_frames",
             None,
-            json!({"frames_path": frames, "output_path": output, "max_frames": max_frames}),
+            json!({"frames_path": frames, "output_path": output, "max_frames": max_frames, "prompt_path": prompt}),
             "job.accepted",
         )?;
         serde_json::from_value(response.payload)

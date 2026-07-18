@@ -271,6 +271,7 @@ def run_loop(
                     max_frames=payload.get("max_frames", 48),
                     preview_width=payload.get("preview_width", 192),
                     uniform_fraction=payload.get("uniform_fraction", 0.5),
+                    prompt_path=payload.get("prompt_path"),
                 )
                 _write(stdout, make_envelope(
                     message_type="job.accepted",

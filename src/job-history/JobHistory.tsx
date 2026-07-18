@@ -7,7 +7,7 @@ import "./JobHistory.css";
 export type JobState = "queued" | "running" | "completed" | "failed" | "cancelled";
 export type JobRequest =
   | { operation: "media.extract_frames"; sourcePath: string; outputPath: string }
-  | { operation: "media.select_motion_frames"; framesPath: string; outputPath: string; maxFrames: number }
+  | { operation: "media.select_motion_frames"; framesPath: string; outputPath: string; promptPath: string; maxFrames: number }
   | { operation: "segmentation.sam2_rgba"; framesPath: string; outputPath: string; promptPath: string; featherRadius: number; defringe: boolean };
 
 export type JobHistoryEntry = {

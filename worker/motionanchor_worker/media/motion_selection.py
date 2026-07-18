@@ -8,6 +8,7 @@ bounded frame sets for expensive downstream segmentation such as SAM 2.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from collections.abc import Iterable
 from pathlib import Path
 
 import cv2
@@ -76,6 +77,7 @@ def select_motion_frames(
     max_frames: int,
     preview_width: int = 192,
     uniform_fraction: float = 0.5,
+    required_indices: Iterable[int] = (),
 ) -> MotionSelection:
     """Select a bounded frame subset while preserving coverage and motion peaks."""
 
@@ -90,15 +92,27 @@ def select_motion_frames(
     if not 0.0 <= float(uniform_fraction) <= 1.0:
         raise MotionSelectionError("uniform_fraction must be between 0 and 1")
 
+    required = tuple(required_indices)
+    if any(not isinstance(index, int) for index in required):
+        raise MotionSelectionError("required_indices must contain integers")
+    if any(index < 0 or index >= len(frame_paths) for index in required):
+        raise MotionSelectionError("required_indices contains an out-of-range frame")
+
     scores = _motion_scores(frame_paths, preview_width)
     target_count = min(max_frames, len(frame_paths))
+    mandatory = {0, len(frame_paths) - 1, *required}
+    if len(mandatory) > target_count:
+        raise MotionSelectionError("max_frames is smaller than the mandatory frame set")
     if target_count == len(frame_paths):
         selected = tuple(range(len(frame_paths)))
         return MotionSelection(len(frame_paths), selected, tuple(scores))
 
     uniform_count = max(2, min(target_count, round(target_count * uniform_fraction)))
-    selected_indices = _uniform_anchors(len(frame_paths), uniform_count)
-    selected_indices.update({0, len(frame_paths) - 1})
+    selected_indices = set(mandatory)
+    for candidate in sorted(_uniform_anchors(len(frame_paths), uniform_count)):
+        if len(selected_indices) >= uniform_count:
+            break
+        selected_indices.add(candidate)
 
     ranked_motion = sorted(scores[1:], key=lambda item: (-item.score, item.index))
     for candidate in ranked_motion:

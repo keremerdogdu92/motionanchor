@@ -49,6 +49,17 @@ class MotionSelectionTests(unittest.TestCase):
             self.assertEqual(first.selected_indices, second.selected_indices)
             self.assertEqual(first.scores, second.scores)
 
+    def test_required_indices_are_retained(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            frames = Path(tmp)
+            for index in range(12):
+                write_frame(frames, index, index % 40)
+
+            result = select_motion_frames(frames, max_frames=5, required_indices=(4, 8))
+
+            self.assertEqual(len(result.selected_indices), 5)
+            self.assertTrue({0, 4, 8, 11}.issubset(result.selected_indices))
+
     def test_returns_all_frames_when_below_limit(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             frames = Path(tmp)

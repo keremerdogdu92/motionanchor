@@ -1,4 +1,4 @@
-use base64::{engine::general_purpose::STANDARD, Engine as _};
+﻿use base64::{engine::general_purpose::STANDARD, Engine as _};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -15,7 +15,6 @@ struct FrameManifestEntry {
 
 #[derive(Debug, Deserialize)]
 struct MotionManifestEntry {
-    index: usize,
     source_index: usize,
     filename: String,
 }
@@ -270,3 +269,4 @@ mod tests {
         assert!(validate_filename("../frame_000001.png").is_err());
     }
 }
+

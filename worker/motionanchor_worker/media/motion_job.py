@@ -27,6 +27,7 @@ def materialize_motion_selection(
     max_frames: int,
     preview_width: int = 192,
     uniform_fraction: float = 0.5,
+    prompt_path: str | Path | None = None,
     report: ProgressReporter | None = None,
     cancelled: CancellationCheck | None = None,
 ) -> dict[str, Any]:
@@ -41,6 +42,15 @@ def materialize_motion_selection(
     temporary.mkdir()
 
     try:
+        prompt_document = None
+        required_indices: tuple[int, ...] = ()
+        if prompt_path is not None:
+            prompt_document = json.loads(Path(prompt_path).expanduser().read_text(encoding="utf-8"))
+            anchors = prompt_document.get("anchors") if isinstance(prompt_document, dict) else None
+            if not isinstance(anchors, list) or not anchors:
+                raise ValueError("prompt_path requires a non-empty anchors array")
+            required_indices = tuple(anchor.get("frame_index") for anchor in anchors)
+
         if report:
             report(0.05, "Scoring frame motion")
         selection = select_motion_frames(
@@ -48,6 +58,7 @@ def materialize_motion_selection(
             max_frames=max_frames,
             preview_width=preview_width,
             uniform_fraction=uniform_fraction,
+            required_indices=required_indices,
         )
         source_frames = sorted(source.glob("frame_*.png"))
         selected_records: list[dict[str, Any]] = []
@@ -78,6 +89,20 @@ def materialize_motion_selection(
             "uniform_fraction": uniform_fraction,
             "frames": selected_records,
         }
+        selected_prompt_path = None
+        if prompt_document is not None:
+            source_to_target = {record["source_index"]: record["index"] for record in selected_records}
+            for anchor in prompt_document["anchors"]:
+                source_index = anchor["frame_index"]
+                if source_index not in source_to_target:
+                    raise ValueError("prompt anchor was not retained by motion selection")
+                anchor["frame_index"] = source_to_target[source_index]
+            selected_prompt_path = temporary / "sam2-prompts.selected.json"
+            selected_prompt_path.write_text(
+                json.dumps(prompt_document, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            manifest["selected_prompt_path"] = str(output / selected_prompt_path.name)
+
         manifest_path = temporary / "motion-selection.json"
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2),

@@ -87,10 +87,11 @@ fn start_motion_selection_job(
     frames_path: &str,
     output_path: &str,
     max_frames: u32,
+    prompt_path: Option<&str>,
     state: tauri::State<'_, JobSidecarState>,
 ) -> Result<sidecar::JobAcceptedReport, String> {
     with_job_client(&state, |client| {
-        client.submit_motion_selection(frames_path, output_path, max_frames)
+        client.submit_motion_selection(frames_path, output_path, max_frames, prompt_path)
     })
 }
 
