@@ -75,6 +75,18 @@ type FramePreview = {
   filename: string;
   data_url: string;
 };
+type PipelineRun = {
+  stage: "extracting" | "starting-selection" | "selecting" | "starting-segmentation" | "segmenting" | "completed" | "failed";
+  sourcePath: string;
+  extractionOutput: string;
+  motionOutput: string;
+  segmentationOutput: string;
+  promptPath: string;
+  maxFrames: number;
+  featherRadius: number;
+  defringe: boolean;
+};
+
 type JobStatus = {
   job_id: string;
   operation: string;
@@ -172,6 +184,7 @@ function App() {
   const [sam2Runtime, setSam2Runtime] = useState<Sam2Preflight | null>(null);
   const [sam2Bootstrap, setSam2Bootstrap] = useState<Sam2BootstrapPlan | null>(null);
   const [sam2BootstrapScript, setSam2BootstrapScript] = useState<string | null>(null);
+  const [pipelineRun, setPipelineRun] = useState<PipelineRun | null>(null);
   const [error, setError] = useState("");
 
   const interruptedJobs = useMemo(
@@ -283,6 +296,39 @@ function App() {
       .catch((cause) => setError(String(cause)));
   }, [job?.status, job?.operation, segmentationOutput]);
 
+  useEffect(() => {
+    if (!pipelineRun || !job || !["completed", "failed", "cancelled"].includes(job.status)) return;
+    if (job.status !== "completed") {
+      setPipelineRun((current) => current ? { ...current, stage: "failed" } : null);
+      return;
+    }
+    if (pipelineRun.stage === "extracting" && job.operation === "media.extract_frames") {
+      setPipelineRun((current) => current ? { ...current, stage: "starting-selection" } : null);
+      void invoke<JobAccepted>("start_motion_selection_job", {
+        framesPath: pipelineRun.extractionOutput, outputPath: pipelineRun.motionOutput,
+        maxFrames: pipelineRun.maxFrames, promptPath: pipelineRun.promptPath,
+      }).then((accepted) => {
+        const request: JobRequest = { operation: "media.select_motion_frames", framesPath: pipelineRun.extractionOutput, outputPath: pipelineRun.motionOutput, promptPath: pipelineRun.promptPath, maxFrames: pipelineRun.maxFrames };
+        setActiveRequest(request); setJob(queuedJob(accepted));
+        setPipelineRun((current) => current ? { ...current, stage: "selecting" } : null);
+      }).catch((cause) => { setError(String(cause)); setPipelineRun((current) => current ? { ...current, stage: "failed" } : null); });
+    } else if (pipelineRun.stage === "selecting" && job.operation === "media.select_motion_frames") {
+      const selectedPrompt = `${pipelineRun.motionOutput}\\sam2-prompts.selected.json`;
+      setPipelineRun((current) => current ? { ...current, stage: "starting-segmentation" } : null);
+      void invoke<JobAccepted>("start_sam2_rgba_job", {
+        framesPath: pipelineRun.motionOutput, outputPath: pipelineRun.segmentationOutput, promptPath: selectedPrompt,
+        featherRadius: pipelineRun.featherRadius, defringe: pipelineRun.defringe,
+      }).then((accepted) => {
+        const request: JobRequest = { operation: "segmentation.sam2_rgba", framesPath: pipelineRun.motionOutput, outputPath: pipelineRun.segmentationOutput, promptPath: selectedPrompt, featherRadius: pipelineRun.featherRadius, defringe: pipelineRun.defringe };
+        setFramesPath(pipelineRun.motionOutput); setPromptPath(selectedPrompt);
+        setActiveRequest(request); setJob(queuedJob(accepted));
+        setPipelineRun((current) => current ? { ...current, stage: "segmenting" } : null);
+      }).catch((cause) => { setError(String(cause)); setPipelineRun((current) => current ? { ...current, stage: "failed" } : null); });
+    } else if (pipelineRun.stage === "segmenting" && job.operation === "segmentation.sam2_rgba") {
+      setPipelineRun((current) => current ? { ...current, stage: "completed" } : null);
+    }
+  }, [job?.status, job?.operation, pipelineRun?.stage]);
+
   function selectProject(project: ProjectRecord | null) {
     setActiveProject(project);
     setWorkspaceStatus(null);
@@ -348,6 +394,21 @@ function App() {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function startFullPipeline() {
+    if (!activeProject) { setError("Select an active project before starting the pipeline."); return; }
+    if (!workspaceStatus?.extractionReady) { setError("The full pipeline requires a prepared workspace, source video, and empty output directories."); return; }
+    setBusy(true); setError("");
+    try {
+      const runtime = await invoke<Sam2Preflight>("sam2_preflight");
+      setSam2Runtime(runtime);
+      if (!runtime.ready) throw new Error(runtime.error ?? "SAM 2 runtime is not ready");
+      const snapshot: PipelineRun = { stage: "extracting", sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe };
+      const accepted = await invoke<JobAccepted>("start_frame_extraction_job", { sourcePath, outputPath: extractionOutput });
+      const request: JobRequest = { operation: "media.extract_frames", sourcePath, outputPath: extractionOutput };
+      setPreviews([]); setRgbaPreviews([]); setPipelineRun(snapshot); setActiveRequest(request); setJob(queuedJob(accepted));
+    } catch (cause) { setError(String(cause)); setPipelineRun(null); } finally { setBusy(false); }
   }
 
   async function startExtraction(event: FormEvent) {
@@ -629,6 +690,14 @@ function App() {
       />
 
       {activeProject && <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>}
+
+      <section className="panel">
+        <div className="panel-heading"><div><h2>Run complete pipeline</h2><span className="muted">Extract → motion selection → SAM 2 RGBA</span></div><span className="step-badge">One click</span></div>
+        <div className="actions">
+          <button type="button" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !workspaceStatus?.extractionReady}>Run complete pipeline</button>
+          {pipelineRun && <span className={`job-state ${pipelineRun.stage === "failed" ? "state-failed" : pipelineRun.stage === "completed" ? "state-completed" : "state-running"}`}>{pipelineRun.stage.replace(/-/g, " ")}</span>}
+        </div>
+      </section>
 
       <section className="workflow-grid">
         <article className="panel">
