@@ -16,6 +16,9 @@ class FakeJobs:
     def submit_extract_frames(self, source: str, output: str) -> str:
         return "job-123"
 
+    def submit_motion_selection(self, frames: str, output: str, **settings) -> str:
+        return "job-motion"
+
     def submit_sam2_rgba(self, frames: str, output: str, prompt: str, **settings) -> str:
         return "job-sam2"
 
@@ -49,6 +52,17 @@ class TestJobProtocol(unittest.TestCase):
         self.assertEqual(response["type"], "job.accepted")
         self.assertEqual(response["message_id"], "submit-1")
         self.assertEqual(response["job_id"], "job-123")
+
+    def test_submit_motion_selection_returns_job_id(self) -> None:
+        request = make_envelope(
+            message_type="job.submit.media.select_motion_frames",
+            message_id="submit-motion",
+            payload={"frames_path": "frames", "output_path": "selected", "max_frames": 48},
+        )
+        response = run_messages([request], FakeJobs())[1]
+        self.assertEqual(response["type"], "job.accepted")
+        self.assertEqual(response["job_id"], "job-motion")
+        self.assertEqual(response["payload"]["operation"], "media.select_motion_frames")
 
     def test_submit_sam2_rgba_returns_job_id(self) -> None:
         request = make_envelope(

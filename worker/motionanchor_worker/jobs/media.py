@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from ..media.ffmpeg import FfmpegAdapter
+from ..media.motion_job import materialize_motion_selection
 from ..segmentation import run_sam2_bootstrap_job, run_sam2_rgba_job
 from .runner import JobRunner
 
@@ -46,6 +47,28 @@ class MediaJobService:
             }
 
         return self.runner.submit("media.extract_frames", work)
+
+    def submit_motion_selection(
+        self,
+        frames_path: str,
+        output_path: str,
+        *,
+        max_frames: int = 48,
+        preview_width: int = 192,
+        uniform_fraction: float = 0.5,
+    ) -> str:
+        def work(report, cancelled) -> dict[str, Any]:
+            return materialize_motion_selection(
+                frames_path,
+                output_path,
+                max_frames=max_frames,
+                preview_width=preview_width,
+                uniform_fraction=uniform_fraction,
+                report=report,
+                cancelled=cancelled,
+            )
+
+        return self.runner.submit("media.select_motion_frames", work)
 
     def submit_sam2_rgba(
         self,

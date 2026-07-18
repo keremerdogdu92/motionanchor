@@ -38,6 +38,7 @@ from .protocol import (
     TYPE_JOB_CANCEL,
     TYPE_JOB_STATUS,
     TYPE_JOB_SUBMIT_EXTRACT_FRAMES,
+    TYPE_JOB_SUBMIT_MOTION_SELECTION,
     TYPE_JOB_SUBMIT_SEGMENT_RGBA,
     TYPE_JOB_SUBMIT_SAM2_BOOTSTRAP,
     TYPE_MEDIA_EXTRACT_FRAMES,
@@ -248,6 +249,36 @@ def run_loop(
                     payload={"job_id": job_id, "operation": "media.extract_frames"},
                 ))
             except MediaRequestError as exc:
+                _write(stdout, make_error_envelope(
+                    WorkerError(code="invalid_request", message=str(exc)),
+                    in_reply_to=obj.get("message_id"),
+                ))
+            continue
+
+
+        if msg_type == TYPE_JOB_SUBMIT_MOTION_SELECTION:
+            try:
+                payload = obj["payload"]
+                frames = payload.get("frames_path")
+                output = payload.get("output_path")
+                if not isinstance(frames, str) or not frames.strip():
+                    raise MediaRequestError("payload.frames_path must be a non-empty string")
+                if not isinstance(output, str) or not output.strip():
+                    raise MediaRequestError("payload.output_path must be a non-empty string")
+                job_id = jobs.submit_motion_selection(
+                    frames,
+                    output,
+                    max_frames=payload.get("max_frames", 48),
+                    preview_width=payload.get("preview_width", 192),
+                    uniform_fraction=payload.get("uniform_fraction", 0.5),
+                )
+                _write(stdout, make_envelope(
+                    message_type="job.accepted",
+                    message_id=obj.get("message_id"),
+                    job_id=job_id,
+                    payload={"job_id": job_id, "operation": "media.select_motion_frames"},
+                ))
+            except (MediaRequestError, ValueError, TypeError) as exc:
                 _write(stdout, make_error_envelope(
                     WorkerError(code="invalid_request", message=str(exc)),
                     in_reply_to=obj.get("message_id"),

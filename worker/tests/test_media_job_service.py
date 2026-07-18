@@ -52,6 +52,23 @@ class TestMediaJobService(unittest.TestCase):
             self.assertEqual(snapshot["result"]["frame_count"], 2)
             self.assertTrue(snapshot["result"]["manifest_path"].endswith("frames.json"))
 
+    def test_motion_selection_job_completes_with_report(self) -> None:
+        original = media_jobs_module.materialize_motion_selection
+        media_jobs_module.materialize_motion_selection = lambda *args, **kwargs: {
+            "source_frame_count": 240,
+            "selected_frame_count": 48,
+            "manifest_path": "motion-selection.json",
+        }
+        try:
+            service = MediaJobService(runner=JobRunner(state_path=False), adapter_factory=FakeAdapter)
+            job_id = service.submit_motion_selection("frames", "selected", max_frames=48)
+            snapshot = wait_terminal(service, job_id)
+            self.assertEqual(snapshot["status"], "completed")
+            self.assertEqual(snapshot["operation"], "media.select_motion_frames")
+            self.assertEqual(snapshot["result"]["selected_frame_count"], 48)
+        finally:
+            media_jobs_module.materialize_motion_selection = original
+
     def test_sam2_job_completes_with_report(self) -> None:
         original = media_jobs_module.run_sam2_rgba_job
         media_jobs_module.run_sam2_rgba_job = lambda **kwargs: {"frame_count": 2, "rgba_path": "rgba"}
