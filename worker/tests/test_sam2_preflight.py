@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import json
 import unittest
-from subprocess import CompletedProcess
+from subprocess import CompletedProcess, TimeoutExpired
 from unittest.mock import patch
 
 from motionanchor_worker.segmentation.sam2_job import Sam2ProcessError, _require_sam2_runtime, probe_sam2_runtime
@@ -74,6 +74,13 @@ class Sam2PreflightTests(unittest.TestCase):
         self.assertFalse(report["ready"])
         self.assertEqual(report["missing_components"], ["cv2", "torch", "sam2"])
         self.assertTrue(report["readiness_errors"])
+
+    @patch("motionanchor_worker.segmentation.sam2_job.subprocess.run")
+    def test_timeout_is_reported_as_structured_process_error(self, run_mock) -> None:
+        run_mock.side_effect = TimeoutExpired(cmd=["python"], timeout=90)
+
+        with self.assertRaisesRegex(Sam2ProcessError, "preflight timed out"):
+            probe_sam2_runtime()
 
     @patch("motionanchor_worker.segmentation.sam2_job.probe_sam2_runtime")
     def test_production_guard_blocks_incomplete_runtime(self, probe_mock) -> None:

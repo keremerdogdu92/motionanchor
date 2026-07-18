@@ -151,15 +151,18 @@ result["checkpoint_sha256"] = (
 )
 print(json.dumps(result))
 """
-    completed = subprocess.run(
-        [str(python), "-c", script, str(checkpoint)],
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        timeout=30,
-        check=False,
-    )
+    try:
+        completed = subprocess.run(
+            [str(python), "-c", script, str(checkpoint)],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=90,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise Sam2ProcessError("SAM 2 preflight timed out") from exc
     if completed.returncode != 0:
         raise Sam2ProcessError(completed.stderr.strip() or "SAM 2 preflight failed")
     try:
