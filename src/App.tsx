@@ -90,6 +90,7 @@ const ROOT = "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixture
 const DEFAULT_SOURCE = `${ROOT}\\videos\\dash.mp4`;
 const DEFAULT_FRAMES = `${ROOT}\\dash\\frames`;
 const DEFAULT_EXTRACTION_OUTPUT = `${ROOT}\\ui-extract`;
+const DEFAULT_MOTION_OUTPUT = `${ROOT}\\ui-motion-selected`;
 const DEFAULT_SEGMENTATION_OUTPUT = `${ROOT}\\ui-sam2-output`;
 const DEFAULT_PROMPTS = `${ROOT}\\dash\\sam2-prompts.json`;
 const JOB_HISTORY_KEY = "motionanchor.job-history.v1";
@@ -153,6 +154,8 @@ function App() {
   const [sourcePath, setSourcePath] = useState(DEFAULT_SOURCE);
   const [extractionOutput, setExtractionOutput] = useState(DEFAULT_EXTRACTION_OUTPUT);
   const [framesPath, setFramesPath] = useState(DEFAULT_FRAMES);
+  const [motionOutput, setMotionOutput] = useState(DEFAULT_MOTION_OUTPUT);
+  const [maxMotionFrames, setMaxMotionFrames] = useState(48);
   const [segmentationOutput, setSegmentationOutput] = useState(DEFAULT_SEGMENTATION_OUTPUT);
   const [promptPath, setPromptPath] = useState(DEFAULT_PROMPTS);
   const [initialSam2Settings] = useState(loadSam2Settings);
@@ -265,6 +268,14 @@ function App() {
 
 
   useEffect(() => {
+    if (job?.status !== "completed" || job.operation !== "media.select_motion_frames") return;
+    setFramesPath(motionOutput);
+    invoke<FramePreview[]>("get_motion_previews", { outputPath: motionOutput, count: 8 })
+      .then(setPreviews)
+      .catch((cause) => setError(String(cause)));
+  }, [job?.status, job?.operation, motionOutput]);
+
+  useEffect(() => {
     if (job?.status !== "completed" || job.operation !== "segmentation.sam2_rgba") return;
     invoke<FramePreview[]>("get_rgba_previews", { outputPath: segmentationOutput, count: 8 })
       .then(setRgbaPreviews)
@@ -290,6 +301,7 @@ function App() {
       setSourcePath(DEFAULT_SOURCE);
       setExtractionOutput(DEFAULT_EXTRACTION_OUTPUT);
       setFramesPath(DEFAULT_FRAMES);
+      setMotionOutput(DEFAULT_MOTION_OUTPUT);
       setSegmentationOutput(DEFAULT_SEGMENTATION_OUTPUT);
       setPromptPath(DEFAULT_PROMPTS);
       return;
@@ -300,6 +312,7 @@ function App() {
     setSourcePath(paths.sourcePath);
     setExtractionOutput(paths.extractionOutput);
     setFramesPath(paths.framesPath);
+    setMotionOutput(paths.motionOutput);
     setSegmentationOutput(paths.segmentationOutput);
     setPromptPath(paths.promptPath);
   }
@@ -359,6 +372,29 @@ function App() {
     }
   }
 
+
+  async function startMotionSelection(event: FormEvent) {
+    event.preventDefault();
+    if (!activeProject) { setError("Select an active project before selecting motion frames."); return; }
+    setBusy(true);
+    setError("");
+    try {
+      const accepted = await invoke<JobAccepted>("start_motion_selection_job", {
+        framesPath,
+        outputPath: motionOutput,
+        maxFrames: maxMotionFrames,
+      });
+      const request: JobRequest = { operation: "media.select_motion_frames", framesPath, outputPath: motionOutput, maxFrames: maxMotionFrames };
+      setPreviews([]);
+      setRgbaPreviews([]);
+      setActiveRequest(request);
+      setJob(queuedJob(accepted));
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function runSam2Preflight() {
     setBusy(true);
@@ -494,6 +530,13 @@ function App() {
       if (entry.status === "completed") {
         setPreviews(await invoke<FramePreview[]>("get_frame_previews", { outputPath: entry.request.outputPath, count: 8 }));
       }
+    } else if (entry.request.operation === "media.select_motion_frames") {
+      setFramesPath(entry.request.framesPath);
+      setMotionOutput(entry.request.outputPath);
+      setMaxMotionFrames(entry.request.maxFrames);
+      if (entry.status === "completed") {
+        setPreviews(await invoke<FramePreview[]>("get_motion_previews", { outputPath: entry.request.outputPath, count: 8 }));
+      }
     } else {
       setFramesPath(entry.request.framesPath);
       setSegmentationOutput(entry.request.outputPath);
@@ -514,6 +557,13 @@ function App() {
         const request: JobRequest = { ...entry.request, outputPath: retryOutputPath(entry.request.outputPath) };
         const accepted = await invoke<JobAccepted>("start_frame_extraction_job", { sourcePath: request.sourcePath, outputPath: request.outputPath });
         setExtractionOutput(request.outputPath);
+        setActiveRequest(request);
+        setPreviews([]);
+        setJob(queuedJob(accepted));
+      } else if (entry.request.operation === "media.select_motion_frames") {
+        const request: JobRequest = { ...entry.request, outputPath: retryOutputPath(entry.request.outputPath) };
+        const accepted = await invoke<JobAccepted>("start_motion_selection_job", { framesPath: request.framesPath, outputPath: request.outputPath, maxFrames: request.maxFrames });
+        setMotionOutput(request.outputPath);
         setActiveRequest(request);
         setPreviews([]);
         setJob(queuedJob(accepted));
@@ -552,7 +602,7 @@ function App() {
     }
   }
 
-  const jobTitle = job?.operation === "segmentation.sam2_bootstrap" ? "SAM 2 setup job" : job?.operation === "segmentation.sam2_rgba" ? "SAM 2 RGBA job" : "Extraction job";
+  const jobTitle = job?.operation === "segmentation.sam2_bootstrap" ? "SAM 2 setup job" : job?.operation === "segmentation.sam2_rgba" ? "SAM 2 RGBA job" : job?.operation === "media.select_motion_frames" ? "Motion selection job" : "Extraction job";
 
   return (
     <main className="app-shell">
@@ -607,7 +657,37 @@ function App() {
 
         <article className="panel">
           <div className="panel-heading">
-            <h2>2. Build RGBA sequence</h2>
+            <h2>2. Select motion frames</h2>
+            <span className="step-badge">Motion-aware</span>
+          </div>
+          <form onSubmit={startMotionSelection}>
+            <label>
+              Extracted frames directory
+              <span className="path-control">
+                <input value={framesPath} onChange={(event) => setFramesPath(event.target.value)} />
+                <button type="button" className="browse" onClick={() => chooseDirectory(setFramesPath)}>Browse</button>
+              </span>
+            </label>
+            <label>
+              Empty selected-frames directory
+              <span className="path-control">
+                <input value={motionOutput} onChange={(event) => setMotionOutput(event.target.value)} />
+                <button type="button" className="browse" onClick={() => chooseDirectory(setMotionOutput)}>Browse</button>
+              </span>
+            </label>
+            <label>
+              Maximum frames
+              <input type="number" min="2" max="240" step="1" value={maxMotionFrames} onChange={(event) => setMaxMotionFrames(Number(event.target.value))} />
+            </label>
+            <div className="actions">
+              <button type="submit" disabled={busy || Boolean(job && !terminal) || !activeProject}>Select motion frames</button>
+            </div>
+          </form>
+        </article>
+
+        <article className="panel">
+          <div className="panel-heading">
+            <h2>3. Build RGBA sequence</h2>
             <span className="step-badge">SAM 2.1 Small</span>
           </div>
           <form onSubmit={startSegmentation}>

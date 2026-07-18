@@ -13,6 +13,18 @@ struct FrameManifestEntry {
     filename: String,
 }
 
+#[derive(Debug, Deserialize)]
+struct MotionManifestEntry {
+    index: usize,
+    source_index: usize,
+    filename: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct MotionManifest {
+    frames: Vec<MotionManifestEntry>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct FramePreview {
     pub index: usize,
@@ -77,6 +89,48 @@ pub fn load_frame_previews(
             timestamp_seconds: entry.timestamp_seconds,
             filename: entry.filename.clone(),
             data_url: format!("data:image/png;base64,{}", STANDARD.encode(bytes)),
+        });
+    }
+    Ok(previews)
+}
+
+pub fn load_motion_previews(
+    output_path: &str,
+    requested: usize,
+) -> Result<Vec<FramePreview>, String> {
+    let root = PathBuf::from(output_path)
+        .canonicalize()
+        .map_err(|error| format!("invalid motion preview path: {error}"))?;
+    let bytes = fs::read(root.join("motion-selection.json"))
+        .map_err(|error| format!("could not read motion manifest: {error}"))?;
+    let manifest: MotionManifest = serde_json::from_slice(&bytes)
+        .map_err(|error| format!("invalid motion manifest: {error}"))?;
+    if manifest.frames.is_empty() {
+        return Err("motion manifest is empty".into());
+    }
+    let mut total_bytes = 0usize;
+    let mut previews = Vec::new();
+    for position in selected_positions(manifest.frames.len(), requested) {
+        let entry = &manifest.frames[position];
+        validate_filename(&entry.filename)?;
+        let frame_path = root
+            .join(&entry.filename)
+            .canonicalize()
+            .map_err(|error| format!("invalid motion frame path: {error}"))?;
+        if frame_path.parent() != Some(root.as_path()) {
+            return Err("motion frame path escaped output directory".into());
+        }
+        let frame_bytes = fs::read(&frame_path)
+            .map_err(|error| format!("could not read motion preview: {error}"))?;
+        total_bytes = total_bytes.saturating_add(frame_bytes.len());
+        if total_bytes > MAX_TOTAL_BYTES {
+            return Err("motion previews exceeded the safety limit".into());
+        }
+        previews.push(FramePreview {
+            index: entry.source_index,
+            timestamp_seconds: 0.0,
+            filename: entry.filename.clone(),
+            data_url: format!("data:image/png;base64,{}", STANDARD.encode(frame_bytes)),
         });
     }
     Ok(previews)

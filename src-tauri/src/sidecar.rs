@@ -595,7 +595,6 @@ impl JobSidecarClient {
             .map_err(|error| SidecarError::Json(error.to_string()))
     }
 
-
     pub fn submit_sam2_bootstrap(
         &mut self,
         script_path: &str,
@@ -604,7 +603,9 @@ impl JobSidecarClient {
             .canonicalize()
             .map_err(|error| SidecarError::Io(format!("invalid bootstrap script path: {error}")))?;
         if !script.is_file() {
-            return Err(SidecarError::Protocol("bootstrap script must be a file".into()));
+            return Err(SidecarError::Protocol(
+                "bootstrap script must be a file".into(),
+            ));
         }
         let response = self.request(
             "job.submit.segmentation.sam2_bootstrap",
@@ -632,6 +633,31 @@ impl JobSidecarClient {
             "job.submit.media.extract_frames",
             None,
             json!({"source_path": source, "output_path": output}),
+            "job.accepted",
+        )?;
+        serde_json::from_value(response.payload)
+            .map_err(|error| SidecarError::Json(error.to_string()))
+    }
+
+    pub fn submit_motion_selection(
+        &mut self,
+        frames_path: &str,
+        output_path: &str,
+        max_frames: u32,
+    ) -> Result<JobAcceptedReport, SidecarError> {
+        let frames = PathBuf::from(frames_path)
+            .canonicalize()
+            .map_err(|error| SidecarError::Io(format!("invalid frames path: {error}")))?;
+        if !frames.is_dir() {
+            return Err(SidecarError::Protocol(
+                "frames path must be a directory".into(),
+            ));
+        }
+        let output = prepare_output_path(output_path)?;
+        let response = self.request(
+            "job.submit.media.select_motion_frames",
+            None,
+            json!({"frames_path": frames, "output_path": output, "max_frames": max_frames}),
             "job.accepted",
         )?;
         serde_json::from_value(response.payload)

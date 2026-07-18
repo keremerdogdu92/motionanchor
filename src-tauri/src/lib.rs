@@ -7,8 +7,8 @@ mod credential_store;
 mod database;
 mod dev_env_store;
 mod previews;
-mod prompt_editor;
 mod project_workspace;
+mod prompt_editor;
 mod sidecar;
 mod unity_export;
 
@@ -83,6 +83,18 @@ fn start_frame_extraction_job(
 }
 
 #[tauri::command]
+fn start_motion_selection_job(
+    frames_path: &str,
+    output_path: &str,
+    max_frames: u32,
+    state: tauri::State<'_, JobSidecarState>,
+) -> Result<sidecar::JobAcceptedReport, String> {
+    with_job_client(&state, |client| {
+        client.submit_motion_selection(frames_path, output_path, max_frames)
+    })
+}
+
+#[tauri::command]
 fn sam2_preflight(
     state: tauri::State<'_, JobSidecarState>,
 ) -> Result<sidecar::Sam2PreflightReport, String> {
@@ -102,9 +114,10 @@ fn write_sam2_bootstrap_script(
     script_path: &str,
     state: tauri::State<'_, JobSidecarState>,
 ) -> Result<sidecar::Sam2BootstrapWriteResult, String> {
-    with_job_client(&state, |client| client.write_sam2_bootstrap_script(script_path))
+    with_job_client(&state, |client| {
+        client.write_sam2_bootstrap_script(script_path)
+    })
 }
-
 
 #[tauri::command]
 fn start_sam2_bootstrap_job(
@@ -164,6 +177,14 @@ fn get_frame_previews(
 }
 
 #[tauri::command]
+fn get_motion_previews(
+    output_path: &str,
+    count: usize,
+) -> Result<Vec<previews::FramePreview>, String> {
+    previews::load_motion_previews(output_path, count)
+}
+
+#[tauri::command]
 fn get_rgba_previews(
     output_path: &str,
     count: usize,
@@ -194,8 +215,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
-            let database = database::initialize(app.handle())
-                .map_err(std::io::Error::other)?;
+            let database = database::initialize(app.handle()).map_err(std::io::Error::other)?;
             app.manage(database);
             Ok(())
         })
@@ -211,6 +231,7 @@ pub fn run() {
             probe_media,
             extract_frames,
             start_frame_extraction_job,
+            start_motion_selection_job,
             sam2_preflight,
             sam2_bootstrap_plan,
             write_sam2_bootstrap_script,
@@ -233,6 +254,7 @@ pub fn run() {
             project_workspace::engine_compatibility,
             project_workspace::prepare_project_workspace,
             get_frame_previews,
+            get_motion_previews,
             get_rgba_previews,
             load_prompt_document,
             save_prompt_document,

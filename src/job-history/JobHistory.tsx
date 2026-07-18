@@ -7,6 +7,7 @@ import "./JobHistory.css";
 export type JobState = "queued" | "running" | "completed" | "failed" | "cancelled";
 export type JobRequest =
   | { operation: "media.extract_frames"; sourcePath: string; outputPath: string }
+  | { operation: "media.select_motion_frames"; framesPath: string; outputPath: string; maxFrames: number }
   | { operation: "segmentation.sam2_rgba"; framesPath: string; outputPath: string; promptPath: string; featherRadius: number; defringe: boolean };
 
 export type JobHistoryEntry = {
@@ -36,7 +37,9 @@ type StatusFilter = "all" | JobState;
 type OperationFilter = "all" | JobHistoryEntry["operation"];
 
 function operationLabel(operation: JobHistoryEntry["operation"]) {
-  return operation === "segmentation.sam2_rgba" ? "SAM 2 RGBA" : "Frame extraction";
+  if (operation === "segmentation.sam2_rgba") return "SAM 2 RGBA";
+  if (operation === "media.select_motion_frames") return "Motion frame selection";
+  return "Frame extraction";
 }
 
 function errorCategory(error: string | null) {
@@ -66,7 +69,7 @@ export function JobHistory({ entries, activeJobId, busy, onOpen, onRetry, onDele
       </div>
       <div className="job-history-filters">
         <label>Status<select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}><option value="all">All</option><option value="queued">Queued</option><option value="running">Running</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="cancelled">Cancelled</option></select></label>
-        <label>Operation<select value={operationFilter} onChange={(event) => setOperationFilter(event.target.value as OperationFilter)}><option value="all">All</option><option value="media.extract_frames">Frame extraction</option><option value="segmentation.sam2_rgba">SAM 2 RGBA</option></select></label>
+        <label>Operation<select value={operationFilter} onChange={(event) => setOperationFilter(event.target.value as OperationFilter)}><option value="all">All</option><option value="media.extract_frames">Frame extraction</option><option value="media.select_motion_frames">Motion selection</option><option value="segmentation.sam2_rgba">SAM 2 RGBA</option></select></label>
       </div>
       {filtered.length === 0 ? <p className="muted">No jobs match the selected filters.</p> : (
         <div className="job-history-list">

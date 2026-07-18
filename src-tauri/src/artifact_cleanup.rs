@@ -4,6 +4,7 @@ use std::fs;
 use std::path::{Component, Path, PathBuf};
 
 const EXTRACTION_MARKER: &str = "frames.json";
+const MOTION_MARKER: &str = "motion-selection.json";
 const SAM2_MARKER: &str = "sam2-rgba-report.json";
 
 pub fn delete_job_artifacts(output_path: &str, operation: &str) -> Result<(), String> {
@@ -19,11 +20,14 @@ pub fn delete_job_artifacts(output_path: &str, operation: &str) -> Result<(), St
     validate_safe_directory(&target)?;
     let marker = match operation {
         "media.extract_frames" => EXTRACTION_MARKER,
+        "media.select_motion_frames" => MOTION_MARKER,
         "segmentation.sam2_rgba" => SAM2_MARKER,
         _ => return Err("unsupported job operation".into()),
     };
     if !target.join(marker).is_file() {
-        return Err(format!("artifact directory is missing required marker {marker}"));
+        return Err(format!(
+            "artifact directory is missing required marker {marker}"
+        ));
     }
     fs::remove_dir_all(&target)
         .map_err(|error| format!("could not delete artifact directory: {error}"))
@@ -46,7 +50,10 @@ mod tests {
     use std::time::{SystemTime, UNIX_EPOCH};
 
     fn unique_temp(name: &str) -> PathBuf {
-        let suffix = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        let suffix = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
         std::env::temp_dir().join(format!("motionanchor-{name}-{suffix}"))
     }
 
@@ -63,7 +70,8 @@ mod tests {
     fn rejects_directory_without_expected_marker() {
         let directory = unique_temp("unmarked");
         fs::create_dir_all(&directory).unwrap();
-        let error = delete_job_artifacts(directory.to_str().unwrap(), "segmentation.sam2_rgba").unwrap_err();
+        let error = delete_job_artifacts(directory.to_str().unwrap(), "segmentation.sam2_rgba")
+            .unwrap_err();
         assert!(error.contains(SAM2_MARKER));
         fs::remove_dir_all(directory).unwrap();
     }

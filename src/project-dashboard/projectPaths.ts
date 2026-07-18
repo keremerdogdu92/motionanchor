@@ -5,6 +5,7 @@ export type ProjectWorkspacePaths = {
   sourcePath: string;
   extractionOutput: string;
   framesPath: string;
+  motionOutput: string;
   segmentationOutput: string;
   promptPath: string;
 };
@@ -19,6 +20,7 @@ export function deriveProjectWorkspacePaths(workspacePath: string): ProjectWorks
     sourcePath: joinWindowsPath(workspacePath, "media", "source.mp4"),
     extractionOutput: joinWindowsPath(workspacePath, "artifacts", "frames"),
     framesPath: joinWindowsPath(workspacePath, "artifacts", "frames"),
+    motionOutput: joinWindowsPath(workspacePath, "artifacts", "selected-frames"),
     segmentationOutput: joinWindowsPath(workspacePath, "artifacts", "rgba"),
     promptPath: joinWindowsPath(workspacePath, "prompts", "sam2-prompts.json"),
   };
