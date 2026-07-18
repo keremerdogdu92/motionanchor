@@ -10,6 +10,7 @@ mod previews;
 mod project_workspace;
 mod prompt_editor;
 mod sidecar;
+mod sprite_sheet;
 mod unity_export;
 
 use std::sync::Mutex;
@@ -247,6 +248,8 @@ pub fn run() {
             database::archive_project,
             canonical_export::build_canonical_export_plan,
             canonical_export::execute_canonical_export,
+            sprite_sheet::build_sprite_sheet_plan,
+            sprite_sheet::execute_sprite_sheet,
             unity_export::build_unity_export_plan,
             unity_export::execute_unity_export,
             unity_export::read_unity_import_status,

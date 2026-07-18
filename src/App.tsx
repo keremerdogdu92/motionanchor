@@ -75,6 +75,9 @@ type FramePreview = {
   filename: string;
   data_url: string;
 };
+type SpriteSheetPlan = { ready: boolean; assetName: string; destinationPath: string; frameCount: number; columns: number; rows: number; cellWidth: number; cellHeight: number; sheetWidth: number; sheetHeight: number; errors: string[] };
+type SpriteSheetResult = { packagePath: string; sheetPath: string; manifestPath: string; frameCount: number; sheetSha256: string };
+
 type PipelineRun = {
   stage: "extracting" | "starting-selection" | "selecting" | "starting-segmentation" | "segmenting" | "completed" | "failed";
   sourcePath: string;
@@ -185,6 +188,10 @@ function App() {
   const [sam2Bootstrap, setSam2Bootstrap] = useState<Sam2BootstrapPlan | null>(null);
   const [sam2BootstrapScript, setSam2BootstrapScript] = useState<string | null>(null);
   const [pipelineRun, setPipelineRun] = useState<PipelineRun | null>(null);
+  const [sheetColumns, setSheetColumns] = useState(8);
+  const [sheetPadding, setSheetPadding] = useState(2);
+  const [sheetPlan, setSheetPlan] = useState<SpriteSheetPlan | null>(null);
+  const [sheetResult, setSheetResult] = useState<SpriteSheetResult | null>(null);
   const [error, setError] = useState("");
 
   const interruptedJobs = useMemo(
@@ -409,6 +416,22 @@ function App() {
       const request: JobRequest = { operation: "media.extract_frames", sourcePath, outputPath: extractionOutput };
       setPreviews([]); setRgbaPreviews([]); setPipelineRun(snapshot); setActiveRequest(request); setJob(queuedJob(accepted));
     } catch (cause) { setError(String(cause)); setPipelineRun(null); } finally { setBusy(false); }
+  }
+
+  async function buildSpriteSheetPlan() {
+    if (!activeProject) return;
+    setBusy(true); setError(""); setSheetResult(null);
+    try { setSheetPlan(await invoke<SpriteSheetPlan>("build_sprite_sheet_plan", { workspacePath: activeProject.workspacePath, assetName: exportAssetName, columns: sheetColumns, padding: sheetPadding })); }
+    catch (cause) { setSheetPlan(null); setError(String(cause)); }
+    finally { setBusy(false); }
+  }
+
+  async function executeSpriteSheet() {
+    if (!activeProject || !sheetPlan?.ready) return;
+    setBusy(true); setError("");
+    try { setSheetResult(await invoke<SpriteSheetResult>("execute_sprite_sheet", { workspacePath: activeProject.workspacePath, assetName: exportAssetName, columns: sheetColumns, padding: sheetPadding })); setSheetPlan(null); }
+    catch (cause) { setSheetResult(null); setError(String(cause)); }
+    finally { setBusy(false); }
   }
 
   async function startExtraction(event: FormEvent) {
@@ -831,6 +854,19 @@ function App() {
           </form>
         </article>
       </section>
+
+      {rgbaPreviews.length > 0 && activeProject && (
+        <section className="panel">
+          <div className="panel-heading"><div><h2>Sprite sheet export</h2><span className="muted">Deterministic engine-neutral PNG atlas</span></div><span className="step-badge">PNG + JSON</span></div>
+          <div className="setting-row">
+            <label>Columns<input type="number" min="1" max="64" step="1" value={sheetColumns} onChange={(event) => { setSheetColumns(Number(event.target.value)); setSheetPlan(null); setSheetResult(null); }} /></label>
+            <label>Padding<input type="number" min="0" max="64" step="1" value={sheetPadding} onChange={(event) => { setSheetPadding(Number(event.target.value)); setSheetPlan(null); setSheetResult(null); }} /></label>
+          </div>
+          <div className="actions"><button type="button" className="secondary" onClick={() => void buildSpriteSheetPlan()} disabled={busy || !exportAssetName.trim()}>Build sheet plan</button><button type="button" onClick={() => void executeSpriteSheet()} disabled={busy || !sheetPlan?.ready}>Export sprite sheet</button></div>
+          {sheetPlan && <div className={`runtime-card ${sheetPlan.ready ? "runtime-ready" : "runtime-blocked"}`}><strong>{sheetPlan.ready ? "Sprite sheet ready" : "Sprite sheet blocked"}</strong><span>{sheetPlan.frameCount} frames · {sheetPlan.columns}×{sheetPlan.rows} cells</span><span>{sheetPlan.cellWidth}×{sheetPlan.cellHeight} cell · {sheetPlan.sheetWidth}×{sheetPlan.sheetHeight} sheet</span><span title={sheetPlan.destinationPath}>{sheetPlan.destinationPath}</span>{sheetPlan.errors.map((message) => <span key={message}>{message}</span>)}</div>}
+          {sheetResult && <div className="runtime-card runtime-ready"><strong>Sprite sheet exported</strong><span>{sheetResult.frameCount} frames</span><span title={sheetResult.sheetPath}>{sheetResult.sheetPath}</span><span>SHA-256: {sheetResult.sheetSha256}</span></div>}
+        </section>
+      )}
 
       {error && <section className="alert">{error}</section>}
 
