@@ -6,6 +6,7 @@ mod canonical_export;
 mod credential_store;
 mod database;
 mod dev_env_store;
+mod pipeline_manifest;
 mod previews;
 mod project_workspace;
 mod prompt_editor;
@@ -246,6 +247,9 @@ pub fn run() {
             database::create_project,
             database::list_projects,
             database::archive_project,
+            pipeline_manifest::create_pipeline_manifest,
+            pipeline_manifest::update_pipeline_manifest,
+            pipeline_manifest::read_pipeline_manifest,
             canonical_export::build_canonical_export_plan,
             canonical_export::execute_canonical_export,
             sprite_sheet::build_sprite_sheet_plan,

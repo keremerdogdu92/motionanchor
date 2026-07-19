@@ -78,7 +78,10 @@ type FramePreview = {
 type SpriteSheetPlan = { ready: boolean; assetName: string; destinationPath: string; frameCount: number; columns: number; rows: number; cellWidth: number; cellHeight: number; sheetWidth: number; sheetHeight: number; errors: string[] };
 type SpriteSheetResult = { packagePath: string; sheetPath: string; manifestPath: string; frameCount: number; sheetSha256: string };
 
+type PipelineManifest = { schemaVersion: number; pipelineId: string; status: string; stage: string; activeJobId: string | null; error: string | null; createdAt: string; updatedAt: string; manifestPath: string };
+
 type PipelineRun = {
+  pipelineId: string;
   stage: "extracting" | "starting-selection" | "selecting" | "starting-segmentation" | "segmenting" | "completed" | "failed";
   sourcePath: string;
   extractionOutput: string;
@@ -188,6 +191,7 @@ function App() {
   const [sam2Bootstrap, setSam2Bootstrap] = useState<Sam2BootstrapPlan | null>(null);
   const [sam2BootstrapScript, setSam2BootstrapScript] = useState<string | null>(null);
   const [pipelineRun, setPipelineRun] = useState<PipelineRun | null>(null);
+  const [pipelineManifest, setPipelineManifest] = useState<PipelineManifest | null>(null);
   const [sheetColumns, setSheetColumns] = useState(8);
   const [sheetPadding, setSheetPadding] = useState(2);
   const [sheetPlan, setSheetPlan] = useState<SpriteSheetPlan | null>(null);
@@ -304,6 +308,26 @@ function App() {
   }, [job?.status, job?.operation, segmentationOutput]);
 
   useEffect(() => {
+    if (!activeProject) { setPipelineManifest(null); return; }
+    invoke<PipelineManifest | null>("read_pipeline_manifest", { workspacePath: activeProject.workspacePath })
+      .then(setPipelineManifest)
+      .catch((cause) => setError(String(cause)));
+  }, [activeProject?.id]);
+
+  useEffect(() => {
+    if (!activeProject || !pipelineRun) return;
+    const status = pipelineRun.stage === "completed" ? "completed" : pipelineRun.stage === "failed" ? "failed" : "running";
+    invoke<PipelineManifest>("update_pipeline_manifest", {
+      workspacePath: activeProject.workspacePath,
+      pipelineId: pipelineRun.pipelineId,
+      status,
+      stage: pipelineRun.stage,
+      activeJobId: job && !terminal ? job.job_id : null,
+      error: pipelineRun.stage === "failed" ? ((job?.error?.message ?? error) || "Pipeline stage failed") : null,
+    }).then(setPipelineManifest).catch((cause) => setError(String(cause)));
+  }, [activeProject?.id, pipelineRun?.pipelineId, pipelineRun?.stage, job?.job_id, job?.status]);
+
+  useEffect(() => {
     if (!pipelineRun || !job || !["completed", "failed", "cancelled"].includes(job.status)) return;
     if (job.status !== "completed") {
       setPipelineRun((current) => current ? { ...current, stage: "failed" } : null);
@@ -411,7 +435,12 @@ function App() {
       const runtime = await invoke<Sam2Preflight>("sam2_preflight");
       setSam2Runtime(runtime);
       if (!runtime.ready) throw new Error(runtime.error ?? "SAM 2 runtime is not ready");
-      const snapshot: PipelineRun = { stage: "extracting", sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe };
+      const manifest = await invoke<PipelineManifest>("create_pipeline_manifest", {
+        workspacePath: activeProject.workspacePath,
+        settings: { sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe },
+      });
+      const snapshot: PipelineRun = { pipelineId: manifest.pipelineId, stage: "extracting", sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe };
+      setPipelineManifest(manifest);
       const accepted = await invoke<JobAccepted>("start_frame_extraction_job", { sourcePath, outputPath: extractionOutput });
       const request: JobRequest = { operation: "media.extract_frames", sourcePath, outputPath: extractionOutput };
       setPreviews([]); setRgbaPreviews([]); setPipelineRun(snapshot); setActiveRequest(request); setJob(queuedJob(accepted));
@@ -715,11 +744,12 @@ function App() {
       {activeProject && <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>}
 
       <section className="panel">
-        <div className="panel-heading"><div><h2>Run complete pipeline</h2><span className="muted">Extract → motion selection → SAM 2 RGBA</span></div><span className="step-badge">One click</span></div>
+        <div className="panel-heading"><div><h2>Run complete pipeline</h2><span className="muted">Extract â†’ motion selection â†’ SAM 2 RGBA</span></div><span className="step-badge">One click</span></div>
         <div className="actions">
           <button type="button" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !workspaceStatus?.extractionReady}>Run complete pipeline</button>
           {pipelineRun && <span className={`job-state ${pipelineRun.stage === "failed" ? "state-failed" : pipelineRun.stage === "completed" ? "state-completed" : "state-running"}`}>{pipelineRun.stage.replace(/-/g, " ")}</span>}
         </div>
+        {pipelineManifest && <div className="runtime-card runtime-ready"><strong>Durable pipeline checkpoint</strong><span>ID: {pipelineManifest.pipelineId}</span><span>Stage: {pipelineManifest.stage} ? Status: {pipelineManifest.status}</span><span title={pipelineManifest.manifestPath}>{pipelineManifest.manifestPath}</span></div>}
       </section>
 
       <section className="workflow-grid">
@@ -863,7 +893,7 @@ function App() {
             <label>Padding<input type="number" min="0" max="64" step="1" value={sheetPadding} onChange={(event) => { setSheetPadding(Number(event.target.value)); setSheetPlan(null); setSheetResult(null); }} /></label>
           </div>
           <div className="actions"><button type="button" className="secondary" onClick={() => void buildSpriteSheetPlan()} disabled={busy || !exportAssetName.trim()}>Build sheet plan</button><button type="button" onClick={() => void executeSpriteSheet()} disabled={busy || !sheetPlan?.ready}>Export sprite sheet</button></div>
-          {sheetPlan && <div className={`runtime-card ${sheetPlan.ready ? "runtime-ready" : "runtime-blocked"}`}><strong>{sheetPlan.ready ? "Sprite sheet ready" : "Sprite sheet blocked"}</strong><span>{sheetPlan.frameCount} frames · {sheetPlan.columns}×{sheetPlan.rows} cells</span><span>{sheetPlan.cellWidth}×{sheetPlan.cellHeight} cell · {sheetPlan.sheetWidth}×{sheetPlan.sheetHeight} sheet</span><span title={sheetPlan.destinationPath}>{sheetPlan.destinationPath}</span>{sheetPlan.errors.map((message) => <span key={message}>{message}</span>)}</div>}
+          {sheetPlan && <div className={`runtime-card ${sheetPlan.ready ? "runtime-ready" : "runtime-blocked"}`}><strong>{sheetPlan.ready ? "Sprite sheet ready" : "Sprite sheet blocked"}</strong><span>{sheetPlan.frameCount} frames Â· {sheetPlan.columns}Ã—{sheetPlan.rows} cells</span><span>{sheetPlan.cellWidth}Ã—{sheetPlan.cellHeight} cell Â· {sheetPlan.sheetWidth}Ã—{sheetPlan.sheetHeight} sheet</span><span title={sheetPlan.destinationPath}>{sheetPlan.destinationPath}</span>{sheetPlan.errors.map((message) => <span key={message}>{message}</span>)}</div>}
           {sheetResult && <div className="runtime-card runtime-ready"><strong>Sprite sheet exported</strong><span>{sheetResult.frameCount} frames</span><span title={sheetResult.sheetPath}>{sheetResult.sheetPath}</span><span>SHA-256: {sheetResult.sheetSha256}</span></div>}
         </section>
       )}
