@@ -250,6 +250,7 @@ pub fn run() {
             pipeline_manifest::create_pipeline_manifest,
             pipeline_manifest::update_pipeline_manifest,
             pipeline_manifest::read_pipeline_manifest,
+            pipeline_manifest::list_pipeline_history,
             pipeline_manifest::build_pipeline_cache_plan,
             canonical_export::build_canonical_export_plan,
             canonical_export::execute_canonical_export,

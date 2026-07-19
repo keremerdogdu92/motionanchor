@@ -79,7 +79,8 @@ type SpriteSheetPlan = { ready: boolean; assetName: string; destinationPath: str
 type SpriteSheetResult = { packagePath: string; sheetPath: string; manifestPath: string; frameCount: number; sheetSha256: string };
 
 type PipelineSettings = { sourcePath: string; extractionOutput: string; motionOutput: string; segmentationOutput: string; promptPath: string; maxFrames: number; featherRadius: number; defringe: boolean };
-type PipelineManifest = { schemaVersion: number; pipelineId: string; status: string; stage: string; lastActiveStage: string; activeJobId: string | null; error: string | null; createdAt: string; updatedAt: string; settings: PipelineSettings; manifestPath: string };
+type ArtifactNode = { id: string; kind: string; path: string; dependsOn: string[] };
+type PipelineManifest = { schemaVersion: number; pipelineId: string; status: string; stage: string; lastActiveStage: string; activeJobId: string | null; error: string | null; createdAt: string; updatedAt: string; settings: PipelineSettings; fingerprints: { sourceSha256: string; promptSha256: string }; artifacts: ArtifactNode[]; manifestPath: string };
 type PipelineCachePlan = { extractionCached: boolean; motionCached: boolean; segmentationCached: boolean; nextStage: "extracting" | "selecting" | "segmenting" | "completed"; reason: string; cachedSettings: PipelineSettings | null };
 
 type PipelineRun = {
@@ -194,6 +195,7 @@ function App() {
   const [sam2BootstrapScript, setSam2BootstrapScript] = useState<string | null>(null);
   const [pipelineRun, setPipelineRun] = useState<PipelineRun | null>(null);
   const [pipelineManifest, setPipelineManifest] = useState<PipelineManifest | null>(null);
+  const [pipelineHistory, setPipelineHistory] = useState<PipelineManifest[]>([]);
   const [pipelineCachePlan, setPipelineCachePlan] = useState<PipelineCachePlan | null>(null);
   const [sheetColumns, setSheetColumns] = useState(8);
   const [sheetPadding, setSheetPadding] = useState(2);
@@ -312,8 +314,8 @@ function App() {
 
   useEffect(() => {
     if (!activeProject) { setPipelineManifest(null); return; }
-    invoke<PipelineManifest | null>("read_pipeline_manifest", { workspacePath: activeProject.workspacePath })
-      .then(setPipelineManifest)
+    Promise.all([invoke<PipelineManifest | null>("read_pipeline_manifest", { workspacePath: activeProject.workspacePath }), invoke<PipelineManifest[]>("list_pipeline_history", { workspacePath: activeProject.workspacePath, limit: 8 })])
+      .then(([manifest, history]) => { setPipelineManifest(manifest); setPipelineHistory(history); })
       .catch((cause) => setError(String(cause)));
   }, [activeProject?.id]);
 
@@ -327,7 +329,7 @@ function App() {
       stage: pipelineRun.stage,
       activeJobId: job && !terminal ? job.job_id : null,
       error: pipelineRun.stage === "failed" ? ((job?.error?.message ?? error) || "Pipeline stage failed") : null,
-    }).then(setPipelineManifest).catch((cause) => setError(String(cause)));
+    }).then((manifest) => { setPipelineManifest(manifest); return invoke<PipelineManifest[]>("list_pipeline_history", { workspacePath: activeProject.workspacePath, limit: 8 }); }).then(setPipelineHistory).catch((cause) => setError(String(cause)));
   }, [activeProject?.id, pipelineRun?.pipelineId, pipelineRun?.stage, job?.job_id, job?.status]);
 
   useEffect(() => {
@@ -821,6 +823,9 @@ function App() {
         </div>
         {pipelineManifest && <div className={`runtime-card ${["failed", "running"].includes(pipelineManifest.status) && !pipelineRun ? "runtime-blocked" : "runtime-ready"}`}><strong>Durable pipeline checkpoint</strong><span>ID: {pipelineManifest.pipelineId}</span><span>Stage: {pipelineManifest.stage} ? Status: {pipelineManifest.status}</span><span title={pipelineManifest.manifestPath}>{pipelineManifest.manifestPath}</span>{["failed", "running"].includes(pipelineManifest.status) && !pipelineRun && <div className="actions"><button type="button" onClick={() => void resumePipeline(false)} disabled={busy || Boolean(job && !terminal)}>Resume safely</button><button type="button" className="secondary" onClick={() => void resumePipeline(true)} disabled={busy || Boolean(job && !terminal)}>Restart with new outputs</button><button type="button" className="secondary" onClick={() => void dismissPipeline()} disabled={busy}>Dismiss</button></div>}</div>}
         {pipelineCachePlan && <div className={`runtime-card ${pipelineCachePlan.segmentationCached ? "runtime-ready" : ""}`}><strong>Artifact cache plan</strong><span>Extraction: {pipelineCachePlan.extractionCached ? "cached" : "rebuild"} ? Motion: {pipelineCachePlan.motionCached ? "cached" : "rebuild"} ? Segmentation: {pipelineCachePlan.segmentationCached ? "cached" : "rebuild"}</span><span>Next stage: {pipelineCachePlan.nextStage}</span><span>{pipelineCachePlan.reason}</span></div>}
+
+        {(pipelineManifest?.artifacts ?? []).length > 0 && <div className="runtime-card runtime-ready"><strong>Artifact graph</strong>{(pipelineManifest?.artifacts ?? []).map((artifact) => <span key={artifact.id}>{artifact.id}: {artifact.kind}{artifact.dependsOn.length ? ` ? ${artifact.dependsOn.join(", ")}` : ""}</span>)}</div>}
+        {pipelineHistory.length > 0 && <div className="runtime-card runtime-ready"><strong>Pipeline run history</strong>{pipelineHistory.map((run) => <span key={run.pipelineId}>{run.pipelineId.slice(0, 8)} ? {run.status} ? {run.stage} ? {run.updatedAt}</span>)}</div>}
       </section>
 
       <section className="workflow-grid">

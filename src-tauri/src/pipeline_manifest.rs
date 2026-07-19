@@ -4,6 +4,7 @@ use std::{fs, path::{Path, PathBuf}};
 use uuid::Uuid;
 
 const PIPELINE_MANIFEST_FILENAME: &str = "pipeline.json";
+const PIPELINE_HISTORY_DIRECTORY: &str = ".motionanchor/pipelines";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -36,6 +37,16 @@ pub struct PipelineCachePlan {
     pub cached_settings: Option<PipelineSettings>,
 }
 
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArtifactNode {
+    pub id: String,
+    pub kind: String,
+    pub path: String,
+    pub depends_on: Vec<String>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PipelineManifest {
@@ -52,6 +63,8 @@ pub struct PipelineManifest {
     pub settings: PipelineSettings,
     #[serde(default)]
     pub fingerprints: PipelineFingerprints,
+    #[serde(default)]
+    pub artifacts: Vec<ArtifactNode>,
     pub manifest_path: String,
 }
 
@@ -80,6 +93,21 @@ fn has_entries(path: &str) -> bool {
     Path::new(path).is_dir() && fs::read_dir(path).ok().and_then(|mut items| items.next()).is_some()
 }
 
+
+fn artifact_graph(settings: &PipelineSettings) -> Vec<ArtifactNode> {
+    vec![
+        ArtifactNode { id: "source".into(), kind: "video".into(), path: settings.source_path.clone(), depends_on: vec![] },
+        ArtifactNode { id: "extraction".into(), kind: "frames".into(), path: settings.extraction_output.clone(), depends_on: vec!["source".into()] },
+        ArtifactNode { id: "motion".into(), kind: "selected-frames".into(), path: settings.motion_output.clone(), depends_on: vec!["extraction".into(), "prompt".into()] },
+        ArtifactNode { id: "prompt".into(), kind: "sam2-prompt".into(), path: settings.prompt_path.clone(), depends_on: vec![] },
+        ArtifactNode { id: "segmentation".into(), kind: "rgba-frames".into(), path: settings.segmentation_output.clone(), depends_on: vec!["motion".into(), "prompt".into()] },
+    ]
+}
+
+fn history_path(workspace: &Path, pipeline_id: &str) -> PathBuf {
+    workspace.join(PIPELINE_HISTORY_DIRECTORY).join(format!("{pipeline_id}.json"))
+}
+
 fn manifest_path(workspace: &Path) -> PathBuf {
     workspace.join(PIPELINE_MANIFEST_FILENAME)
 }
@@ -92,6 +120,13 @@ fn write_atomic(path: &Path, manifest: &PipelineManifest) -> Result<(), String> 
         fs::remove_file(path).map_err(|error| format!("could not replace pipeline manifest: {error}"))?;
     }
     fs::rename(&staging, path).map_err(|error| format!("could not publish pipeline manifest atomically: {error}"))
+}
+
+fn persist_manifest(workspace: &Path, manifest: &PipelineManifest) -> Result<(), String> {
+    let history = history_path(workspace, &manifest.pipeline_id);
+    if let Some(parent) = history.parent() { fs::create_dir_all(parent).map_err(|error| format!("could not create pipeline history: {error}"))?; }
+    write_atomic(&manifest_path(workspace), manifest)?;
+    write_atomic(&history, manifest)
 }
 
 #[tauri::command]
@@ -111,10 +146,11 @@ pub fn create_pipeline_manifest(workspace_path: &str, settings: PipelineSettings
         created_at: timestamp.clone(),
         updated_at: timestamp,
         fingerprints: fingerprints(&settings)?,
+        artifacts: artifact_graph(&settings),
         settings,
         manifest_path: path.to_string_lossy().into_owned(),
     };
-    write_atomic(&path, &manifest)?;
+    persist_manifest(&workspace, &manifest)?;
     Ok(manifest)
 }
 
@@ -131,7 +167,7 @@ pub fn update_pipeline_manifest(workspace_path: &str, pipeline_id: &str, status:
     manifest.active_job_id = active_job_id;
     manifest.error = error;
     manifest.updated_at = now();
-    write_atomic(&path, &manifest)?;
+    persist_manifest(&workspace, &manifest)?;
     Ok(manifest)
 }
 
@@ -142,6 +178,21 @@ pub fn read_pipeline_manifest(workspace_path: &str) -> Result<Option<PipelineMan
     if !path.is_file() { return Ok(None); }
     serde_json::from_slice(&fs::read(&path).map_err(|error| format!("could not read pipeline manifest: {error}"))?)
         .map(Some).map_err(|error| format!("invalid pipeline manifest: {error}"))
+}
+
+
+#[tauri::command]
+pub fn list_pipeline_history(workspace_path: &str, limit: Option<usize>) -> Result<Vec<PipelineManifest>, String> {
+    let workspace = canonical_workspace(workspace_path)?;
+    let directory = workspace.join(PIPELINE_HISTORY_DIRECTORY);
+    if !directory.is_dir() { return Ok(vec![]); }
+    let mut manifests = fs::read_dir(directory).map_err(|error| format!("could not read pipeline history: {error}"))?
+        .filter_map(Result::ok).filter(|entry| entry.path().extension().and_then(|v| v.to_str()) == Some("json"))
+        .filter_map(|entry| fs::read(entry.path()).ok())
+        .filter_map(|bytes| serde_json::from_slice::<PipelineManifest>(&bytes).ok()).collect::<Vec<_>>();
+    manifests.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
+    manifests.truncate(limit.unwrap_or(20).min(100));
+    Ok(manifests)
 }
 
 #[tauri::command]
@@ -192,6 +243,8 @@ mod tests {
         let updated = update_pipeline_manifest(workspace.to_str().unwrap(), &created.pipeline_id, "running", "selecting", Some("job-1".into()), None).unwrap();
         assert_eq!(updated.last_active_stage, "selecting");
         assert!(!updated.fingerprints.source_sha256.is_empty());
+        assert_eq!(updated.artifacts.len(), 5);
+        assert_eq!(list_pipeline_history(workspace.to_str().unwrap(), None).unwrap().len(), 1);
     }
 
     #[test]
