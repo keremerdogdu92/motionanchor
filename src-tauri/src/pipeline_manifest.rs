@@ -25,6 +25,8 @@ pub struct PipelineManifest {
     pub pipeline_id: String,
     pub status: String,
     pub stage: String,
+    #[serde(default)]
+    pub last_active_stage: String,
     pub active_job_id: Option<String>,
     pub error: Option<String>,
     pub created_at: String,
@@ -58,15 +60,17 @@ fn write_atomic(path: &Path, manifest: &PipelineManifest) -> Result<(), String> 
 }
 
 #[tauri::command]
-pub fn create_pipeline_manifest(workspace_path: &str, settings: PipelineSettings) -> Result<PipelineManifest, String> {
+pub fn create_pipeline_manifest(workspace_path: &str, settings: PipelineSettings, initial_stage: Option<String>) -> Result<PipelineManifest, String> {
     let workspace = canonical_workspace(workspace_path)?;
     let path = manifest_path(&workspace);
     let timestamp = now();
+    let initial_stage = initial_stage.unwrap_or_else(|| "extracting".into());
     let manifest = PipelineManifest {
         schema_version: 1,
         pipeline_id: Uuid::new_v4().to_string(),
         status: "running".into(),
-        stage: "extracting".into(),
+        stage: initial_stage.clone(),
+        last_active_stage: initial_stage,
         active_job_id: None,
         error: None,
         created_at: timestamp.clone(),
@@ -96,6 +100,9 @@ pub fn update_pipeline_manifest(
     }
     manifest.status = status.into();
     manifest.stage = stage.into();
+    if !matches!(stage, "failed" | "completed" | "dismissed") {
+        manifest.last_active_stage = stage.into();
+    }
     manifest.active_job_id = active_job_id;
     manifest.error = error;
     manifest.updated_at = now();
@@ -134,10 +141,11 @@ mod tests {
     fn persists_and_updates_pipeline_checkpoint() {
         let directory = tempfile::tempdir().unwrap();
         let workspace = directory.path().canonicalize().unwrap();
-        let created = create_pipeline_manifest(workspace.to_str().unwrap(), settings(&workspace)).unwrap();
+        let created = create_pipeline_manifest(workspace.to_str().unwrap(), settings(&workspace), None).unwrap();
         assert_eq!(created.stage, "extracting");
         let updated = update_pipeline_manifest(workspace.to_str().unwrap(), &created.pipeline_id, "running", "selecting", Some("job-1".into()), None).unwrap();
         assert_eq!(updated.active_job_id.as_deref(), Some("job-1"));
+        assert_eq!(updated.last_active_stage, "selecting");
         let loaded = read_pipeline_manifest(workspace.to_str().unwrap()).unwrap().unwrap();
         assert_eq!(loaded.stage, "selecting");
         assert_eq!(loaded.pipeline_id, created.pipeline_id);
@@ -147,7 +155,7 @@ mod tests {
     fn rejects_updates_for_another_pipeline() {
         let directory = tempfile::tempdir().unwrap();
         let workspace = directory.path().canonicalize().unwrap();
-        create_pipeline_manifest(workspace.to_str().unwrap(), settings(&workspace)).unwrap();
+        create_pipeline_manifest(workspace.to_str().unwrap(), settings(&workspace), None).unwrap();
         let error = update_pipeline_manifest(workspace.to_str().unwrap(), "other", "failed", "failed", None, Some("boom".into())).unwrap_err();
         assert!(error.contains("does not match"));
     }

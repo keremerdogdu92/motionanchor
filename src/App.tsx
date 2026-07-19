@@ -78,7 +78,8 @@ type FramePreview = {
 type SpriteSheetPlan = { ready: boolean; assetName: string; destinationPath: string; frameCount: number; columns: number; rows: number; cellWidth: number; cellHeight: number; sheetWidth: number; sheetHeight: number; errors: string[] };
 type SpriteSheetResult = { packagePath: string; sheetPath: string; manifestPath: string; frameCount: number; sheetSha256: string };
 
-type PipelineManifest = { schemaVersion: number; pipelineId: string; status: string; stage: string; activeJobId: string | null; error: string | null; createdAt: string; updatedAt: string; manifestPath: string };
+type PipelineSettings = { sourcePath: string; extractionOutput: string; motionOutput: string; segmentationOutput: string; promptPath: string; maxFrames: number; featherRadius: number; defringe: boolean };
+type PipelineManifest = { schemaVersion: number; pipelineId: string; status: string; stage: string; lastActiveStage: string; activeJobId: string | null; error: string | null; createdAt: string; updatedAt: string; settings: PipelineSettings; manifestPath: string };
 
 type PipelineRun = {
   pipelineId: string;
@@ -438,6 +439,7 @@ function App() {
       const manifest = await invoke<PipelineManifest>("create_pipeline_manifest", {
         workspacePath: activeProject.workspacePath,
         settings: { sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe },
+        initialStage: null,
       });
       const snapshot: PipelineRun = { pipelineId: manifest.pipelineId, stage: "extracting", sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe };
       setPipelineManifest(manifest);
@@ -445,6 +447,62 @@ function App() {
       const request: JobRequest = { operation: "media.extract_frames", sourcePath, outputPath: extractionOutput };
       setPreviews([]); setRgbaPreviews([]); setPipelineRun(snapshot); setActiveRequest(request); setJob(queuedJob(accepted));
     } catch (cause) { setError(String(cause)); setPipelineRun(null); } finally { setBusy(false); }
+  }
+
+  async function launchPipelineStage(settings: PipelineSettings, initialStage: "extracting" | "selecting" | "segmenting") {
+    if (!activeProject) return;
+    const runtime = await invoke<Sam2Preflight>("sam2_preflight");
+    setSam2Runtime(runtime);
+    if (!runtime.ready) throw new Error(runtime.error ?? "SAM 2 runtime is not ready");
+    const manifest = await invoke<PipelineManifest>("create_pipeline_manifest", {
+      workspacePath: activeProject.workspacePath, settings, initialStage,
+    });
+    const snapshot: PipelineRun = { pipelineId: manifest.pipelineId, stage: initialStage, ...settings };
+    setPipelineManifest(manifest); setPipelineRun(snapshot); setPreviews([]); setRgbaPreviews([]);
+    if (initialStage === "extracting") {
+      const accepted = await invoke<JobAccepted>("start_frame_extraction_job", { sourcePath: settings.sourcePath, outputPath: settings.extractionOutput });
+      setActiveRequest({ operation: "media.extract_frames", sourcePath: settings.sourcePath, outputPath: settings.extractionOutput });
+      setJob(queuedJob(accepted));
+    } else if (initialStage === "selecting") {
+      const accepted = await invoke<JobAccepted>("start_motion_selection_job", { framesPath: settings.extractionOutput, outputPath: settings.motionOutput, maxFrames: settings.maxFrames, promptPath: settings.promptPath });
+      setActiveRequest({ operation: "media.select_motion_frames", framesPath: settings.extractionOutput, outputPath: settings.motionOutput, promptPath: settings.promptPath, maxFrames: settings.maxFrames });
+      setJob(queuedJob(accepted));
+    } else {
+      const selectedPrompt = `${settings.motionOutput}\\sam2-prompts.selected.json`;
+      const accepted = await invoke<JobAccepted>("start_sam2_rgba_job", { framesPath: settings.motionOutput, outputPath: settings.segmentationOutput, promptPath: selectedPrompt, featherRadius: settings.featherRadius, defringe: settings.defringe });
+      setFramesPath(settings.motionOutput); setPromptPath(selectedPrompt);
+      setActiveRequest({ operation: "segmentation.sam2_rgba", framesPath: settings.motionOutput, outputPath: settings.segmentationOutput, promptPath: selectedPrompt, featherRadius: settings.featherRadius, defringe: settings.defringe });
+      setJob(queuedJob(accepted));
+    }
+  }
+
+  async function resumePipeline(restart = false) {
+    if (!pipelineManifest || !activeProject) return;
+    setBusy(true); setError("");
+    try {
+      const previous = pipelineManifest.settings;
+      const resumeStage = restart ? "extracting" : (pipelineManifest.lastActiveStage || pipelineManifest.stage);
+      const initialStage = resumeStage.includes("selection") || resumeStage === "selecting" ? "selecting" : resumeStage.includes("segmentation") || resumeStage === "segmenting" ? "segmenting" : "extracting";
+      const settings: PipelineSettings = {
+        ...previous,
+        extractionOutput: initialStage === "extracting" ? retryOutputPath(previous.extractionOutput) : previous.extractionOutput,
+        motionOutput: initialStage !== "segmenting" ? retryOutputPath(previous.motionOutput) : previous.motionOutput,
+        segmentationOutput: retryOutputPath(previous.segmentationOutput),
+      };
+      setSourcePath(settings.sourcePath); setExtractionOutput(settings.extractionOutput); setMotionOutput(settings.motionOutput); setSegmentationOutput(settings.segmentationOutput); setMaxMotionFrames(settings.maxFrames); setFeatherRadius(settings.featherRadius); setDefringe(settings.defringe);
+      await launchPipelineStage(settings, initialStage);
+    } catch (cause) { setError(String(cause)); }
+    finally { setBusy(false); }
+  }
+
+  async function dismissPipeline() {
+    if (!pipelineManifest || !activeProject) return;
+    setBusy(true); setError("");
+    try {
+      setPipelineManifest(await invoke<PipelineManifest>("update_pipeline_manifest", { workspacePath: activeProject.workspacePath, pipelineId: pipelineManifest.pipelineId, status: "dismissed", stage: "dismissed", activeJobId: null, error: null }));
+      setPipelineRun(null);
+    } catch (cause) { setError(String(cause)); }
+    finally { setBusy(false); }
   }
 
   async function buildSpriteSheetPlan() {
@@ -749,7 +807,7 @@ function App() {
           <button type="button" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !workspaceStatus?.extractionReady}>Run complete pipeline</button>
           {pipelineRun && <span className={`job-state ${pipelineRun.stage === "failed" ? "state-failed" : pipelineRun.stage === "completed" ? "state-completed" : "state-running"}`}>{pipelineRun.stage.replace(/-/g, " ")}</span>}
         </div>
-        {pipelineManifest && <div className="runtime-card runtime-ready"><strong>Durable pipeline checkpoint</strong><span>ID: {pipelineManifest.pipelineId}</span><span>Stage: {pipelineManifest.stage} ? Status: {pipelineManifest.status}</span><span title={pipelineManifest.manifestPath}>{pipelineManifest.manifestPath}</span></div>}
+        {pipelineManifest && <div className={`runtime-card ${["failed", "running"].includes(pipelineManifest.status) && !pipelineRun ? "runtime-blocked" : "runtime-ready"}`}><strong>Durable pipeline checkpoint</strong><span>ID: {pipelineManifest.pipelineId}</span><span>Stage: {pipelineManifest.stage} ? Status: {pipelineManifest.status}</span><span title={pipelineManifest.manifestPath}>{pipelineManifest.manifestPath}</span>{["failed", "running"].includes(pipelineManifest.status) && !pipelineRun && <div className="actions"><button type="button" onClick={() => void resumePipeline(false)} disabled={busy || Boolean(job && !terminal)}>Resume safely</button><button type="button" className="secondary" onClick={() => void resumePipeline(true)} disabled={busy || Boolean(job && !terminal)}>Restart with new outputs</button><button type="button" className="secondary" onClick={() => void dismissPipeline()} disabled={busy}>Dismiss</button></div>}</div>}
       </section>
 
       <section className="workflow-grid">
