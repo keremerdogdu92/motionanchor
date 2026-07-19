@@ -80,6 +80,7 @@ type SpriteSheetResult = { packagePath: string; sheetPath: string; manifestPath:
 
 type PipelineSettings = { sourcePath: string; extractionOutput: string; motionOutput: string; segmentationOutput: string; promptPath: string; maxFrames: number; featherRadius: number; defringe: boolean };
 type PipelineManifest = { schemaVersion: number; pipelineId: string; status: string; stage: string; lastActiveStage: string; activeJobId: string | null; error: string | null; createdAt: string; updatedAt: string; settings: PipelineSettings; manifestPath: string };
+type PipelineCachePlan = { extractionCached: boolean; motionCached: boolean; segmentationCached: boolean; nextStage: "extracting" | "selecting" | "segmenting" | "completed"; reason: string; cachedSettings: PipelineSettings | null };
 
 type PipelineRun = {
   pipelineId: string;
@@ -193,6 +194,7 @@ function App() {
   const [sam2BootstrapScript, setSam2BootstrapScript] = useState<string | null>(null);
   const [pipelineRun, setPipelineRun] = useState<PipelineRun | null>(null);
   const [pipelineManifest, setPipelineManifest] = useState<PipelineManifest | null>(null);
+  const [pipelineCachePlan, setPipelineCachePlan] = useState<PipelineCachePlan | null>(null);
   const [sheetColumns, setSheetColumns] = useState(8);
   const [sheetPadding, setSheetPadding] = useState(2);
   const [sheetPlan, setSheetPlan] = useState<SpriteSheetPlan | null>(null);
@@ -373,6 +375,7 @@ function App() {
     setSam2BootstrapScript(null);
     setActiveRequest(null);
     setJob(null);
+    setPipelineCachePlan(null);
     setError("");
 
     if (!project) {
@@ -430,22 +433,31 @@ function App() {
 
   async function startFullPipeline() {
     if (!activeProject) { setError("Select an active project before starting the pipeline."); return; }
-    if (!workspaceStatus?.extractionReady) { setError("The full pipeline requires a prepared workspace, source video, and empty output directories."); return; }
+    if (!workspaceStatus?.ready || !workspaceStatus.sourceExists || !workspaceStatus.promptExists) { setError("The full pipeline requires a prepared workspace, source video, and prompt file."); return; }
     setBusy(true); setError("");
     try {
-      const runtime = await invoke<Sam2Preflight>("sam2_preflight");
-      setSam2Runtime(runtime);
-      if (!runtime.ready) throw new Error(runtime.error ?? "SAM 2 runtime is not ready");
-      const manifest = await invoke<PipelineManifest>("create_pipeline_manifest", {
-        workspacePath: activeProject.workspacePath,
-        settings: { sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe },
-        initialStage: null,
-      });
-      const snapshot: PipelineRun = { pipelineId: manifest.pipelineId, stage: "extracting", sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe };
-      setPipelineManifest(manifest);
-      const accepted = await invoke<JobAccepted>("start_frame_extraction_job", { sourcePath, outputPath: extractionOutput });
-      const request: JobRequest = { operation: "media.extract_frames", sourcePath, outputPath: extractionOutput };
-      setPreviews([]); setRgbaPreviews([]); setPipelineRun(snapshot); setActiveRequest(request); setJob(queuedJob(accepted));
+      const requested: PipelineSettings = { sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe };
+      const plan = await invoke<PipelineCachePlan>("build_pipeline_cache_plan", { workspacePath: activeProject.workspacePath, settings: requested });
+      setPipelineCachePlan(plan);
+      if (plan.nextStage === "completed" && plan.cachedSettings) {
+        const cached = plan.cachedSettings;
+        setExtractionOutput(cached.extractionOutput); setMotionOutput(cached.motionOutput); setSegmentationOutput(cached.segmentationOutput);
+        setFramesPath(cached.motionOutput); setPromptPath(`${cached.motionOutput}\\sam2-prompts.selected.json`);
+        setPipelineManifest(await invoke<PipelineManifest | null>("read_pipeline_manifest", { workspacePath: activeProject.workspacePath }));
+        setRgbaPreviews(await invoke<FramePreview[]>("get_rgba_previews", { outputPath: cached.segmentationOutput, count: 8 }));
+        return;
+      }
+      const cached = plan.cachedSettings;
+      const hasPrior = Boolean(cached);
+      const settings: PipelineSettings = {
+        ...requested,
+        extractionOutput: plan.extractionCached && cached ? cached.extractionOutput : hasPrior ? retryOutputPath(requested.extractionOutput) : requested.extractionOutput,
+        motionOutput: plan.motionCached && cached ? cached.motionOutput : hasPrior ? retryOutputPath(requested.motionOutput) : requested.motionOutput,
+        segmentationOutput: hasPrior ? retryOutputPath(requested.segmentationOutput) : requested.segmentationOutput,
+      };
+      setExtractionOutput(settings.extractionOutput); setMotionOutput(settings.motionOutput); setSegmentationOutput(settings.segmentationOutput);
+      const nextStage = plan.nextStage === "selecting" ? "selecting" : plan.nextStage === "segmenting" ? "segmenting" : "extracting";
+      await launchPipelineStage(settings, nextStage);
     } catch (cause) { setError(String(cause)); setPipelineRun(null); } finally { setBusy(false); }
   }
 
@@ -804,10 +816,11 @@ function App() {
       <section className="panel">
         <div className="panel-heading"><div><h2>Run complete pipeline</h2><span className="muted">Extract â†’ motion selection â†’ SAM 2 RGBA</span></div><span className="step-badge">One click</span></div>
         <div className="actions">
-          <button type="button" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !workspaceStatus?.extractionReady}>Run complete pipeline</button>
+          <button type="button" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !workspaceStatus?.ready || !workspaceStatus.sourceExists || !workspaceStatus.promptExists}>Run complete pipeline</button>
           {pipelineRun && <span className={`job-state ${pipelineRun.stage === "failed" ? "state-failed" : pipelineRun.stage === "completed" ? "state-completed" : "state-running"}`}>{pipelineRun.stage.replace(/-/g, " ")}</span>}
         </div>
         {pipelineManifest && <div className={`runtime-card ${["failed", "running"].includes(pipelineManifest.status) && !pipelineRun ? "runtime-blocked" : "runtime-ready"}`}><strong>Durable pipeline checkpoint</strong><span>ID: {pipelineManifest.pipelineId}</span><span>Stage: {pipelineManifest.stage} ? Status: {pipelineManifest.status}</span><span title={pipelineManifest.manifestPath}>{pipelineManifest.manifestPath}</span>{["failed", "running"].includes(pipelineManifest.status) && !pipelineRun && <div className="actions"><button type="button" onClick={() => void resumePipeline(false)} disabled={busy || Boolean(job && !terminal)}>Resume safely</button><button type="button" className="secondary" onClick={() => void resumePipeline(true)} disabled={busy || Boolean(job && !terminal)}>Restart with new outputs</button><button type="button" className="secondary" onClick={() => void dismissPipeline()} disabled={busy}>Dismiss</button></div>}</div>}
+        {pipelineCachePlan && <div className={`runtime-card ${pipelineCachePlan.segmentationCached ? "runtime-ready" : ""}`}><strong>Artifact cache plan</strong><span>Extraction: {pipelineCachePlan.extractionCached ? "cached" : "rebuild"} ? Motion: {pipelineCachePlan.motionCached ? "cached" : "rebuild"} ? Segmentation: {pipelineCachePlan.segmentationCached ? "cached" : "rebuild"}</span><span>Next stage: {pipelineCachePlan.nextStage}</span><span>{pipelineCachePlan.reason}</span></div>}
       </section>
 
       <section className="workflow-grid">
