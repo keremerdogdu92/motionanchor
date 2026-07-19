@@ -82,6 +82,8 @@ type PipelineSettings = { sourcePath: string; extractionOutput: string; motionOu
 type ArtifactNode = { id: string; kind: string; path: string; dependsOn: string[] };
 type PipelineManifest = { schemaVersion: number; pipelineId: string; status: string; stage: string; lastActiveStage: string; activeJobId: string | null; error: string | null; createdAt: string; updatedAt: string; settings: PipelineSettings; fingerprints: { sourceSha256: string; promptSha256: string }; artifacts: ArtifactNode[]; manifestPath: string };
 type PipelineCachePlan = { extractionCached: boolean; motionCached: boolean; segmentationCached: boolean; nextStage: "extracting" | "selecting" | "segmenting" | "completed"; reason: string; cachedSettings: PipelineSettings | null };
+type PipelineStageState = "pending" | "cached" | "queued" | "running" | "completed" | "failed";
+type PipelineStageProgress = { id: "extraction" | "motion" | "segmentation"; label: string; state: PipelineStageState; progress: number };
 
 type PipelineRun = {
   pipelineId: string;
@@ -212,6 +214,25 @@ function App() {
     () => Boolean(job && ["completed", "failed", "cancelled"].includes(job.status)),
     [job],
   );
+
+  const pipelineProgress = useMemo(() => {
+    const stages: PipelineStageProgress[] = [
+      { id: "extraction", label: "Frame extraction", state: pipelineCachePlan?.extractionCached ? "cached" : "pending", progress: pipelineCachePlan?.extractionCached ? 100 : 0 },
+      { id: "motion", label: "Motion selection", state: pipelineCachePlan?.motionCached ? "cached" : "pending", progress: pipelineCachePlan?.motionCached ? 100 : 0 },
+      { id: "segmentation", label: "SAM 2 RGBA", state: pipelineCachePlan?.segmentationCached ? "cached" : "pending", progress: pipelineCachePlan?.segmentationCached ? 100 : 0 },
+    ];
+    const operationStage = job?.operation === "media.extract_frames" ? "extraction" : job?.operation === "media.select_motion_frames" ? "motion" : job?.operation === "segmentation.sam2_rgba" ? "segmentation" : null;
+    if (pipelineRun?.stage === "completed") stages.forEach((stage) => { stage.state = stage.state === "cached" ? "cached" : "completed"; stage.progress = 100; });
+    if (operationStage && job) {
+      const index = stages.findIndex((stage) => stage.id === operationStage);
+      for (let position = 0; position < index; position += 1) if (stages[position].state === "pending") { stages[position].state = "completed"; stages[position].progress = 100; }
+      const active = stages[index];
+      active.state = job.status === "failed" || job.status === "cancelled" ? "failed" : job.status === "completed" ? "completed" : job.status === "queued" ? "queued" : "running";
+      active.progress = job.status === "completed" ? 100 : Math.max(0, Math.min(100, Math.round(job.progress)));
+    }
+    const overall = Math.round(stages.reduce((sum, stage) => sum + stage.progress, 0) / stages.length);
+    return { stages, overall };
+  }, [job, pipelineRun?.stage, pipelineCachePlan]);
 
   useEffect(() => {
     window.localStorage.setItem(JOB_HISTORY_KEY, JSON.stringify(jobHistory.slice(0, JOB_HISTORY_LIMIT)));
@@ -823,6 +844,11 @@ function App() {
         </div>
         {pipelineManifest && <div className={`runtime-card ${["failed", "running"].includes(pipelineManifest.status) && !pipelineRun ? "runtime-blocked" : "runtime-ready"}`}><strong>Durable pipeline checkpoint</strong><span>ID: {pipelineManifest.pipelineId}</span><span>Stage: {pipelineManifest.stage} ? Status: {pipelineManifest.status}</span><span title={pipelineManifest.manifestPath}>{pipelineManifest.manifestPath}</span>{["failed", "running"].includes(pipelineManifest.status) && !pipelineRun && <div className="actions"><button type="button" onClick={() => void resumePipeline(false)} disabled={busy || Boolean(job && !terminal)}>Resume safely</button><button type="button" className="secondary" onClick={() => void resumePipeline(true)} disabled={busy || Boolean(job && !terminal)}>Restart with new outputs</button><button type="button" className="secondary" onClick={() => void dismissPipeline()} disabled={busy}>Dismiss</button></div>}</div>}
         {pipelineCachePlan && <div className={`runtime-card ${pipelineCachePlan.segmentationCached ? "runtime-ready" : ""}`}><strong>Artifact cache plan</strong><span>Extraction: {pipelineCachePlan.extractionCached ? "cached" : "rebuild"} ? Motion: {pipelineCachePlan.motionCached ? "cached" : "rebuild"} ? Segmentation: {pipelineCachePlan.segmentationCached ? "cached" : "rebuild"}</span><span>Next stage: {pipelineCachePlan.nextStage}</span><span>{pipelineCachePlan.reason}</span></div>}
+        <div className="pipeline-progress-card">
+          <div className="pipeline-progress-heading"><strong>Pipeline progress</strong><span>{pipelineProgress.overall}%</span></div>
+          <progress value={pipelineProgress.overall} max={100} />
+          <div className="pipeline-stage-list">{pipelineProgress.stages.map((stage) => <div className={`pipeline-stage stage-${stage.state}`} key={stage.id}><span>{stage.label}</span><strong>{stage.state}</strong><small>{stage.progress}%</small></div>)}</div>
+        </div>
 
         {(pipelineManifest?.artifacts ?? []).length > 0 && <div className="runtime-card runtime-ready"><strong>Artifact graph</strong>{(pipelineManifest?.artifacts ?? []).map((artifact) => <span key={artifact.id}>{artifact.id}: {artifact.kind}{artifact.dependsOn.length ? ` ? ${artifact.dependsOn.join(", ")}` : ""}</span>)}</div>}
         {pipelineHistory.length > 0 && <div className="runtime-card runtime-ready"><strong>Pipeline run history</strong>{pipelineHistory.map((run) => <span key={run.pipelineId}>{run.pipelineId.slice(0, 8)} ? {run.status} ? {run.stage} ? {run.updatedAt}</span>)}</div>}
