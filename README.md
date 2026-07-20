@@ -2,7 +2,7 @@
 
 **Tagline:** Consistent Characters. Production-Ready Motion.
 
-**Status:** Core production pipeline and real Cat Trap acceptance gate are complete; packaged Windows and clean Unity acceptance remain.
+**Status:** Core production pipeline, real Cat Trap acceptance, and packaged Windows acceptance are complete; clean Unity acceptance remains.
 
 ---
 
@@ -51,6 +51,9 @@ python -m unittest discover -s tests -v
 
 # Real Cat Trap release acceptance (run from repository root)
 npm run acceptance:cat-trap
+
+# Packaged Windows release acceptance after npm run tauri:build
+npm run acceptance:windows-package
 ```
 
 The first `npm run tauri:dev` or `cargo check` compiles ~400 Rust crates and takes approximately 90 seconds. Subsequent builds are cached.

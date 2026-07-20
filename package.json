@@ -11,7 +11,8 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "typecheck": "tsc --noEmit",
-    "acceptance:cat-trap": "cd worker && .venv\\Scripts\\python.exe scripts\\cat_trap_acceptance.py"
+    "acceptance:cat-trap": "cd worker && .venv\\Scripts\\python.exe scripts\\cat_trap_acceptance.py",
+    "acceptance:windows-package": "powershell -ExecutionPolicy Bypass -File scripts\\windows-package-acceptance.ps1"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
