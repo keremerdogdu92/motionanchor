@@ -266,3 +266,24 @@ button.browse:hover {
 .stage-running, .stage-queued { border-color: #735f2d; }
 .stage-failed { border-color: #7a3948; }
 @media (max-width: 760px) { .pipeline-stage-list { grid-template-columns: 1fr; } }
+
+.product-empty-state {
+  margin-top: 18px;
+  padding: 42px;
+  text-align: center;
+}
+.product-empty-state h2 { margin: 14px 0 8px; font-size: 1.6rem; }
+.product-empty-state p { max-width: 650px; margin: 8px auto; color: #c8cde0; }
+.primary-workflow { border-color: rgba(116, 130, 255, 0.55); }
+.primary-action { min-width: 180px; padding: 13px 20px; font-size: 1rem; }
+.workspace-checklist { display: grid; gap: 8px; margin: 16px 0; padding: 14px; border: 1px solid #3a4058; border-radius: 12px; background: #0d0f17; }
+.workspace-checklist strong { margin-bottom: 2px; }
+.workspace-checklist span { font-size: 0.86rem; }
+.workspace-checklist small { color: #858ca7; }
+.check-ready { color: #9fe7c2; }
+.check-missing { color: #ffc0ca; }
+.advanced-workflow { margin-top: 18px; }
+.advanced-workflow > summary { display: flex; justify-content: space-between; gap: 16px; padding: 16px 18px; border: 1px solid #282c3d; border-radius: 14px; background: #12141d; cursor: pointer; color: #edf0ff; font-weight: 700; }
+.advanced-workflow > summary small { color: #858ca7; font-weight: 400; }
+.advanced-workflow[open] > summary { margin-bottom: 18px; }
+@media (max-width: 620px) { .advanced-workflow > summary { flex-direction: column; } .product-empty-state { padding: 28px 20px; } }

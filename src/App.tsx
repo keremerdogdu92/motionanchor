@@ -109,13 +109,6 @@ type JobStatus = {
   cancellation_requested: boolean;
 };
 
-const ROOT = "C:\\Users\\kerem\\Documents\\AI-Work\\repos\\motionanchor\\fixtures\\cat-trap";
-const DEFAULT_SOURCE = `${ROOT}\\videos\\dash.mp4`;
-const DEFAULT_FRAMES = `${ROOT}\\dash\\frames`;
-const DEFAULT_EXTRACTION_OUTPUT = `${ROOT}\\ui-extract`;
-const DEFAULT_MOTION_OUTPUT = `${ROOT}\\ui-motion-selected`;
-const DEFAULT_SEGMENTATION_OUTPUT = `${ROOT}\\ui-sam2-output`;
-const DEFAULT_PROMPTS = `${ROOT}\\dash\\sam2-prompts.json`;
 const JOB_HISTORY_KEY = "motionanchor.job-history.v1";
 const JOB_HISTORY_LIMIT = 20;
 const SAM2_SETTINGS_KEY = "motionanchor.sam2-settings.v1";
@@ -174,13 +167,13 @@ function App() {
   const [workspaceStatus, setWorkspaceStatus] = useState<WorkspaceReadiness | null>(null);
   const [exportAssetName, setExportAssetName] = useState("");
   const [initialActiveProjectId] = useState(loadActiveProjectId);
-  const [sourcePath, setSourcePath] = useState(DEFAULT_SOURCE);
-  const [extractionOutput, setExtractionOutput] = useState(DEFAULT_EXTRACTION_OUTPUT);
-  const [framesPath, setFramesPath] = useState(DEFAULT_FRAMES);
-  const [motionOutput, setMotionOutput] = useState(DEFAULT_MOTION_OUTPUT);
+  const [sourcePath, setSourcePath] = useState("");
+  const [extractionOutput, setExtractionOutput] = useState("");
+  const [framesPath, setFramesPath] = useState("");
+  const [motionOutput, setMotionOutput] = useState("");
   const [maxMotionFrames, setMaxMotionFrames] = useState(48);
-  const [segmentationOutput, setSegmentationOutput] = useState(DEFAULT_SEGMENTATION_OUTPUT);
-  const [promptPath, setPromptPath] = useState(DEFAULT_PROMPTS);
+  const [segmentationOutput, setSegmentationOutput] = useState("");
+  const [promptPath, setPromptPath] = useState("");
   const [initialSam2Settings] = useState(loadSam2Settings);
   const [featherRadius, setFeatherRadius] = useState(initialSam2Settings.featherRadius);
   const [defringe, setDefringe] = useState(initialSam2Settings.defringe);
@@ -403,12 +396,12 @@ function App() {
 
     if (!project) {
       window.localStorage.removeItem(ACTIVE_PROJECT_KEY);
-      setSourcePath(DEFAULT_SOURCE);
-      setExtractionOutput(DEFAULT_EXTRACTION_OUTPUT);
-      setFramesPath(DEFAULT_FRAMES);
-      setMotionOutput(DEFAULT_MOTION_OUTPUT);
-      setSegmentationOutput(DEFAULT_SEGMENTATION_OUTPUT);
-      setPromptPath(DEFAULT_PROMPTS);
+      setSourcePath("");
+      setExtractionOutput("");
+      setFramesPath("");
+      setMotionOutput("");
+      setSegmentationOutput("");
+      setPromptPath("");
       return;
     }
 
@@ -812,6 +805,12 @@ function App() {
   }
 
   const jobTitle = job?.operation === "segmentation.sam2_bootstrap" ? "SAM 2 setup job" : job?.operation === "segmentation.sam2_rgba" ? "SAM 2 RGBA job" : job?.operation === "media.select_motion_frames" ? "Motion selection job" : "Extraction job";
+  const workspaceChecklist = activeProject ? [
+    { label: "Workspace folders", ready: Boolean(workspaceStatus?.ready) },
+    { label: "Source video", ready: Boolean(workspaceStatus?.sourceExists) },
+    { label: "SAM 2 prompt", ready: Boolean(workspaceStatus?.promptExists) },
+  ] : [];
+  const pipelineReady = workspaceChecklist.length > 0 && workspaceChecklist.every((item) => item.ready);
 
   return (
     <main className="app-shell">
@@ -821,7 +820,7 @@ function App() {
           <h1>MotionAnchor</h1>
           <p>Extract deterministic frames, propagate SAM 2 masks, and publish defringed RGBA sequences.</p>
         </div>
-        <span className="status-pill">Keremev worker</span>
+        <span className="status-pill">Local processing</span>
       </header>
 
       <ProjectDashboard
@@ -834,16 +833,32 @@ function App() {
         onExportAssetNameChange={setExportAssetName}
       />
 
-      {activeProject && <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>}
+      {!activeProject ? (
+        <section className="panel product-empty-state">
+          <span className="step-badge">Start here</span>
+          <h2>Create or select a project</h2>
+          <p>MotionAnchor keeps source media, prompts, generated frames, RGBA output, and exports inside a dedicated project workspace.</p>
+          <p className="muted">Use the project panel above. The production workflow becomes available after a project is selected.</p>
+        </section>
+      ) : (
+        <>
+      <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>
 
-      <section className="panel">
-        <div className="panel-heading"><div><h2>Run complete pipeline</h2><span className="muted">Extract â†’ motion selection â†’ SAM 2 RGBA</span></div><span className="step-badge">One click</span></div>
+      <section className="panel primary-workflow">
+        <div className="panel-heading"><div><p className="eyebrow">Production workflow</p><h2>Create animation</h2><span className="muted">Source video ? motion selection ? transparent RGBA frames</span></div><span className="step-badge">One click</span></div>
         <div className="actions">
-          <button type="button" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !workspaceStatus?.ready || !workspaceStatus.sourceExists || !workspaceStatus.promptExists}>Run complete pipeline</button>
+          <button type="button" className="primary-action" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !pipelineReady}>Create animation</button>
           {pipelineRun && <span className={`job-state ${pipelineRun.stage === "failed" ? "state-failed" : pipelineRun.stage === "completed" ? "state-completed" : "state-running"}`}>{pipelineRun.stage.replace(/-/g, " ")}</span>}
         </div>
         {pipelineManifest && <div className={`runtime-card ${["failed", "running"].includes(pipelineManifest.status) && !pipelineRun ? "runtime-blocked" : "runtime-ready"}`}><strong>Durable pipeline checkpoint</strong><span>ID: {pipelineManifest.pipelineId}</span><span>Stage: {pipelineManifest.stage} ? Status: {pipelineManifest.status}</span><span title={pipelineManifest.manifestPath}>{pipelineManifest.manifestPath}</span>{["failed", "running"].includes(pipelineManifest.status) && !pipelineRun && <div className="actions"><button type="button" onClick={() => void resumePipeline(false)} disabled={busy || Boolean(job && !terminal)}>Resume safely</button><button type="button" className="secondary" onClick={() => void resumePipeline(true)} disabled={busy || Boolean(job && !terminal)}>Restart with new outputs</button><button type="button" className="secondary" onClick={() => void dismissPipeline()} disabled={busy}>Dismiss</button></div>}</div>}
         {pipelineCachePlan && <div className={`runtime-card ${pipelineCachePlan.segmentationCached ? "runtime-ready" : ""}`}><strong>Artifact cache plan</strong><span>Extraction: {pipelineCachePlan.extractionCached ? "cached" : "rebuild"} ? Motion: {pipelineCachePlan.motionCached ? "cached" : "rebuild"} ? Segmentation: {pipelineCachePlan.segmentationCached ? "cached" : "rebuild"}</span><span>Next stage: {pipelineCachePlan.nextStage}</span><span>{pipelineCachePlan.reason}</span></div>}
+        {!pipelineReady && (
+          <div className="workspace-checklist">
+            <strong>Project setup</strong>
+            {workspaceChecklist.map((item) => <span className={item.ready ? "check-ready" : "check-missing"} key={item.label}>{item.ready ? "Ready" : "Required"}: {item.label}</span>)}
+            <small>Prepare the missing project files from the project panel before creating the animation.</small>
+          </div>
+        )}
         <div className="pipeline-progress-card">
           <div className="pipeline-progress-heading"><strong>Pipeline progress</strong><span>{pipelineProgress.overall}%</span></div>
           <progress value={pipelineProgress.overall} max={100} />
@@ -854,6 +869,8 @@ function App() {
         {pipelineHistory.length > 0 && <div className="runtime-card runtime-ready"><strong>Pipeline run history</strong>{pipelineHistory.map((run) => <span key={run.pipelineId}>{run.pipelineId.slice(0, 8)} ? {run.status} ? {run.stage} ? {run.updatedAt}</span>)}</div>}
       </section>
 
+      <details className="advanced-workflow">
+        <summary><span>Advanced workflow</span><small>Run or inspect individual pipeline stages</small></summary>
       <section className="workflow-grid">
         <article className="panel">
           <div className="panel-heading">
@@ -986,6 +1003,7 @@ function App() {
           </form>
         </article>
       </section>
+      </details>
 
       {rgbaPreviews.length > 0 && activeProject && (
         <section className="panel">
@@ -1084,6 +1102,8 @@ function App() {
             ))}
           </div>
         </section>
+      )}
+        </>
       )}
     </main>
   );
