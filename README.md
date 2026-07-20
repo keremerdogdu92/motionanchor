@@ -162,7 +162,7 @@ The following are **not** included in Spike 0.1 and will be addressed in later P
 - Adopt mature infrastructure behind adapters; build MotionAnchor-specific intelligence.
 - Code and model licenses are separate release gates.
 - 2D first, architecture extensible to 3D.
-- Unity 2022.3 LTS first, engine-neutral export contract.
+- Unity 6 / 6000 production adapter first; Unity 2022.3 LTS remains a compatibility target.
 - Current use is single-user; architecture prepared for commercialization.
 
 ## Reading Order

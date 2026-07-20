@@ -5,7 +5,7 @@
 **Status:** Approved baseline updated for open-source integration and OpenCode implementation handoff  
 **Date:** 2026-07-11  
 **Initial platform:** Windows desktop  
-**Initial engine integration:** Unity 2022.3 LTS  
+**Primary production engine integration:** Unity 6 / 6000
 **Product name:** MotionAnchor  
 **Tagline:** Consistent Characters. Production-Ready Motion.  
 **Trademark status:** Working commercial name pending formal clearance before public launch
@@ -196,7 +196,7 @@ May need:
 | Final approval | Human approval required by default |
 | Initial production domain | 2D video-to-animation pipeline |
 | Future domain | Extendable to 3D rig/motion workflows |
-| Initial exporter | Unity 2022.3 LTS |
+| Primary production exporter | Unity 6 / 6000; Unity 2022.3 LTS compatibility profile |
 | Export architecture | Engine-independent interface |
 | Product name | MotionAnchor; formal clearance pending |
 | Product tagline | Consistent Characters. Production-Ready Motion. |
@@ -555,7 +555,7 @@ It must never alter approved image content except explicit resize or color-space
 
 ### 10.15 Unity Exporter
 
-The initial exporter must target Unity 2022.3 LTS and use an engine-adapter interface.
+The primary production exporter must target Unity 6 / 6000 through an engine-adapter interface. Unity 2022.3 LTS remains a compatibility profile and must not define the canonical manifest contract.
 
 The application must produce:
 
@@ -1060,9 +1060,9 @@ MotionAnchor is an engine-neutral AI-assisted 2D animation production pipeline, 
 
 Official adapter priority:
 
-1. **Godot 4** — strategic open-source target and second official production adapter.
-2. **Unity 6** — first production adapter for current Cat Trap continuity and broad commercial reach.
-3. **Unity 2022.3 LTS** — compatibility target where a legally accessible editor version is available.
+1. **Unity 6 / 6000** - first production adapter for Cat Trap continuity and broad commercial reach.
+2. **Godot 4** - second official production adapter and strategic open-source target.
+3. **Unity 2022.3 LTS** - compatibility target where a legally accessible editor version is available.
 4. **Unreal Paper2D and GameMaker** — later adapters evaluated against demand and automation capability.
 
 The product must always support engine-neutral outputs such as individual PNG frames, sprite sheets, contact sheets, and the Animation Manifest v2. No engine-specific file format may become the authoritative project representation.

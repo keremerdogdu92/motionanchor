@@ -180,6 +180,17 @@ mod tests {
     }
 
     #[test]
+    fn unity_6_profile_detects_matching_project() {
+        let directory = tempfile::tempdir().expect("temporary directory");
+        std::fs::create_dir(directory.path().join("Assets")).expect("assets");
+        std::fs::create_dir(directory.path().join("ProjectSettings")).expect("settings");
+        std::fs::write(directory.path().join("ProjectSettings/ProjectVersion.txt"), "m_EditorVersion: 6000.0.45f1\n").expect("version");
+        let status = engine_compatibility(directory.path().to_str().unwrap(), "unity-6").expect("compatibility");
+        assert!(status.compatible);
+        assert_eq!(status.detected_version.as_deref(), Some("6000.0.45f1"));
+    }
+
+    #[test]
     fn unity_2022_profile_detects_matching_project() {
         let directory = tempfile::tempdir().expect("temporary directory");
         std::fs::create_dir(directory.path().join("Assets")).expect("assets");

@@ -1,5 +1,5 @@
 /// src-tauri/src/unity_export.rs
-/// Builds a non-destructive Unity 2022.3 export plan for completed RGBA sequences.
+/// Builds a non-destructive Unity 6 production export with Unity 2022.3 compatibility.
 
 use serde::{Deserialize, Serialize};
 use crate::animation_manifest::{AnimationManifestV2, ANIMATION_MANIFEST_FILENAME};
@@ -98,9 +98,9 @@ fn build_plan(workspace: &Path, asset_name: &str, engine_profile: &str, frame_ra
     let asset_name = sanitize_segment(asset_name)?;
     let destination = workspace.join("Assets/MotionAnchor").join(&asset_name);
     let rgba_directory = workspace.join("artifacts/rgba");
-    let supported = engine_profile == "unity-2022.3";
+    let supported = matches!(engine_profile, "unity-6" | "unity-2022.3");
     let mut errors = Vec::new();
-    if !supported { errors.push("Unity export is initially supported only for the unity-2022.3 profile".into()); }
+    if !supported { errors.push("Unity export supports the unity-6 production profile and unity-2022.3 compatibility profile".into()); }
     let mut frames = if rgba_directory.is_dir() {
         fs::read_dir(&rgba_directory).map_err(|error| format!("could not inspect RGBA output: {error}"))?
             .filter_map(Result::ok).map(|entry| entry.path())
@@ -366,17 +366,17 @@ mod tests {
         fs::create_dir_all(directory.path().join("artifacts/rgba")).unwrap();
         fs::create_dir(directory.path().join("Assets")).unwrap();
         for name in ["frame_10.png", "frame_2.png", "frame_1.png"] { fs::write(directory.path().join("artifacts/rgba").join(name), png(64, 32)).unwrap(); }
-        let plan = build_plan(directory.path(), "Dash", "unity-2022.3", 30.0, true).unwrap();
+        let plan = build_plan(directory.path(), "Dash", "unity-6", 30.0, true).unwrap();
         assert!(plan.ready); assert_eq!(plan.frame_count, 3); assert!(plan.frames[0].ends_with("frame_1.png")); assert_eq!(plan.width, Some(64));
     }
 
     #[test]
-    fn plan_blocks_unity_six_during_initial_release() {
+    fn plan_supports_unity_six_as_primary_profile() {
         let directory = tempfile::tempdir().unwrap();
         fs::create_dir_all(directory.path().join("artifacts/rgba")).unwrap();
         fs::write(directory.path().join("artifacts/rgba/frame.png"), png(32, 32)).unwrap();
         let plan = build_plan(directory.path(), "Test", "unity-6", 30.0, false).unwrap();
-        assert!(!plan.supported); assert!(!plan.ready);
+        assert!(plan.supported); assert!(plan.ready);
     }
 
     #[test]
@@ -387,7 +387,7 @@ mod tests {
         fs::write(directory.path().join("Assets/MotionAnchor/Test/existing.png"), b"asset").unwrap();
         fs::write(directory.path().join("artifacts/rgba/1.png"), png(32, 32)).unwrap();
         fs::write(directory.path().join("artifacts/rgba/2.png"), png(64, 32)).unwrap();
-        let plan = build_plan(directory.path(), "Test", "unity-2022.3", 24.0, true).unwrap();
+        let plan = build_plan(directory.path(), "Test", "unity-6", 24.0, true).unwrap();
         assert!(!plan.ready); assert!(!plan.conflicts.is_empty()); assert!(plan.errors.iter().any(|error| error.contains("dimensions")));
     }
 
@@ -420,7 +420,7 @@ mod tests {
         fs::create_dir(directory.path().join("Assets")).unwrap();
         fs::write(directory.path().join("artifacts/rgba/frame_1.png"), png(32, 16)).unwrap();
         fs::write(directory.path().join("artifacts/rgba/frame_2.png"), png(32, 16)).unwrap();
-        let result = execute_unity_export(directory.path().to_str().unwrap(), "Dash", "unity-2022.3", 30.0, true).unwrap();
+        let result = execute_unity_export(directory.path().to_str().unwrap(), "Dash", "unity-6", 30.0, true).unwrap();
         assert_eq!(result.copied_frames, 2);
         assert!(Path::new(&result.manifest_path).is_file());
         assert!(Path::new(&result.editor_script_path).is_file());
@@ -441,11 +441,11 @@ mod tests {
         fs::create_dir_all(directory.path().join("artifacts/rgba")).unwrap();
         fs::create_dir(directory.path().join("Assets")).unwrap();
         fs::write(directory.path().join("artifacts/rgba/frame.png"), png(16, 16)).unwrap();
-        let first = execute_unity_export(directory.path().to_str().unwrap(), "Idle", "unity-2022.3", 12.0, true).unwrap();
+        let first = execute_unity_export(directory.path().to_str().unwrap(), "Idle", "unity-6", 12.0, true).unwrap();
         fs::remove_dir_all(directory.path().join("artifacts/rgba")).unwrap();
         fs::create_dir_all(directory.path().join("artifacts/rgba")).unwrap();
         fs::write(directory.path().join("artifacts/rgba/frame.png"), png(16, 16)).unwrap();
-        let second = execute_unity_export(directory.path().to_str().unwrap(), "Dash", "unity-2022.3", 24.0, false).unwrap();
+        let second = execute_unity_export(directory.path().to_str().unwrap(), "Dash", "unity-6", 24.0, false).unwrap();
         assert_eq!(first.editor_script_path, second.editor_script_path);
         assert!(Path::new(&second.destination_path).join("Frames/Dash_frame_0001.png").is_file());
     }

@@ -91,7 +91,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - ~~Add user-controlled SAM 2 bootstrap execution as a cancellable background job with trusted-script validation, bounded logs, failure cleanup, and automatic post-install preflight.~~
 - ~~Add a user-controlled SAM 2 bootstrap plan and non-executing PowerShell script generator with pinned dependencies, official checkpoint provenance, SHA-256 verification, and non-overwrite protection.~~
 - ~~Connect SAM 2 RGBA production to the worker job protocol and Tauri UI. Verified with an isolated Python 3.12 subprocess, bounded stderr draining, cooperative cancellation, atomic artifact publication, final-path rebasing, prompt JSON input, React controls, a fake-child integration fixture, 103 Python tests, 17 Rust tests, TypeScript validation, and a production Vite build; see ADR-031.~~
-- Create a Unity 2022.3 editor script that reads a small manifest and creates a sliced texture/Animation Clip. Engine-neutral manifest schema `1.0`, strict validator, provenance fields, safe relative paths, and repository fixture are complete under ADR-028; Unity Editor importer and real clip creation remain blocked until Unity 2022.3 LTS is installed.
+- Promote the Unity adapter to Unity 6 / 6000 production support and validate manifest-driven sprite/AnimationClip creation. Unity 2022.3 remains a lower-priority compatibility matrix target.
 - Complete code, model-weight, checkpoint, binary, and transitive-dependency license inventory.
 - Build the Open Source & Model Evaluation Matrix.
 - Benchmark FFmpeg, OpenCV, PySceneDetect, ruptures, rembg, SAM 2, Cutie/XMem, TAPIR/TAPNext, RAFT, DINOv2, aisuite/LiteLLM, Instructor, and keyring candidates only where relevant to the first release.
@@ -318,7 +318,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 - PPU/pivot/FPS/loop profiles.
 - Export validation and dry-run report.
 
-### Sprint 11 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Unity 2022.3 Companion Package
+### Sprint 11 ? Unity 6 / 6000 Production Adapter
 
 - Unity package structure and installation guide, with one shared importer under `Assets/MotionAnchor/Editor` and no duplicate Editor class per animation export.
 - Manifest importer window.
@@ -331,7 +331,7 @@ Expanded engine integrations, advanced automation, and initial 3D workflow suppo
 
 ### Exit Criteria
 
-- Exported assets import into a clean Unity 2022.3 project.
+- Exported assets import into a clean Unity 6 / 6000 project; Unity 2022.3 is covered separately as compatibility.
 - The idle clip loops with correct frame order, FPS, pivot, and PPU.
 - Reimport updates owned generated assets without damaging unrelated assets.
 - Existing target files require explicit replace/merge confirmation.

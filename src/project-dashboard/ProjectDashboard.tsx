@@ -82,8 +82,8 @@ type Props = {
 };
 
 const ENGINE_PROFILES = [
-  { value: "unity-2022.3", label: "Unity 2022.3 LTS" },
-  { value: "unity-6", label: "Unity 6" },
+  { value: "unity-6", label: "Unity 6 / 6000 (Production)" },
+  { value: "unity-2022.3", label: "Unity 2022.3 LTS (Compatibility)" },
   { value: "generic", label: "Generic RGBA Pipeline" },
 ];
 
