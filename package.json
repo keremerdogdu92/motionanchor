@@ -10,7 +10,8 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "acceptance:cat-trap": "cd worker && .venv\\Scripts\\python.exe scripts\\cat_trap_acceptance.py"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

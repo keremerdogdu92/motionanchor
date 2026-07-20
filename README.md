@@ -2,7 +2,7 @@
 
 **Tagline:** Consistent Characters. Production-Ready Motion.
 
-**Status:** Phase 0 mask benchmark harness complete; real Cat Trap fixtures are now the next quality gate.
+**Status:** Core production pipeline and real Cat Trap acceptance gate are complete; packaged Windows and clean Unity acceptance remain.
 
 ---
 
@@ -48,6 +48,9 @@ cargo test           # run from src-tauri/
 # Python worker tests
 cd worker
 python -m unittest discover -s tests -v
+
+# Real Cat Trap release acceptance (run from repository root)
+npm run acceptance:cat-trap
 ```
 
 The first `npm run tauri:dev` or `cargo check` compiles ~400 Rust crates and takes approximately 90 seconds. Subsequent builds are cached.

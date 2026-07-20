@@ -54,3 +54,6 @@ fixtures/cat-trap/dash/sam2-smoke/
 worker/.venv-sam2/
 
 worker/models/
+
+# Generated acceptance reports
+artifacts/acceptance/
