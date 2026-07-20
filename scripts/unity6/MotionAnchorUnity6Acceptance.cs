@@ -49,8 +49,8 @@ public static class MotionAnchorUnity6Acceptance
         if (sprites.Any(sprite => sprite == null)) throw new InvalidOperationException("One or more sprites failed to import.");
         if (sprites.Any(sprite => Math.Abs(sprite.pixelsPerUnit - 100f) > 0.001f))
             throw new InvalidOperationException("Sprite PPU does not match the importer contract.");
-        if (sprites.Any(sprite => Vector2.Distance(sprite.pivot, new Vector2(8f, 8f)) > 0.01f))
-            throw new InvalidOperationException("Sprite pivot is not centered.");
+        if (sprites.Any(sprite => Vector2.Distance(sprite.pivot, new Vector2(8f, 0f)) > 0.01f))
+            throw new InvalidOperationException("Sprite pivot does not match the canonical bottom-center pivot.");
 
         var binding = EditorCurveBinding.PPtrCurve(string.Empty, typeof(SpriteRenderer), "m_Sprite");
         var keys = AnimationUtility.GetObjectReferenceCurve(clip, binding);
@@ -71,7 +71,7 @@ public static class MotionAnchorUnity6Acceptance
             frameRate = passed ? 12f : 0f,
             loop = passed,
             pixelsPerUnit = passed ? 100f : 0f,
-            pivot = passed ? "center" : string.Empty,
+            pivot = passed ? "bottom-center" : string.Empty,
             message = message
         };
         Directory.CreateDirectory(Path.GetDirectoryName(ReportPath));

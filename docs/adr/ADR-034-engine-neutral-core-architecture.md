@@ -39,3 +39,16 @@ Exported frame names remain deterministic:
 ```
 
 Adapters must preserve canonical frame order from the manifest rather than inferring order from filesystem enumeration.
+
+
+## Manifest v2 Adapter Contract
+
+Production adapters must consume canonical values rather than substitute engine defaults:
+
+- `schemaVersion` must be `2`.
+- `canvas`, normalized `pivot`, and `pixelsPerUnit` define sprite import geometry.
+- Frame paths and one-based order come from the manifest.
+- Every frame requires a SHA-256 entry in `contentHashes`.
+- Adapters must reject canvas mismatches and unsupported manifest versions.
+
+Unity 6 is the reference adapter for this contract. Godot and later adapters must produce equivalent animation timing and geometry from the same canonical package.

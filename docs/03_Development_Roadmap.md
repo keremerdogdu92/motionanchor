@@ -656,7 +656,7 @@ These ranges assume solo implementation and production-grade testing. They can s
 
 The adapter roadmap is now locked as follows:
 
-1. Finalize Animation Manifest v2 and engine-neutral artifact contracts.
+1. ~~Finalize Animation Manifest v2 and engine-neutral artifact contracts. Completed with required frame SHA-256 coverage, event-range validation, and Unity consumption of canonical schema, canvas, pivot, and PPU.~~
 2. Promote Unity 6 to the first production adapter for Cat Trap validation.
 3. Retain Unity 2022.3 as a compatibility target, not the primary baseline.
 4. Implement Godot 4 as the second official adapter and strategic open-source path.
