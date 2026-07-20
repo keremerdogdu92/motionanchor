@@ -434,6 +434,52 @@ function App() {
     }
   }
 
+  async function prepareGuidedWorkspace() {
+    if (!activeProject) return;
+    setBusy(true);
+    setError("");
+    try {
+      setWorkspaceStatus(await invoke<WorkspaceReadiness>("prepare_project_workspace", { workspacePath: activeProject.workspacePath }));
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function importGuidedVideo() {
+    if (!activeProject) return;
+    const selected = await open({ multiple: false, directory: false, filters: [{ name: "Video", extensions: ["mp4", "mov", "mkv", "webm", "avi"] }] });
+    if (typeof selected !== "string") return;
+    setBusy(true);
+    setError("");
+    try {
+      const status = await invoke<WorkspaceReadiness>("import_project_source_video", { workspacePath: activeProject.workspacePath, sourcePath: selected });
+      setWorkspaceStatus(status);
+      setProbe(null);
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function importGuidedPrompt() {
+    if (!activeProject) return;
+    const selected = await open({ multiple: false, directory: false, filters: [{ name: "Prompt JSON", extensions: ["json"] }] });
+    if (typeof selected !== "string") return;
+    setBusy(true);
+    setError("");
+    try {
+      const status = await invoke<WorkspaceReadiness>("import_project_prompt", { workspacePath: activeProject.workspacePath, sourcePath: selected });
+      setWorkspaceStatus(status);
+    } catch (cause) {
+      setError(String(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function runProbe() {
     setBusy(true);
     setError("");
@@ -844,10 +890,45 @@ function App() {
         <>
       <section className="active-project-banner"><strong>{activeProject.name}</strong><span>{activeProject.workspacePath}</span></section>
 
+      <section className="panel guided-setup">
+        <div className="panel-heading">
+          <div><h2>Project setup</h2><span className="muted">Complete these steps once, then create the animation.</span></div>
+          <span className="step-badge">Guided</span>
+        </div>
+        <div className="guided-step-grid">
+          <article className={workspaceStatus?.ready ? "guided-step guided-step-ready" : "guided-step guided-step-active"}>
+            <span className="guided-step-number">1</span>
+            <div><strong>Prepare workspace</strong><p>Create the controlled project folders for media, prompts, generated frames, and exports.</p></div>
+            <button type="button" className={workspaceStatus?.ready ? "secondary" : ""} onClick={() => void prepareGuidedWorkspace()} disabled={busy || workspaceStatus?.ready}>
+              {workspaceStatus?.ready ? "Prepared" : "Prepare"}
+            </button>
+          </article>
+          <article className={workspaceStatus?.sourceExists ? "guided-step guided-step-ready" : workspaceStatus?.ready ? "guided-step guided-step-active" : "guided-step"}>
+            <span className="guided-step-number">2</span>
+            <div><strong>Add source video</strong><p>Select the clip MotionAnchor should convert into a game-ready animation.</p></div>
+            <button type="button" className={workspaceStatus?.sourceExists ? "secondary" : ""} onClick={() => void importGuidedVideo()} disabled={busy || !workspaceStatus?.ready || workspaceStatus?.sourceExists}>
+              {workspaceStatus?.sourceExists ? "Video added" : "Choose video"}
+            </button>
+          </article>
+          <article className={workspaceStatus?.promptExists ? "guided-step guided-step-ready" : workspaceStatus?.sourceExists ? "guided-step guided-step-active" : "guided-step"}>
+            <span className="guided-step-number">3</span>
+            <div><strong>Add character prompt</strong><p>Select the SAM 2 prompt JSON that identifies the character in the source clip.</p></div>
+            <button type="button" className={workspaceStatus?.promptExists ? "secondary" : ""} onClick={() => void importGuidedPrompt()} disabled={busy || !workspaceStatus?.sourceExists || workspaceStatus?.promptExists}>
+              {workspaceStatus?.promptExists ? "Prompt added" : "Choose prompt"}
+            </button>
+          </article>
+          <article className={pipelineReady ? "guided-step guided-step-active guided-step-final" : "guided-step guided-step-final"}>
+            <span className="guided-step-number">4</span>
+            <div><strong>Create animation</strong><p>Run extraction, motion selection, segmentation, and RGBA generation as one recoverable pipeline.</p></div>
+            <button type="button" className="primary-action" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !pipelineReady}>Create animation</button>
+          </article>
+        </div>
+      </section>
+
       <section className="panel primary-workflow">
         <div className="panel-heading"><div><p className="eyebrow">Production workflow</p><h2>Create animation</h2><span className="muted">Source video ? motion selection ? transparent RGBA frames</span></div><span className="step-badge">One click</span></div>
         <div className="actions">
-          <button type="button" className="primary-action" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !pipelineReady}>Create animation</button>
+          <button type="button" className="secondary" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !pipelineReady}>Run again</button>
           {pipelineRun && <span className={`job-state ${pipelineRun.stage === "failed" ? "state-failed" : pipelineRun.stage === "completed" ? "state-completed" : "state-running"}`}>{pipelineRun.stage.replace(/-/g, " ")}</span>}
         </div>
         {pipelineManifest && <div className={`runtime-card ${["failed", "running"].includes(pipelineManifest.status) && !pipelineRun ? "runtime-blocked" : "runtime-ready"}`}><strong>Durable pipeline checkpoint</strong><span>ID: {pipelineManifest.pipelineId}</span><span>Stage: {pipelineManifest.stage} ? Status: {pipelineManifest.status}</span><span title={pipelineManifest.manifestPath}>{pipelineManifest.manifestPath}</span>{["failed", "running"].includes(pipelineManifest.status) && !pipelineRun && <div className="actions"><button type="button" onClick={() => void resumePipeline(false)} disabled={busy || Boolean(job && !terminal)}>Resume safely</button><button type="button" className="secondary" onClick={() => void resumePipeline(true)} disabled={busy || Boolean(job && !terminal)}>Restart with new outputs</button><button type="button" className="secondary" onClick={() => void dismissPipeline()} disabled={busy}>Dismiss</button></div>}</div>}
@@ -1013,7 +1094,7 @@ function App() {
             <label>Padding<input type="number" min="0" max="64" step="1" value={sheetPadding} onChange={(event) => { setSheetPadding(Number(event.target.value)); setSheetPlan(null); setSheetResult(null); }} /></label>
           </div>
           <div className="actions"><button type="button" className="secondary" onClick={() => void buildSpriteSheetPlan()} disabled={busy || !exportAssetName.trim()}>Build sheet plan</button><button type="button" onClick={() => void executeSpriteSheet()} disabled={busy || !sheetPlan?.ready}>Export sprite sheet</button></div>
-          {sheetPlan && <div className={`runtime-card ${sheetPlan.ready ? "runtime-ready" : "runtime-blocked"}`}><strong>{sheetPlan.ready ? "Sprite sheet ready" : "Sprite sheet blocked"}</strong><span>{sheetPlan.frameCount} frames Â· {sheetPlan.columns}Ã—{sheetPlan.rows} cells</span><span>{sheetPlan.cellWidth}Ã—{sheetPlan.cellHeight} cell Â· {sheetPlan.sheetWidth}Ã—{sheetPlan.sheetHeight} sheet</span><span title={sheetPlan.destinationPath}>{sheetPlan.destinationPath}</span>{sheetPlan.errors.map((message) => <span key={message}>{message}</span>)}</div>}
+          {sheetPlan && <div className={`runtime-card ${sheetPlan.ready ? "runtime-ready" : "runtime-blocked"}`}><strong>{sheetPlan.ready ? "Sprite sheet ready" : "Sprite sheet blocked"}</strong><span>{sheetPlan.frameCount} frames Ã‚Â· {sheetPlan.columns}Ãƒâ€”{sheetPlan.rows} cells</span><span>{sheetPlan.cellWidth}Ãƒâ€”{sheetPlan.cellHeight} cell Ã‚Â· {sheetPlan.sheetWidth}Ãƒâ€”{sheetPlan.sheetHeight} sheet</span><span title={sheetPlan.destinationPath}>{sheetPlan.destinationPath}</span>{sheetPlan.errors.map((message) => <span key={message}>{message}</span>)}</div>}
           {sheetResult && <div className="runtime-card runtime-ready"><strong>Sprite sheet exported</strong><span>{sheetResult.frameCount} frames</span><span title={sheetResult.sheetPath}>{sheetResult.sheetPath}</span><span>SHA-256: {sheetResult.sheetSha256}</span></div>}
         </section>
       )}

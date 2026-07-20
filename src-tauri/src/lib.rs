@@ -263,6 +263,8 @@ pub fn run() {
             project_workspace::workspace_readiness,
             project_workspace::engine_compatibility,
             project_workspace::prepare_project_workspace,
+            project_workspace::import_project_source_video,
+            project_workspace::import_project_prompt,
             get_frame_previews,
             get_motion_previews,
             get_rgba_previews,

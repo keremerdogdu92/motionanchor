@@ -287,3 +287,16 @@ button.browse:hover {
 .advanced-workflow > summary small { color: #858ca7; font-weight: 400; }
 .advanced-workflow[open] > summary { margin-bottom: 18px; }
 @media (max-width: 620px) { .advanced-workflow > summary { flex-direction: column; } .product-empty-state { padding: 28px 20px; } }
+
+
+.guided-setup { margin-top: 18px; }
+.guided-step-grid { display: grid; gap: 10px; margin-top: 16px; }
+.guided-step { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 15px; border: 1px solid #2d3143; border-radius: 14px; background: #0d0f17; opacity: 0.58; }
+.guided-step-active { border-color: rgba(116, 130, 255, 0.72); opacity: 1; box-shadow: 0 0 0 3px rgba(116, 130, 255, 0.08); }
+.guided-step-ready { border-color: #2d6751; opacity: 0.85; }
+.guided-step-final { margin-top: 4px; background: #141728; }
+.guided-step-number { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #252a40; color: #cbd1ff; font-weight: 800; }
+.guided-step-ready .guided-step-number { background: #1f4a3a; color: #9fe7c2; }
+.guided-step p { margin: 4px 0 0; color: #8f96ad; font-size: 0.84rem; }
+.guided-step button { min-width: 132px; }
+@media (max-width: 700px) { .guided-step { grid-template-columns: auto minmax(0, 1fr); } .guided-step button { grid-column: 1 / -1; width: 100%; } }

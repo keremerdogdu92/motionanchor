@@ -2,7 +2,9 @@
 /// Validates and prepares the controlled directory structure for project workspaces.
 
 use serde::Serialize;
+use std::fs;
 use std::path::{Path, PathBuf};
+use uuid::Uuid;
 
 const REQUIRED_DIRECTORIES: [&str; 5] = ["media", "artifacts", "artifacts/frames", "artifacts/rgba", "prompts"];
 
@@ -130,6 +132,59 @@ pub fn prepare_project_workspace(workspace_path: &str) -> Result<WorkspaceReadin
     inspect_workspace(&workspace)
 }
 
+fn import_workspace_file(
+    workspace: &Path,
+    source_path: &str,
+    relative_target: &str,
+    validate: impl Fn(&Path) -> Result<(), String>,
+) -> Result<WorkspaceReadiness, String> {
+    let source = Path::new(source_path)
+        .canonicalize()
+        .map_err(|error| format!("invalid source file path: {error}"))?;
+    if !source.is_file() {
+        return Err("selected source must be a file".into());
+    }
+    validate(&source)?;
+    let target = workspace.join(relative_target);
+    if target.exists() {
+        return Err(format!("workspace file already exists: {}", target.display()));
+    }
+    let parent = target.parent().ok_or_else(|| "workspace target has no parent directory".to_string())?;
+    fs::create_dir_all(parent).map_err(|error| format!("could not create {}: {error}", parent.display()))?;
+    let staging = parent.join(format!(".motionanchor-import-{}", Uuid::new_v4()));
+    let result = (|| {
+        fs::copy(&source, &staging).map_err(|error| format!("could not import {}: {error}", source.display()))?;
+        fs::rename(&staging, &target).map_err(|error| format!("could not publish imported file: {error}"))?;
+        inspect_workspace(workspace)
+    })();
+    if result.is_err() && staging.exists() { let _ = fs::remove_file(staging); }
+    result
+}
+
+#[tauri::command]
+pub fn import_project_source_video(workspace_path: &str, source_path: &str) -> Result<WorkspaceReadiness, String> {
+    let workspace = canonical_workspace(workspace_path)?;
+    import_workspace_file(&workspace, source_path, "media/source.mp4", |source| {
+        let supported = ["mp4", "mov", "mkv", "webm", "avi"];
+        let extension = source.extension().and_then(|value| value.to_str()).unwrap_or_default();
+        if !supported.iter().any(|candidate| extension.eq_ignore_ascii_case(candidate)) {
+            return Err("selected video format is not supported".into());
+        }
+        Ok(())
+    })
+}
+
+#[tauri::command]
+pub fn import_project_prompt(workspace_path: &str, source_path: &str) -> Result<WorkspaceReadiness, String> {
+    let workspace = canonical_workspace(workspace_path)?;
+    import_workspace_file(&workspace, source_path, "prompts/sam2-prompts.json", |source| {
+        let bytes = fs::read(source).map_err(|error| format!("could not read prompt JSON: {error}"))?;
+        serde_json::from_slice::<serde_json::Value>(&bytes)
+            .map_err(|error| format!("invalid prompt JSON: {error}"))?;
+        Ok(())
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -209,6 +264,32 @@ mod tests {
         std::fs::write(directory.path().join("ProjectSettings/ProjectVersion.txt"), "m_EditorVersion: 6000.0.45f1\n").expect("version");
         let status = engine_compatibility(directory.path().to_str().unwrap(), "unity-2022.3").expect("compatibility");
         assert!(!status.compatible);
+    }
+
+    #[test]
+    fn imports_source_video_and_prompt_without_overwriting() {
+        let workspace = tempfile::tempdir().expect("workspace");
+        prepare_project_workspace(workspace.path().to_str().unwrap()).expect("prepared");
+        let inputs = tempfile::tempdir().expect("inputs");
+        let video = inputs.path().join("clip.mov");
+        let prompt = inputs.path().join("prompt.json");
+        fs::write(&video, b"video").expect("video");
+        fs::write(&prompt, br#"{"frames": []}"#).expect("prompt");
+        let after_video = import_project_source_video(workspace.path().to_str().unwrap(), video.to_str().unwrap()).expect("video imported");
+        assert!(after_video.source_exists);
+        let after_prompt = import_project_prompt(workspace.path().to_str().unwrap(), prompt.to_str().unwrap()).expect("prompt imported");
+        assert!(after_prompt.prompt_exists);
+        assert!(import_project_source_video(workspace.path().to_str().unwrap(), video.to_str().unwrap()).unwrap_err().contains("already exists"));
+    }
+
+    #[test]
+    fn rejects_invalid_prompt_json() {
+        let workspace = tempfile::tempdir().expect("workspace");
+        prepare_project_workspace(workspace.path().to_str().unwrap()).expect("prepared");
+        let inputs = tempfile::tempdir().expect("inputs");
+        let prompt = inputs.path().join("prompt.json");
+        fs::write(&prompt, b"not-json").expect("prompt");
+        assert!(import_project_prompt(workspace.path().to_str().unwrap(), prompt.to_str().unwrap()).unwrap_err().contains("invalid prompt JSON"));
     }
 
     #[test]
