@@ -2,7 +2,7 @@
 
 **Tagline:** Consistent Characters. Production-Ready Motion.
 
-**Status:** Core production pipeline, real Cat Trap acceptance, and packaged Windows acceptance are complete; clean Unity acceptance remains.
+**Status:** Core production pipeline, real Cat Trap acceptance, packaged Windows acceptance, and clean Unity 6 import acceptance are complete.
 
 ---
 

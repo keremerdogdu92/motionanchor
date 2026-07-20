@@ -197,14 +197,14 @@ public sealed class MotionAnchorTexturePostprocessor : AssetPostprocessor
 }
 
 [InitializeOnLoad]
-internal static class MotionAnchorAnimationImporter
+public static class MotionAnchorAnimationImporter
 {
     static MotionAnchorAnimationImporter()
     {
-        EditorApplication.delayCall += ImportPendingManifests;
+        EditorApplication.delayCall += ImportAllPending;
     }
 
-    private static void ImportPendingManifests()
+    public static void ImportAllPending()
     {
         foreach (var manifestPath in Directory.GetFiles("Assets/MotionAnchor", "motionanchor-animation-v2.json", SearchOption.AllDirectories))
         {
@@ -226,8 +226,15 @@ internal static class MotionAnchorAnimationImporter
                 throw new InvalidOperationException("Manifest frame rate must be between 1 and 240.");
 
             var clipPath = directory + "/" + manifest.assetName + ".anim";
-            if (AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath) != null || File.Exists(clipPath))
-                throw new InvalidOperationException("Animation clip already exists; replacement is not automatic.");
+            var existingClip = AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath);
+            if (existingClip != null || File.Exists(clipPath))
+            {
+                var importedFrames = existingClip == null
+                    ? manifest.frames.Length
+                    : AnimationUtility.GetObjectReferenceCurve(existingClip, new EditorCurveBinding { type = typeof(SpriteRenderer), path = string.Empty, propertyName = "m_Sprite" })?.Length ?? 0;
+                WriteStatus(statusPath, "completed", manifest.assetName, clipPath, importedFrames, "Animation clip already exists and was preserved.");
+                return;
+            }
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             var sprites = manifest.frames.Select(relative =>
@@ -392,9 +399,9 @@ mod tests {
     }
 
     #[test]
-    fn editor_script_creates_clip_without_automatic_replacement() {
+    fn editor_script_creates_clip_and_preserves_existing_asset() {
         assert!(EDITOR_SCRIPT.contains("AssetDatabase.CreateAsset(clip, clipPath)"));
-        assert!(EDITOR_SCRIPT.contains("replacement is not automatic"));
+        assert!(EDITOR_SCRIPT.contains("Animation clip already exists and was preserved."));
         assert!(EDITOR_SCRIPT.contains("motionanchor-import-status.json"));
         assert!(EDITOR_SCRIPT.contains("motionanchor-animation-v2.json"));
         assert!(EDITOR_SCRIPT.contains("relative.path"));
@@ -435,6 +442,20 @@ mod tests {
         assert_eq!(manifest.frames[1].path, "Frames/Dash_frame_0002.png");
         assert_eq!(manifest.frames[0].index, 1);
     }
+    #[test]
+    fn writes_unity_6_acceptance_fixture_when_requested() {
+        let Ok(root) = std::env::var("MOTIONANCHOR_UNITY_ACCEPTANCE_ROOT") else { return; };
+        let root = PathBuf::from(root);
+        fs::create_dir_all(root.join("Assets")).unwrap();
+        fs::create_dir_all(root.join("artifacts/rgba")).unwrap();
+        for index in 1..=3 {
+            let image = image::RgbaImage::from_pixel(16, 16, image::Rgba([40 * index as u8, 80, 160, 255]));
+            image.save(root.join(format!("artifacts/rgba/frame_{index}.png"))).unwrap();
+        }
+        let result = execute_unity_export(root.to_str().unwrap(), "Unity6Acceptance", "unity-6", 12.0, true).unwrap();
+        assert_eq!(result.copied_frames, 3);
+    }
+
     #[test]
     fn exports_share_one_unity_importer_without_overwriting_it() {
         let directory = tempfile::tempdir().unwrap();
