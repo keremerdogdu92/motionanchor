@@ -20,6 +20,8 @@ type Props = {
   promptPath: string;
   onPromptPathChange: (path: string) => void;
   onError: (message: string) => void;
+  mode?: "advanced" | "guided";
+  onSaved?: () => void;
 };
 
 type BoxHandle = "nw" | "ne" | "se" | "sw";
@@ -53,11 +55,11 @@ function resizeBox(box: Box, handle: BoxHandle, point: Point, width: number, hei
   ];
 }
 
-export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onError }: Props) {
+export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onError, mode = "advanced", onSaved }: Props) {
   const [document, setDocument] = useState<PromptDocument>(EMPTY_DOCUMENT);
   const [selectedFrame, setSelectedFrame] = useState(0);
   const [preview, setPreview] = useState<EditorFramePreview | null>(null);
-  const [tool, setTool] = useState<EditorTool>("box");
+  const [tool, setTool] = useState<EditorTool>(mode === "guided" ? "positive" : "box");
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState<Point>([0, 0]);
   const [draftBox, setDraftBox] = useState<Box | null>(null);
@@ -81,6 +83,10 @@ export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onErr
     if (!selectedAnchor) return;
     void loadFrame(selectedAnchor.frame_index);
   }, [framesPath, selectedAnchor?.frame_index]);
+
+  useEffect(() => {
+    if (mode === "guided" && framesPath) void loadFrame(0);
+  }, [mode, framesPath]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -142,6 +148,7 @@ export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onErr
     try {
       await invoke("save_prompt_document", { path: promptPath, document });
       onPromptPathChange(promptPath);
+      onSaved?.();
       onError("");
     } catch (cause) {
       onError(String(cause));
@@ -270,6 +277,7 @@ export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onErr
     setDraftBox(null);
   }
 
+  const promptReady = Boolean(selectedAnchor && (selectedAnchor.box || selectedAnchor.positive.length > 0));
   const activeBox = draftBox ?? selectedAnchor?.box ?? null;
   const handles: Array<[BoxHandle, Point]> = activeBox ? [
     ["nw", [activeBox[0], activeBox[1]]],
@@ -281,22 +289,22 @@ export function PromptEditor({ framesPath, promptPath, onPromptPathChange, onErr
   return (
     <section className="panel prompt-editor-panel">
       <div className="panel-heading prompt-editor-heading">
-        <div><p className="eyebrow">Milestone 1</p><h2>Visual Prompt Editor</h2></div>
+        <div><p className="eyebrow">{mode === "guided" ? "Character selection" : "Advanced prompt editing"}</p><h2>{mode === "guided" ? "Click the character" : "Visual Prompt Editor"}</h2>{mode === "guided" && <p className="muted">Add one or more green points on the character. Red points exclude background or nearby objects.</p>}</div>
         <div className="prompt-file-actions">
-          <button type="button" className="secondary" onClick={importDocument} disabled={busy}>Import JSON</button>
-          <button type="button" onClick={exportDocument} disabled={busy}>Export JSON</button>
+          {mode === "advanced" && <button type="button" className="secondary" onClick={importDocument} disabled={busy}>Import JSON</button>}
+          <button type="button" onClick={exportDocument} disabled={busy || !promptReady}>{mode === "guided" ? "Save character selection" : "Export JSON"}</button>
         </div>
       </div>
 
-      <div className="prompt-editor-layout">
-        <aside className="anchor-sidebar">
+      <div className={`prompt-editor-layout ${mode === "guided" ? "prompt-editor-layout--guided" : ""}`}>
+        {mode === "advanced" && <aside className="anchor-sidebar">
           <label>Object ID<input type="number" min="1" value={document.object_id} onChange={(event) => setDocument({ ...document, object_id: Math.max(1, Number(event.target.value)) })} /></label>
           <label>Anchor frame<span className="anchor-frame-row"><input type="number" min="0" value={selectedFrame} onChange={(event) => setSelectedFrame(Math.max(0, Number(event.target.value)))} /><button type="button" className="secondary" onClick={() => loadFrame(selectedFrame)} disabled={busy}>Load</button></span></label>
           <div className="anchor-actions"><button type="button" className="secondary" onClick={addAnchor}>Add anchor</button><button type="button" className="danger" onClick={removeSelectedAnchor} disabled={document.anchors.length <= 1}>Remove</button></div>
           <div className="anchor-list" aria-label="Prompt anchors">
             {sortedAnchors.map((anchor) => <button key={anchor.frame_index} type="button" className={anchor.frame_index === selectedFrame ? "anchor-active" : "secondary"} onClick={() => setSelectedFrame(anchor.frame_index)}>Frame {anchor.frame_index}<small>{anchor.positive.length}+ / {anchor.negative.length}-</small></button>)}
           </div>
-        </aside>
+        </aside>}
 
         <div className="editor-workspace">
           <div className="editor-toolbar" role="toolbar" aria-label="Prompt tools">

@@ -50,3 +50,16 @@
   .editor-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .zoom-row { align-items: stretch; flex-direction: column; }
 }
+
+.prompt-editor-layout--guided {
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 18px;
+}
+.prompt-editor-layout--guided .editor-workspace {
+  min-width: 0;
+}
+.guided-setup .prompt-editor-panel {
+  margin-top: 18px;
+  background: #0d0f17;
+  box-shadow: none;
+}

@@ -304,10 +304,14 @@ function App() {
 
   useEffect(() => {
     if (job?.status !== "completed" || job.operation !== "media.extract_frames") return;
-    invoke<FramePreview[]>("get_frame_previews", { outputPath: extractionOutput, count: 8 })
-      .then(setPreviews)
-      .catch((cause) => setError(String(cause)));
-  }, [job?.status, job?.operation, extractionOutput]);
+    Promise.all([
+      invoke<FramePreview[]>("get_frame_previews", { outputPath: extractionOutput, count: 8 }),
+      activeProject ? invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: activeProject.workspacePath }) : Promise.resolve(null),
+    ]).then(([loadedPreviews, status]) => {
+      setPreviews(loadedPreviews);
+      if (status) setWorkspaceStatus(status);
+    }).catch((cause) => setError(String(cause)));
+  }, [job?.status, job?.operation, extractionOutput, activeProject?.id]);
 
 
   useEffect(() => {
@@ -464,19 +468,28 @@ function App() {
     }
   }
 
-  async function importGuidedPrompt() {
-    if (!activeProject) return;
-    const selected = await open({ multiple: false, directory: false, filters: [{ name: "Prompt JSON", extensions: ["json"] }] });
-    if (typeof selected !== "string") return;
+  async function prepareGuidedFrames() {
+    if (!activeProject || !workspaceStatus?.extractionReady) return;
     setBusy(true);
     setError("");
     try {
-      const status = await invoke<WorkspaceReadiness>("import_project_prompt", { workspacePath: activeProject.workspacePath, sourcePath: selected });
-      setWorkspaceStatus(status);
+      const accepted = await invoke<JobAccepted>("start_frame_extraction_job", { sourcePath, outputPath: extractionOutput });
+      setPreviews([]);
+      setActiveRequest({ operation: "media.extract_frames", sourcePath, outputPath: extractionOutput });
+      setJob(queuedJob(accepted));
     } catch (cause) {
       setError(String(cause));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function handleGuidedPromptSaved() {
+    if (!activeProject) return;
+    try {
+      setWorkspaceStatus(await invoke<WorkspaceReadiness>("workspace_readiness", { workspacePath: activeProject.workspacePath }));
+    } catch (cause) {
+      setError(String(cause));
     }
   }
 
@@ -499,6 +512,10 @@ function App() {
     setBusy(true); setError("");
     try {
       const requested: PipelineSettings = { sourcePath, extractionOutput, motionOutput, segmentationOutput, promptPath, maxFrames: maxMotionFrames, featherRadius, defringe };
+      if (workspaceStatus.framesHaveFiles && !workspaceStatus.rgbaHasFiles) {
+        await launchPipelineStage(requested, "selecting");
+        return;
+      }
       const plan = await invoke<PipelineCachePlan>("build_pipeline_cache_plan", { workspacePath: activeProject.workspacePath, settings: requested });
       setPipelineCachePlan(plan);
       if (plan.nextStage === "completed" && plan.cachedSettings) {
@@ -912,9 +929,9 @@ function App() {
           </article>
           <article className={workspaceStatus?.promptExists ? "guided-step guided-step-ready" : workspaceStatus?.sourceExists ? "guided-step guided-step-active" : "guided-step"}>
             <span className="guided-step-number">3</span>
-            <div><strong>Add character prompt</strong><p>Select the SAM 2 prompt JSON that identifies the character in the source clip.</p></div>
-            <button type="button" className={workspaceStatus?.promptExists ? "secondary" : ""} onClick={() => void importGuidedPrompt()} disabled={busy || !workspaceStatus?.sourceExists || workspaceStatus?.promptExists}>
-              {workspaceStatus?.promptExists ? "Prompt added" : "Choose prompt"}
+            <div><strong>Select the character</strong><p>Prepare the reference frame, then click the character directly inside MotionAnchor.</p></div>
+            <button type="button" className={workspaceStatus?.promptExists ? "secondary" : ""} onClick={() => void prepareGuidedFrames()} disabled={busy || !workspaceStatus?.extractionReady || workspaceStatus?.framesHaveFiles}>
+              {workspaceStatus?.promptExists ? "Character selected" : workspaceStatus?.framesHaveFiles ? "Frame ready" : "Prepare frame"}
             </button>
           </article>
           <article className={pipelineReady ? "guided-step guided-step-active guided-step-final" : "guided-step guided-step-final"}>
@@ -923,6 +940,16 @@ function App() {
             <button type="button" className="primary-action" onClick={() => void startFullPipeline()} disabled={busy || Boolean(job && !terminal) || !pipelineReady}>Create animation</button>
           </article>
         </div>
+        {workspaceStatus?.framesHaveFiles && !workspaceStatus.promptExists && (
+          <PromptEditor
+            framesPath={extractionOutput}
+            promptPath={deriveProjectWorkspacePaths(activeProject.workspacePath).promptPath}
+            onPromptPathChange={setPromptPath}
+            onError={setError}
+            mode="guided"
+            onSaved={() => void handleGuidedPromptSaved()}
+          />
+        )}
       </section>
 
       <section className="panel primary-workflow">
@@ -1101,12 +1128,19 @@ function App() {
 
       {error && <section className="alert">{error}</section>}
 
-      <PromptEditor
-        framesPath={framesPath}
-        promptPath={promptPath}
-        onPromptPathChange={setPromptPath}
-        onError={setError}
-      />
+      {workspaceStatus?.framesHaveFiles && workspaceStatus?.promptExists && (
+        <details className="advanced-workflow">
+          <summary><span>Advanced prompt editor</span><small>Edit multiple anchors, boxes, and exclusion points</small></summary>
+          <PromptEditor
+            framesPath={framesPath}
+            promptPath={promptPath}
+            onPromptPathChange={setPromptPath}
+            onError={setError}
+            mode="advanced"
+            onSaved={() => void handleGuidedPromptSaved()}
+          />
+        </details>
+      )}
 
       <section className="dashboard">
         <article className="panel metric-panel">
